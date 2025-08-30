@@ -45,6 +45,21 @@
 			path = DoItAllUITests;
 			sourceTree = "<group>";
 		};
+		D29E22D62E63651900000F8A /* Journal */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Journal;
+			sourceTree = "<group>";
+		};
+		D29E22D72E63652400000F8A /* Shopping List */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Shopping List";
+			sourceTree = "<group>";
+		};
+		D29E22D82E63653E00000F8A /* Scribble */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Scribble;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +90,9 @@
 		D23CBCA72E635A6D007F5B0A = {
 			isa = PBXGroup;
 			children = (
+				D29E22D82E63653E00000F8A /* Scribble */,
+				D29E22D72E63652400000F8A /* Shopping List */,
+				D29E22D62E63651900000F8A /* Journal */,
 				D23CBCB22E635A6E007F5B0A /* DoItAll */,
 				D23CBCC52E635A70007F5B0A /* DoItAllTests */,
 				D23CBCCF2E635A70007F5B0A /* DoItAllUITests */,
@@ -109,6 +127,9 @@
 			);
 			fileSystemSynchronizedGroups = (
 				D23CBCB22E635A6E007F5B0A /* DoItAll */,
+				D29E22D62E63651900000F8A /* Journal */,
+				D29E22D72E63652400000F8A /* Shopping List */,
+				D29E22D82E63653E00000F8A /* Scribble */,
 			);
 			name = DoItAll;
 			packageProductDependencies = (
