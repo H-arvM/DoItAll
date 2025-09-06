@@ -11,9 +11,11 @@ import CoreData
 class JournalEntryViewModel: ObservableObject {
     @Published var journalText: String = ""
     private var viewContext: NSManagedObjectContext
+    public var settingsManager: SettingsManager
 
-    init(context: NSManagedObjectContext) {
+    init(context: NSManagedObjectContext, settingsManager: SettingsManager) {
         self.viewContext = context
+        self.settingsManager = settingsManager
     }
 
     func saveJournalEntry() {
@@ -24,6 +26,7 @@ class JournalEntryViewModel: ObservableObject {
         let newEntry = Item(context: viewContext)
         newEntry.timestamp = Date()
         newEntry.journalText = journalText
+        newEntry.isHidden = settingsManager.isNewEntryHidden
 
         do {
             try viewContext.save()

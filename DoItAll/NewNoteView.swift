@@ -10,7 +10,8 @@ import SwiftUI
 struct NewNoteView: View {
     @Environment(\.managedObjectContext) private var viewContext
     let columns = [ GridItem(.flexible()), GridItem(.flexible())]
-
+    @ObservedObject var settingsManager: SettingsManager
+    
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 20) {
@@ -18,7 +19,7 @@ struct NewNoteView: View {
                     NavigationLink {
                         switch noteType {
                         case .journal:
-                            JournalEntry(context: viewContext)
+                            JournalEntry(context: viewContext, settingsManager: settingsManager)
                         case .shoppingList:
                             ShoppingListEntry()
                         case .scribblePad:

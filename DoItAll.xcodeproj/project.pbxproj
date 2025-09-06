@@ -45,6 +45,16 @@
 			path = DoItAllUITests;
 			sourceTree = "<group>";
 		};
+		D28C51882E6C9A7C00B65946 /* Resources */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		D28C518D2E6CA83500B65946 /* Settings */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Settings;
+			sourceTree = "<group>";
+		};
 		D29E22D62E63651900000F8A /* Journal */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Journal;
@@ -90,6 +100,8 @@
 		D23CBCA72E635A6D007F5B0A = {
 			isa = PBXGroup;
 			children = (
+				D28C518D2E6CA83500B65946 /* Settings */,
+				D28C51882E6C9A7C00B65946 /* Resources */,
 				D29E22D82E63653E00000F8A /* Scribble */,
 				D29E22D72E63652400000F8A /* Shopping List */,
 				D29E22D62E63651900000F8A /* Journal */,
@@ -127,6 +139,8 @@
 			);
 			fileSystemSynchronizedGroups = (
 				D23CBCB22E635A6E007F5B0A /* DoItAll */,
+				D28C51882E6C9A7C00B65946 /* Resources */,
+				D28C518D2E6CA83500B65946 /* Settings */,
 				D29E22D62E63651900000F8A /* Journal */,
 				D29E22D72E63652400000F8A /* Shopping List */,
 				D29E22D82E63653E00000F8A /* Scribble */,

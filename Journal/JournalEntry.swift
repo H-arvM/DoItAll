@@ -10,19 +10,16 @@ import CoreData
 
 struct JournalEntry: View {
     @Environment(\.dismiss) private var dismiss
-    
-    // Inject the ViewModel with the Core Data context
     @StateObject private var viewModel: JournalEntryViewModel
-
     @FocusState private var isJournalTextFocused: Bool
+    @State private var showingSettings = false
 
-    // Custom initializer to pass the context to the ViewModel
-    init(context: NSManagedObjectContext) {
-        _viewModel = StateObject(wrappedValue: JournalEntryViewModel(context: context))
+    init(context: NSManagedObjectContext, settingsManager: SettingsManager) {
+        _viewModel = StateObject(wrappedValue: JournalEntryViewModel(context: context, settingsManager: settingsManager))
     }
 
     var body: some View {
-        VStack {
+        ZStack(alignment: .bottomLeading) {
             TextEditor(text: $viewModel.journalText)
                 .focused($isJournalTextFocused)
                 .padding()
@@ -31,21 +28,31 @@ struct JournalEntry: View {
                         isJournalTextFocused = true
                     }
                 }
+            
+            Button {
+                showingSettings.toggle()
+            } label: {
+                Image(systemName: "gearshape.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundColor(.gray)
+                    .padding()
+                    .shadow(radius: 10)
+            }
+            .padding(.leading, 10)
+            .padding(.bottom, 10)
         }
-        .navigationTitle("New Journal Entry")
+        .navigationTitle(StringsStore.JournalEntry.navTitle)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button("Back") {
-                    dismiss()
-                }
-            }
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Save") {
+                Button(StringsStore.JournalEntry.saveTitle) {
                     viewModel.saveJournalEntry()
                     dismiss()
                 }
             }
+        }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView(settingsManager: viewModel.settingsManager, sourceView: "Journal View")
         }
     }
 }
