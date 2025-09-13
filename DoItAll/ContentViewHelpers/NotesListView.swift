@@ -16,9 +16,8 @@ public struct NotesListView: View {
     public var body: some View {
         List {
             ForEach(items) { item in
-                // The destination view now displays the full text of the item.
                 NavigationLink {
-                    Text(settingsManager.isNewEntryHidden ? "" : (item.journalText ?? "Hidden ya fuck"))
+                    ViewNoteView(item: item)
                 } label: {
                     VStack(alignment: .leading) {
                         // TODO: Add back in later and make it prettier. Theres value in having the timestamp and will need formatting too
@@ -36,7 +35,6 @@ public struct NotesListView: View {
                                 .background(Color.purple)
                                 .cornerRadius(8)
                         } else if !settingsManager.hidePreview {
-                            // If not hidden, apply the global preview setting
                             Text(item.journalText ?? StringsStore.ContentView.awrite)
                                 .lineLimit(1)
                         }
