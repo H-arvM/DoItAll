@@ -12,12 +12,12 @@ struct FloatingPlusButton: View {
     
     var body: some View {
         NavigationLink(destination: NewNoteView(settingsManager: settingsManager)) {
-            Image(systemName: "plus.circle.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.purple)
+            Image(systemName: "plus")
+                .font(.system(size: 25))
                 .padding()
-                .shadow(radius: 10)
+                .shadow(radius: 5)
         }
+        .glassEffect()
         .padding(.leading, 10)
         .padding(.bottom, 10)
     }

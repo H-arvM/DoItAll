@@ -10,6 +10,7 @@ import CoreData
 import UIKit
 import PhotosUI
 import _PhotosUI_SwiftUI
+import MusicKit
 
 class JournalEntryViewModel: ObservableObject {
     private var viewContext: NSManagedObjectContext
@@ -20,6 +21,8 @@ class JournalEntryViewModel: ObservableObject {
     @Published var selectedPhotos: [PhotosPickerItem] = []
     @Published var loadedImages: [UIImage] = []
     @Published var loadedImage: UIImage?
+    @Published var selectedSong: Song?
+    
 
     init(context: NSManagedObjectContext, item: Item? = nil, settingsManager: SettingsManager) {
         self.viewContext = context
@@ -27,7 +30,6 @@ class JournalEntryViewModel: ObservableObject {
         self.item = item
         if let item = item {
             self.journalText = item.journalText ?? ""
-            // Load existing images from Core Data if available
             if let imageDataArray = item.imageData {
                 self.loadedImages = imageDataArray.compactMap { UIImage(data: $0) }
             }

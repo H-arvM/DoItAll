@@ -17,6 +17,7 @@ struct ToolbarButtons: ToolbarContent {
             } label: {
                 Image(systemName: "slider.vertical.3")
             }
+            .glassEffect()
         }
         
         ToolbarItem(placement: .navigationBarTrailing) {
