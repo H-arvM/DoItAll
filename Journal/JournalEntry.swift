@@ -27,6 +27,16 @@ struct JournalEntry: View {
         GeometryReader { geometry in
             ZStack(alignment: .bottom){
                 VStack(spacing: 0) {
+                    TextEditor(text: $viewModel.journalHeader)
+                        .frame(maxHeight: 40)
+                        .font(.title)
+                        .padding()
+                        .border(Color.gray, width: 1)
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                                isJournalTextFocused = true
+                            }
+                        }
                     TextEditor(text: $viewModel.journalText)
                         .focused($isJournalTextFocused)
                         .frame(maxHeight: .infinity)
@@ -67,7 +77,7 @@ struct JournalEntry: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
                 .padding(.leading, 10)
                 .padding(.bottom, 10)
-                                
+                
                 HStack(spacing: 15) {
                     if showingActionButtons {
                         PhotosPicker(selection: $viewModel.selectedPhotos, maxSelectionCount: 10, matching: .images) {
@@ -114,6 +124,28 @@ struct JournalEntry: View {
                 .padding(.trailing, 20)
                 .padding(.bottom, 10)
             }
+            
+            if viewModel.isShowingEmptyWarning {
+                // TODO: Tidy up presenation of this later
+                Text("Cannot save empty entry. Fill it out")
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.red.opacity(0.8))
+                    .cornerRadius(10)
+                    .shadow(radius: 5)
+                    .zIndex(2)
+                    .padding(.top, 5)
+                    .frame(maxHeight: .infinity, alignment: .top)
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                            withAnimation {
+                                viewModel.isShowingEmptyWarning = false
+                            }
+                        }
+                    }
+                    .transition(.slide)
+            }
         }
         .navigationTitle(StringsStore.JournalEntry.navTitle)
         .navigationBarTitleDisplayMode(.inline)
@@ -121,7 +153,9 @@ struct JournalEntry: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(StringsStore.JournalEntry.saveTitle) {
                     viewModel.saveJournalEntry()
-                    dismiss()
+                    if !viewModel.isShowingEmptyWarning {
+                        dismiss()
+                    }
                 }
             }
         }

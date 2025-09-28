@@ -11,7 +11,7 @@ struct FloatingPlusButton: View {
     @ObservedObject var settingsManager: SettingsManager
     
     var body: some View {
-        NavigationLink(destination: NewNoteView(settingsManager: settingsManager)) {
+        NavigationLink(destination: NoteSelectionView(settingsManager: settingsManager)) {
             Image(systemName: "plus")
                 .font(.system(size: 25))
                 .padding()

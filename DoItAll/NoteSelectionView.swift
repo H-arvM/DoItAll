@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NewNoteView: View {
+struct NoteSelectionView: View {
     @Environment(\.managedObjectContext) private var viewContext
     let columns = [ GridItem(.flexible()), GridItem(.flexible())]
     @ObservedObject var settingsManager: SettingsManager
