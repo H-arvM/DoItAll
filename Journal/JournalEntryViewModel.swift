@@ -11,13 +11,13 @@ import UIKit
 import PhotosUI
 import _PhotosUI_SwiftUI
 import MusicKit
-
+import SwiftUI
 
 class JournalEntryViewModel: ObservableObject {
     private var viewContext: NSManagedObjectContext
     public var settingsManager: SettingsManager
     private var item: Item?
-
+    
     @Published var journalText: String = ""
     @Published var journalHeader: String = ""
     @Published var selectedPhotos: [PhotosPickerItem] = []
@@ -25,7 +25,7 @@ class JournalEntryViewModel: ObservableObject {
     @Published var loadedImage: UIImage?
     @Published var selectedSong: Song?
     @Published var isShowingEmptyWarning: Bool = false
-
+    
     init(context: NSManagedObjectContext, item: Item? = nil, settingsManager: SettingsManager) {
         self.viewContext = context
         self.settingsManager = settingsManager
@@ -38,7 +38,7 @@ class JournalEntryViewModel: ObservableObject {
             }
         }
     }
-
+    
     func saveJournalEntry() {
         let isTextEmpty = journalText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         let isHeaderEmpty = journalHeader.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -62,7 +62,7 @@ class JournalEntryViewModel: ObservableObject {
         entryToSave.songTitle = selectedSong?.title
         entryToSave.artistName = selectedSong?.artistName
         entryToSave.albumArtURL = selectedSong?.artwork?.url(width: 200, height: 200)?.absoluteString
-
+        
         do {
             try viewContext.save()
             isShowingEmptyWarning = false
@@ -70,4 +70,5 @@ class JournalEntryViewModel: ObservableObject {
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
-    }}
+    }
+}

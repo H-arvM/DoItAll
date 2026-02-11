@@ -8,6 +8,7 @@
 import SwiftUI
 import CoreData
 import PhotosUI
+import AVFoundation
 
 struct JournalEntry: View {
     @Environment(\.dismiss) private var dismiss
@@ -16,6 +17,18 @@ struct JournalEntry: View {
     @State private var showingSettings = false
     @State private var showingActionButtons = false
     @State private var showingMusicPicker = false
+    @State private var showingVoiceNoteRecorder = false
+    @State private var voiceNoteURL: URL?
+    
+    @State private var showingFontStylePicker = false
+    @State private var fontSize: CGFloat = 18
+    @State private var fontColor: Color = .primary
+    @State private var fontName: String = "System"
+    @State private var fontWeight: Font.Weight = .regular
+    @State private var settingsExpanded = false
+    
+    /// Called after successful save and dismiss. Use this in the presenting view to return to the main ContentView.
+    var onSaveAndReturnToRoot: (() -> Void)? = nil
     
     let gridColumns = [GridItem(.adaptive(minimum: 100, maximum: 200), spacing: 10)]
     
@@ -27,21 +40,37 @@ struct JournalEntry: View {
         GeometryReader { geometry in
             ZStack(alignment: .bottom){
                 VStack(spacing: 0) {
-                    TextEditor(text: $viewModel.journalHeader)
-                        .frame(maxHeight: 40)
-                        .font(.title)
-                        .padding()
-                        .border(Color.gray, width: 1)
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-                                isJournalTextFocused = true
-                            }
+                    ZStack(alignment: .leading) {
+                        if viewModel.journalHeader.isEmpty {
+                            Text("Enter title")
+                                .foregroundColor(Color.gray)
+                                .padding(.horizontal, 8)
                         }
+                        TextField("", text: $viewModel.journalHeader)
+                            .font(.title)
+                            .padding(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
+                            .background(Color.clear)
+                            .submitLabel(.done)
+                            .onAppear {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                                    isJournalTextFocused = true
+                                }
+                            }
+                    }
+                    .frame(height: 50)
+                    .padding(.horizontal)
+                                        
+                    Rectangle()
+                        .fill(Color.gray)
+                        .frame(height: 1)
+                        .padding(.horizontal)
+                    
                     TextEditor(text: $viewModel.journalText)
+                        .font(fontForName(fontName, size: fontSize, weight: fontWeight))
+                        .foregroundColor(fontColor)
                         .focused($isJournalTextFocused)
                         .frame(maxHeight: .infinity)
                         .padding()
-                        .border(Color.gray, width: 1)
                         .onAppear {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
                                 isJournalTextFocused = true
@@ -63,22 +92,28 @@ struct JournalEntry: View {
                         }
                         .frame(height: 160)
                     }
+                    
+                    if let url = voiceNoteURL {
+                        VoiceNotePlayerBar(audioURL: url)
+                            .padding([.leading, .trailing, .top], 8)
+                    }
                 }
                 
-                // Settings Button
+                // Settings Button - Bottom Left
                 Button {
                     showingSettings.toggle()
                 } label: {
                     Image(systemName: "gearshape.circle")
-                        .font(.system(size: 40))
+                        .font(.system(size: 30))
                         .padding(10)
+                        .shadow(radius: 5)
                 }
-                .glassEffect()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
-                .padding(.leading, 10)
+                .padding(.leading, 20)
                 .padding(.bottom, 10)
                 
-                HStack(spacing: 15) {
+                // Action Buttons - Bottom Right
+                VStack(spacing: 15) {
                     if showingActionButtons {
                         PhotosPicker(selection: $viewModel.selectedPhotos, maxSelectionCount: 10, matching: .images) {
                             Image(systemName: "photo.circle")
@@ -88,9 +123,8 @@ struct JournalEntry: View {
                                 .shadow(radius: 5)
                         }
                         .glassEffect()
-                        .padding(.trailing, 5)
                         .padding(.bottom, 10)
-                        .transition(.scale.combined(with: .opacity))
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                         
                         // Music Picker Button
                         Button {
@@ -103,9 +137,22 @@ struct JournalEntry: View {
                                 .shadow(radius: 5)
                         }
                         .glassEffect()
-                        .transition(.scale.combined(with: .opacity))
-                        .padding(.trailing, 5)
                         .padding(.bottom, 10)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        
+                        // Voice Note Recorder Button
+                        Button {
+                            showingVoiceNoteRecorder.toggle()
+                        } label: {
+                            Image(systemName: "mic.circle")
+                                .font(.system(size: 25))
+                                .padding(10)
+                                .clipShape(Circle())
+                                .shadow(radius: 5)
+                        }
+                        .glassEffect()
+                        .padding(.bottom, 10)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
                     
                     Button {
@@ -114,7 +161,7 @@ struct JournalEntry: View {
                         }
                     } label: {
                         Image(systemName: "plus.circle")
-                            .font(.system(size: 40))
+                            .font(.system(size: 30))
                             .padding(10)
                             .shadow(radius: 5)
                     }
@@ -147,14 +194,19 @@ struct JournalEntry: View {
                     .transition(.slide)
             }
         }
-        .navigationTitle(StringsStore.JournalEntry.navTitle)
-        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                Button {
+                    showingFontStylePicker = true
+                } label: {
+                    Image(systemName: "pencil.and.scribble")
+                }
+                
                 Button(StringsStore.JournalEntry.saveTitle) {
                     viewModel.saveJournalEntry()
                     if !viewModel.isShowingEmptyWarning {
                         dismiss()
+                        onSaveAndReturnToRoot?()
                     }
                 }
             }
@@ -164,6 +216,12 @@ struct JournalEntry: View {
         }
         .sheet(isPresented: $showingMusicPicker) {
             MusicSelectionView(selectedSong: $viewModel.selectedSong)
+        }
+        .sheet(isPresented: $showingVoiceNoteRecorder) {
+            VoiceNoteRecorderView(audioURL: $voiceNoteURL)
+        }
+        .sheet(isPresented: $showingFontStylePicker) {
+            FontStylePickerView(fontSize: $fontSize, fontColor: $fontColor, fontName: $fontName, fontWeight: $fontWeight)
         }
         .task(id: viewModel.selectedPhotos) {
             for photo in viewModel.selectedPhotos {
@@ -175,8 +233,18 @@ struct JournalEntry: View {
             }
         }
     }
+    
+    private func fontForName(_ name: String, size: CGFloat, weight: Font.Weight) -> Font {
+        switch name {
+        case "Arial": return .custom("Arial", size: size).weight(weight)
+        case "Georgia": return .custom("Georgia", size: size).weight(weight)
+        case "Courier": return .custom("Courier", size: size).weight(weight)
+        default: return .system(size: size, weight: weight)
+        }
+    }
 }
 
 //#Preview {
 //    JournalEntry(context: )
 //}
+

@@ -23,7 +23,9 @@ struct DisplayEntryView: View {
     @State private var journalImages: [UIImage]
     @State private var imageContainerHeight: CGFloat = Self.kCompactHeight
     
-    init(item: Item) {
+    var onEdit: (() -> Void)? = nil
+    
+    init(item: Item, onEdit: (() -> Void)? = nil) {
         self.item = item
         _journalText = State(initialValue: item.journalText ?? "")
         _header = State(initialValue: item.journalHeader ?? "")
@@ -33,6 +35,7 @@ struct DisplayEntryView: View {
         } else {
             _journalImages = State(initialValue: [])
         }
+        self.onEdit = onEdit
     }
     
     var body: some View {
@@ -65,7 +68,6 @@ struct DisplayEntryView: View {
             }
         }
         .navigationTitle($header)
-        .navigationBarTitleDisplayMode(.inline)
     }
     
     var imageScale: CGFloat {

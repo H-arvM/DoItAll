@@ -13,47 +13,60 @@ struct NoteSelectionView: View {
     @ObservedObject var settingsManager: SettingsManager
     
     var body: some View {
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: 20) {
-                ForEach(NoteType.allCases) { noteType in
-                    NavigationLink {
-                        switch noteType {
-                        case .journal:
-                            JournalEntry(context: viewContext, settingsManager: settingsManager)
-                        case .shoppingList:
-                            ShoppingListEntry()
-                        case .scribblePad:
-                            ScribbleEntry()
+        GeometryReader { geometry in
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 20) {
+                    ForEach(NoteType.allCases) { noteType in
+                        NavigationLink {
+                            switch noteType {
+                            case .journal:
+                                JournalEntry(context: viewContext, settingsManager: settingsManager)
+                            case .shoppingList:
+                                ShoppingListEntry()
+                            case .scribblePad:
+                                ScribbleEntry()
+                            case .freeForm:
+                                EmptyView()
+                            case .lifeAdmin:
+                                EmptyView()
+                            case .bucketList:
+                                EmptyView()
+                            case .favouritesList:
+                                EmptyView()
+                            }
+                        } label: {
+                            VStack(spacing: 10) {
+                                Image(systemName: noteType.iconName)
+                                    .font(.system(size: geometry.size.width * 0.1))
+                                    .foregroundColor(.white)
+                                    .frame(width: geometry.size.width * 0.2, height: geometry.size.width * 0.2)
+                                    .background(Color.accentColor)
+                                    .clipShape(Circle())
+                                Text(noteType.title)
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                    .multilineTextAlignment(.center)
+                                    .lineLimit(2)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: geometry.size.width * 0.4)
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .cornerRadius(12)
+                            .shadow(radius: 1)
                         }
-                    } label: {
-                        VStack(spacing: 10) {
-                            Image(systemName: noteType.iconName)
-                                .font(.largeTitle)
-                                .imageScale(.large)
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(Color.accentColor)
-                                .clipShape(Circle())
-                            Text(noteType.title)
-                                .font(.headline)
-                                .foregroundColor(.primary)
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(12)
-                        .shadow(radius: 5)
                     }
                 }
+                .padding()
             }
-            .padding()
         }
         .navigationTitle("New Note")
     }
 }
 
 enum NoteType: String, CaseIterable, Identifiable {
-    case journal, shoppingList, scribblePad
+    case journal, shoppingList, scribblePad, freeForm, lifeAdmin, bucketList, favouritesList
 
     var id: String { self.rawValue }
 
@@ -65,6 +78,14 @@ enum NoteType: String, CaseIterable, Identifiable {
             return "Shopping List"
         case .scribblePad:
             return "Scribble Pad"
+        case .freeForm:
+            return "Freeform"
+        case .lifeAdmin:
+            return "Life Admin"
+        case .bucketList:
+            return "Bucket List"
+        case .favouritesList:
+            return "Favouries"
         }
     }
 
@@ -76,6 +97,14 @@ enum NoteType: String, CaseIterable, Identifiable {
             return "list.bullet"
         case .scribblePad:
             return "scribble"
+        case .freeForm:
+            return "brain.head.profile"
+        case .lifeAdmin:
+            return "figure.wave"
+        case .bucketList:
+            return "list.clipboard"
+        case .favouritesList:
+            return "bolt.heart"
         }
     }
 }
