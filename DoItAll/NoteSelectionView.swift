@@ -20,18 +20,16 @@ struct NoteSelectionView: View {
                         NavigationLink {
                             switch noteType {
                             case .journal:
-                                JournalEntry(context: viewContext, settingsManager: settingsManager)
+                                JournalEntryView(context: viewContext, settingsManager: settingsManager)
                             case .shoppingList:
                                 ShoppingListEntry()
                             case .scribblePad:
                                 ScribbleEntry()
                             case .freeForm:
-                                EmptyView()
+                                FreeFormView()
                             case .lifeAdmin:
-                                EmptyView()
-                            case .bucketList:
-                                EmptyView()
-                            case .favouritesList:
+                                LifeAdminView()
+                            case .generalList:
                                 EmptyView()
                             }
                         } label: {
@@ -66,7 +64,7 @@ struct NoteSelectionView: View {
 }
 
 enum NoteType: String, CaseIterable, Identifiable {
-    case journal, shoppingList, scribblePad, freeForm, lifeAdmin, bucketList, favouritesList
+    case journal, shoppingList, scribblePad, freeForm, lifeAdmin, generalList
 
     var id: String { self.rawValue }
 
@@ -82,10 +80,9 @@ enum NoteType: String, CaseIterable, Identifiable {
             return "Freeform"
         case .lifeAdmin:
             return "Life Admin"
-        case .bucketList:
-            return "Bucket List"
-        case .favouritesList:
-            return "Favouries"
+        case .generalList:
+            return "List"
+       
         }
     }
 
@@ -101,10 +98,8 @@ enum NoteType: String, CaseIterable, Identifiable {
             return "brain.head.profile"
         case .lifeAdmin:
             return "figure.wave"
-        case .bucketList:
+        case .generalList:
             return "list.clipboard"
-        case .favouritesList:
-            return "bolt.heart"
         }
     }
 }
