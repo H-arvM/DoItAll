@@ -30,7 +30,7 @@ struct NoteSelectionView: View {
                             case .lifeAdmin:
                                 LifeAdminView()
                             case .generalList:
-                                EmptyView()
+                                ListView()
                             }
                         } label: {
                             VStack(spacing: 10) {
@@ -82,7 +82,6 @@ enum NoteType: String, CaseIterable, Identifiable {
             return "Life Admin"
         case .generalList:
             return "List"
-       
         }
     }
 

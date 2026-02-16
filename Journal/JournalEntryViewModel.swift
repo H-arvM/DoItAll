@@ -13,6 +13,7 @@ import _PhotosUI_SwiftUI
 import MusicKit
 import SwiftUI
 
+@MainActor
 class JournalEntryViewModel: ObservableObject {
     private var viewContext: NSManagedObjectContext
     public var settingsManager: SettingsManager

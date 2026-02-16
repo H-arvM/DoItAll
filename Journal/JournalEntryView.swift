@@ -26,9 +26,7 @@ struct JournalEntryView: View {
     @State private var fontName: String = "System"
     @State private var fontWeight: Font.Weight = .regular
     @State private var settingsExpanded = false
-    
-    @State private var hueRotation: Double = 0
-    
+        
     /// Called after successful save and dismiss. Use this in the presenting view to return to the main ContentView.
     var onSaveAndReturnToRoot: (() -> Void)? = nil
     
@@ -43,7 +41,7 @@ struct JournalEntryView: View {
             ZStack(alignment: .bottom){
                 VStack(spacing: 0) {
                     headerEntryView
-                    pulsingDividerBar
+                    PulsingDividerBar()
                     journalEntryView
                     
                     if !viewModel.loadedImages.isEmpty {
@@ -132,28 +130,6 @@ struct JournalEntryView: View {
         }
         .frame(height: 50)
         .padding(.horizontal)
-    }
-    
-    private var pulsingDividerBar: some View {
-        Rectangle()
-            .fill(
-                LinearGradient(
-                    colors: [.red, .orange, .yellow, .green, .blue, .purple, .red],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
-            .frame(height: 1)
-            .padding(.horizontal, 16)
-            .hueRotation(Angle(degrees: hueRotation))
-            .onAppear {
-                withAnimation(
-                    .linear(duration: 10)
-                    .repeatForever(autoreverses: false)
-                ) {
-                    hueRotation = 360
-                }
-            }
     }
     
     private var journalEntryView: some View {

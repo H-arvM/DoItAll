@@ -8,6 +8,7 @@
 import Foundation
 import UserNotifications
 
+@MainActor
 class SettingsManager: ObservableObject {
     @Published var hidePreview: Bool = false
     @Published var emptyBool: Bool = false
