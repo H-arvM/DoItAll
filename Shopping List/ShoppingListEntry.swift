@@ -92,11 +92,13 @@ struct ShoppingListEntry: View {
         .navigationTitle("Shopping List")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Save") {
-                    viewModel.saveToCoreData()
-                }
+                AnimatedActionButton(
+                    systemImage: "plus.circle",
+                    action: viewModel.saveToCoreData
+                )
             }
         }
+    
         .sheet(isPresented: $showingSettings) {
             ShoppingListSettingsView()
                 .presentationDetents([.fraction(0.5)])

@@ -8,36 +8,20 @@
 import SwiftUI
 
 struct FreeFormView: View {
-    @State private var text: String = ""
+    @StateObject private var viewModel = FreeFormViewModel()
     @FocusState private var isTextFieldFocused: Bool
     
     var body: some View {
         NavigationStack {
             ZStack {
-                // Subtle background
                 Color(uiColor: .systemGroupedBackground)
                     .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
-                    // Main text editor
-                    TextEditor(text: $text)
-                        .focused($isTextFieldFocused)
-                        .font(.body)
-                        .scrollContentBackground(.hidden)
-                        .padding()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color.clear)
+                    textEditorSection
                     
-                    // Subtle word count footer
-                    if !text.isEmpty {
-                        HStack {
-                            Text("\(wordCount) words")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        .padding(.bottom, 8)
+                    if !viewModel.text.isEmpty {
+                        wordCountFooter
                     }
                 }
             }
@@ -46,23 +30,42 @@ struct FreeFormView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        // TODO: Save to CoreData
-                        print("Save tapped")
+                        viewModel.saveEntry()
                     } label: {
                         Text("Save")
                             .fontWeight(.medium)
                     }
+                    .disabled(viewModel.text.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
             .onAppear {
-                isTextFieldFocused = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    isTextFieldFocused = true
+                }
             }
         }
     }
     
-    private var wordCount: Int {
-        let words = text.split(whereSeparator: \.isWhitespace)
-        return words.count
+    private var textEditorSection: some View {
+        TextEditor(text: $viewModel.text)
+            .focused($isTextFieldFocused)
+            .font(.body)
+            .scrollContentBackground(.hidden)
+            .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.clear)
+    }
+    
+    private var wordCountFooter: some View {
+        HStack {
+            Text("\(viewModel.wordCount) words")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Spacer()
+        }
+        .padding(.horizontal)
+        .padding(.bottom, 8)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.wordCount)
     }
 }
 
