@@ -65,6 +65,11 @@
 			path = GeneralList;
 			sourceTree = "<group>";
 		};
+		D26D48482F438A74009575A7 /* DisplayEntryView */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = DisplayEntryView;
+			sourceTree = "<group>";
+		};
 		D28C51882E6C9A7C00B65946 /* Resources */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Resources;
@@ -120,6 +125,7 @@
 		D23CBCA72E635A6D007F5B0A = {
 			isa = PBXGroup;
 			children = (
+				D26D48482F438A74009575A7 /* DisplayEntryView */,
 				D26D483B2F43553A009575A7 /* GeneralList */,
 				D25A554B2F3E3E6100BEC4A3 /* CommonUI */,
 				D25A55382F3E256F00BEC4A3 /* LifeAdmin */,
@@ -167,6 +173,7 @@
 				D25A55382F3E256F00BEC4A3 /* LifeAdmin */,
 				D25A554B2F3E3E6100BEC4A3 /* CommonUI */,
 				D26D483B2F43553A009575A7 /* GeneralList */,
+				D26D48482F438A74009575A7 /* DisplayEntryView */,
 				D28C51882E6C9A7C00B65946 /* Resources */,
 				D28C518D2E6CA83500B65946 /* Settings */,
 				D29E22D62E63651900000F8A /* Journal */,
