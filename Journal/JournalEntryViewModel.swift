@@ -41,29 +41,32 @@ class JournalEntryViewModel: ObservableObject {
     }
     
     func saveJournalEntry() {
+        // Validate that there's something to save
         let isTextEmpty = journalText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         let isHeaderEmpty = journalHeader.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         let hasNoImages = loadedImages.isEmpty
         let hasNoSong = selectedSong == nil
-        
-        guard !isTextEmpty || !hasNoImages || !hasNoSong || !isHeaderEmpty else {
+
+        guard !(isTextEmpty && isHeaderEmpty && hasNoImages && hasNoSong) else {
             isShowingEmptyWarning = true
             return
         }
-        
-        let entryToSave = item ?? Item(context: viewContext)
-        entryToSave.timestamp = Date()
-        entryToSave.journalText = journalText
-        entryToSave.journalHeader = journalHeader
-        entryToSave.isHidden = settingsManager.isNewEntryHidden
-        
-        entryToSave.imageData = loadedImages.compactMap { $0.pngData() } as? NSObject as? [Data]
-        
-        entryToSave.songID = selectedSong?.id.rawValue
-        entryToSave.songTitle = selectedSong?.title
-        entryToSave.artistName = selectedSong?.artistName
-        entryToSave.albumArtURL = selectedSong?.artwork?.url(width: 200, height: 200)?.absoluteString
-        
+
+        let entry = item ?? Item(context: viewContext)
+        entry.timestamp = Date()
+        entry.journalText = journalText
+        entry.journalHeader = journalHeader
+        entry.isHidden = settingsManager.isNewEntryHidden
+
+        // Store images as Data array if available
+        entry.imageData = loadedImages.compactMap { $0.pngData() } as? NSObject as? [Data]
+
+        // Store MusicKit metadata if available
+        entry.songID = selectedSong?.id.rawValue
+        entry.songTitle = selectedSong?.title
+        entry.artistName = selectedSong?.artistName
+        entry.albumArtURL = selectedSong?.artwork?.url(width: 200, height: 200)?.absoluteString
+
         do {
             try viewContext.save()
             isShowingEmptyWarning = false
@@ -73,3 +76,4 @@ class JournalEntryViewModel: ObservableObject {
         }
     }
 }
+

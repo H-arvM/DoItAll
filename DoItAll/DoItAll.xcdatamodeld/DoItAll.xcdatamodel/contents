@@ -4,9 +4,12 @@
         <attribute name="albumArtURL" optional="YES" attributeType="String"/>
         <attribute name="artistName" optional="YES" attributeType="String"/>
         <attribute name="imageData" optional="YES" attributeType="Transformable" valueTransformerName="NSKeyedUnarchiveFromData" customClassName="[Data]"/>
+        <attribute name="isChecked" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="isHidden" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="journalHeader" optional="YES" attributeType="String"/>
         <attribute name="journalText" optional="YES" attributeType="String"/>
+        <attribute name="shoppingItem" optional="YES" attributeType="String"/>
+        <attribute name="shoppingItemQuantity" optional="YES" attributeType="String"/>
         <attribute name="songID" optional="YES" attributeType="String"/>
         <attribute name="songTitle" optional="YES" attributeType="String"/>
         <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>

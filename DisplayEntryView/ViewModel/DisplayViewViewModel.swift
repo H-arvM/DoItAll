@@ -16,7 +16,7 @@ class DisplayEntryViewModel: ObservableObject {
     
     private static let kCompactHeight: CGFloat = 170
     private static let kMaxImageHeight: CGFloat = 550
-    private let kCollapsedHeight: CGFloat = 30
+    private var kCollapsedHeight: CGFloat { Self.kCompactHeight }
     
     init(item: Item) {
         self.journalText = item.journalText ?? ""
@@ -44,7 +44,7 @@ class DisplayEntryViewModel: ObservableObject {
     }
     
     var isImageContainerVisible: Bool {
-        imageContainerHeight > kCollapsedHeight + 10
+        true
     }
     
     func updateImageContainerHeight(translation: CGFloat) {

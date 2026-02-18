@@ -6,22 +6,24 @@
 //
 
 import SwiftUI
-
-struct ShoppingListItem: Identifiable {
-    let id = UUID()
-    var name: String
-    var quantity: String
-    var isChecked: Bool = false
-}
+import CoreData
 
 struct ShoppingListEntry: View {
-    @StateObject private var viewModel = ShoppingListViewModel()
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.managedObjectContext) private var viewContext
+    @StateObject private var viewModel: ShoppingListViewModel
+
+    init() {
+        _viewModel = StateObject(wrappedValue: ShoppingListViewModel(viewContext: PersistenceController.shared.container.viewContext))
+    }
     @State private var showingSettings = false
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             VStack {
                 List {
+                    // Use non-binding ForEach — Item is a reference type (NSManagedObject)
+                    // so mutations are reflected without needing a Binding.
                     ForEach(viewModel.items) { item in
                         HStack {
                             Button(action: {
@@ -33,13 +35,13 @@ struct ShoppingListEntry: View {
                             }
                             .buttonStyle(BorderlessButtonStyle())
                             
-                            Text(item.name)
+                            Text(item.shoppingItem ?? "")
                                 .strikethrough(item.isChecked)
                                 .lineLimit(2)
                             
                             Spacer()
                             
-                            Text("x \(item.quantity)")
+                            Text("x \(item.shoppingItemQuantity ?? "")")
                                 .foregroundColor(.secondary)
                         }
                         .padding(.vertical, 8)
@@ -94,11 +96,13 @@ struct ShoppingListEntry: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 AnimatedActionButton(
                     systemImage: "plus.circle",
-                    action: viewModel.saveToCoreData
+                    action: {
+                        viewModel.saveToCoreData()
+                        dismiss()
+                    }
                 )
             }
         }
-    
         .sheet(isPresented: $showingSettings) {
             ShoppingListSettingsView()
                 .presentationDetents([.fraction(0.5)])
@@ -108,7 +112,9 @@ struct ShoppingListEntry: View {
 }
 
 #Preview {
-    NavigationView {
+    let context = PersistenceController.preview.container.viewContext
+    return NavigationView {
         ShoppingListEntry()
+            .environment(\.managedObjectContext, context)
     }
 }
