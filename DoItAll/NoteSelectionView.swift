@@ -16,7 +16,7 @@ struct NoteSelectionView: View {
         GeometryReader { geometry in
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(NoteType.allCases) { noteType in
+                    ForEach(NoteTypeTitle.allCases) { noteType in
                         NavigationLink {
                             switch noteType {
                             case .journal:
@@ -63,7 +63,7 @@ struct NoteSelectionView: View {
     }
 }
 
-enum NoteType: String, CaseIterable, Identifiable {
+enum NoteTypeTitle: String, CaseIterable, Identifiable {
     case journal, shoppingList, scribblePad, freeForm, lifeAdmin, generalList
 
     var id: String { self.rawValue }

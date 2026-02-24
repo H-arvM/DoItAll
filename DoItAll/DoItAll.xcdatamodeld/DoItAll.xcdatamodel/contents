@@ -8,6 +8,7 @@
         <attribute name="isHidden" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="journalHeader" optional="YES" attributeType="String"/>
         <attribute name="journalText" optional="YES" attributeType="String"/>
+        <attribute name="shoppingEntryID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="shoppingItem" optional="YES" attributeType="String"/>
         <attribute name="shoppingItemQuantity" optional="YES" attributeType="String"/>
         <attribute name="songID" optional="YES" attributeType="String"/>
