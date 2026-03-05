@@ -1,5 +1,5 @@
 //
-//  NewNoteView.swift
+//  NoteSelectionView.swift
 //  DoItAll
 //
 //  Created by Marc Harvey on 30/08/2025.

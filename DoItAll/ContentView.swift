@@ -13,6 +13,9 @@ struct ContentView: View {
     @StateObject private var settingsManager = SettingsManager()
     @State private var showingSettings = false
     
+//    @AppStorage("hasSeenOnBoard") private var hasSeenOnboarding: Data? = Data() // Sort later
+
+    
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Item.journalText, ascending: true)], animation: .default)
     private var items: FetchedResults<Item>
     
@@ -22,11 +25,16 @@ struct ContentView: View {
                 NotesListView(settingsManager: settingsManager)
                     .environment(\.managedObjectContext, viewContext)
                 
-                FloatingPlusButton(settingsManager: settingsManager)
+                FloatingSaveButton(settingsManager: settingsManager)
+                    .padding(.leading, 20)
             }
             .navigationTitle(StringsStore.ContentView.awrite)
             .toolbar {
-                ToolbarButtons(showingSettings: $showingSettings)
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationBarSaveButton{
+                        showingSettings.toggle()
+                    }
+                }
             }
             .sheet(isPresented: $showingSettings) {
                 SettingsView(settingsManager: settingsManager, sourceView: "Content View")
@@ -46,3 +54,4 @@ private let itemFormatter: DateFormatter = {
     formatter.timeStyle = .medium
     return formatter
 }()
+
