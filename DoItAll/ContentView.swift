@@ -12,10 +12,10 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var settingsManager = SettingsManager()
     @State private var showingSettings = false
+    @State private var showingOnboarding = false
     
-//    @AppStorage("hasSeenOnBoard") private var hasSeenOnboarding: Data? = Data() // Sort later
+    @AppStorage("hasSeenOnBoard") private var hasSeenOnboarding: Bool = false
 
-    
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Item.journalText, ascending: true)], animation: .default)
     private var items: FetchedResults<Item>
     
@@ -27,6 +27,12 @@ struct ContentView: View {
                 
                 FloatingSaveButton(settingsManager: settingsManager)
                     .padding(.leading, 20)
+            }
+            .fullScreenCover(isPresented: $showingOnboarding) {
+                OnboardingView(isPresented: $showingOnboarding, dontShowAgain: $hasSeenOnboarding)
+            }
+            .onAppear {
+                showingOnboarding = !hasSeenOnboarding
             }
             .navigationTitle(StringsStore.ContentView.awrite)
             .toolbar {

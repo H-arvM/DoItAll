@@ -80,6 +80,11 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
+		D29930D92F59DF5C00624DCE /* Onboarding */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 		D29E22D62E63651900000F8A /* Journal */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Journal;
@@ -125,6 +130,7 @@
 		D23CBCA72E635A6D007F5B0A = {
 			isa = PBXGroup;
 			children = (
+				D29930D92F59DF5C00624DCE /* Onboarding */,
 				D26D48482F438A74009575A7 /* DisplayEntryView */,
 				D26D483B2F43553A009575A7 /* GeneralList */,
 				D25A554B2F3E3E6100BEC4A3 /* CommonUI */,
@@ -176,6 +182,7 @@
 				D26D48482F438A74009575A7 /* DisplayEntryView */,
 				D28C51882E6C9A7C00B65946 /* Resources */,
 				D28C518D2E6CA83500B65946 /* Settings */,
+				D29930D92F59DF5C00624DCE /* Onboarding */,
 				D29E22D62E63651900000F8A /* Journal */,
 				D29E22D72E63652400000F8A /* Shopping List */,
 				D29E22D82E63653E00000F8A /* Scribble */,
