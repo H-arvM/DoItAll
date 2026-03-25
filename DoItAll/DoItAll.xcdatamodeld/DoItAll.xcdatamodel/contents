@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24512" systemVersion="25C56" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Item" representedClassName="Item" syncable="YES" codeGenerationType="class">
+        <attribute name="albumArtURL" optional="YES" attributeType="String"/>
+        <attribute name="artistName" optional="YES" attributeType="String"/>
+        <attribute name="imageData" optional="YES" attributeType="Transformable" valueTransformerName="NSKeyedUnarchiveFromData" customClassName="[Data]"/>
+        <attribute name="isChecked" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isHidden" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="journalHeader" optional="YES" attributeType="String"/>
+        <attribute name="journalText" optional="YES" attributeType="String"/>
+        <attribute name="shoppingEntryID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="shoppingItem" optional="YES" attributeType="String"/>
+        <attribute name="shoppingItemQuantity" optional="YES" attributeType="String"/>
+        <attribute name="songID" optional="YES" attributeType="String"/>
+        <attribute name="songTitle" optional="YES" attributeType="String"/>
+        <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
+</model>
