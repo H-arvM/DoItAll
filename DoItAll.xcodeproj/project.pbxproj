@@ -100,6 +100,21 @@
 			path = Scribble;
 			sourceTree = "<group>";
 		};
+		D2D1B9982F742E12003A18BF /* Extensions */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		D2D1B99D2F7430A6003A18BF /* Models */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Models;
+			sourceTree = "<group>";
+		};
+		D2D1B9A92F7444FF003A18BF /* ThemeManager */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ThemeManager;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +145,9 @@
 		D23CBCA72E635A6D007F5B0A = {
 			isa = PBXGroup;
 			children = (
+				D2D1B9A92F7444FF003A18BF /* ThemeManager */,
+				D2D1B99D2F7430A6003A18BF /* Models */,
+				D2D1B9982F742E12003A18BF /* Extensions */,
 				D29930D92F59DF5C00624DCE /* Onboarding */,
 				D26D48482F438A74009575A7 /* DisplayEntryView */,
 				D26D483B2F43553A009575A7 /* GeneralList */,
@@ -186,6 +204,9 @@
 				D29E22D62E63651900000F8A /* Journal */,
 				D29E22D72E63652400000F8A /* Shopping List */,
 				D29E22D82E63653E00000F8A /* Scribble */,
+				D2D1B9982F742E12003A18BF /* Extensions */,
+				D2D1B99D2F7430A6003A18BF /* Models */,
+				D2D1B9A92F7444FF003A18BF /* ThemeManager */,
 			);
 			name = DoItAll;
 			packageProductDependencies = (

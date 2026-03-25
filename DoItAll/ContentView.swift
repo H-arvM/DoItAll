@@ -25,11 +25,15 @@ struct ContentView: View {
                 NotesListView(settingsManager: settingsManager)
                     .environment(\.managedObjectContext, viewContext)
                 
-                FloatingSaveButton(settingsManager: settingsManager)
+                FloatingArrowButton(
+                    showSortOptions: .constant(false),
+                    currentSortOption: .dateCreated,
+                    onToggleSort: { /* TODO: implement sort toggle if needed */ }
+                )
                     .padding(.leading, 20)
             }
             .fullScreenCover(isPresented: $showingOnboarding) {
-                OnboardingView(isPresented: $showingOnboarding, dontShowAgain: $hasSeenOnboarding)
+                OnboardingView(isPresented: $showingOnboarding, dontShowAgain: Binding(get: { hasSeenOnboarding }, set: { hasSeenOnboarding = $0 }))
             }
             .onAppear {
                 showingOnboarding = !hasSeenOnboarding

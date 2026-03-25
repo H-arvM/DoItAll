@@ -136,7 +136,7 @@ public struct NotesListView: View {
         return formatter.string(from: date)
     }
 
-    private func noteType(for item: Item) -> NoteTypeTitle {
+    private func noteType(for item: Item) -> NoteType {
         if item.shoppingEntryID != nil { return .shoppingList }
         if let text = item.journalText?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty {
             return .journal
