@@ -115,7 +115,7 @@ public struct NotesListView: View {
         .listRowSeparator(.hidden)
         .background {
             if isHidden {
-                GlassMorphicBackground(isPulsing: true)
+                GlassMorphicBackground()
             }
         }
         .overlay(alignment: .bottom) {
