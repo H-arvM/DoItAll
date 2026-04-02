@@ -31,7 +31,7 @@ struct FloatingArrowButton: View {
             )
         }
         .sheet(isPresented: $viewModel.showSettings) {
-            EmptyView()
+            NewSettingsView()
             // Insert new SettingsView() here later
         }
     }

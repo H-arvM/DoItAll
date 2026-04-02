@@ -6,6 +6,22 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D27770062F79BB06007CCDDA /* NewSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D27770052F79BB06007CCDDA /* NewSettingsView.swift */; };
+		D27770092F79BC18007CCDDA /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D27770082F79BC18007CCDDA /* SettingsViewModel.swift */; };
+		D277700B2F79BCB8007CCDDA /* FavouriteSupermarketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D277700A2F79BCB8007CCDDA /* FavouriteSupermarketManager.swift */; };
+		D277700E2F7C0AF8007CCDDA /* SettingsNavigationRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D277700D2F7C0AF8007CCDDA /* SettingsNavigationRow.swift */; };
+		D27770102F7C0BAF007CCDDA /* SettingsIconCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D277700F2F7C0BAF007CCDDA /* SettingsIconCircle.swift */; };
+		D27770122F7C0CB9007CCDDA /* RowTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D27770112F7C0CB9007CCDDA /* RowTitle.swift */; };
+		D27770182F7C10CE007CCDDA /* SupermarketSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D27770172F7C10CE007CCDDA /* SupermarketSettingsView.swift */; };
+		D28F2BC52F7EB5A100E37D85 /* RadiusPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28F2BC42F7EB5A100E37D85 /* RadiusPickerView.swift */; };
+		D28F2BC72F7EB74700E37D85 /* PausePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28F2BC62F7EB74700E37D85 /* PausePickerView.swift */; };
+		D28F2BC92F7EBD9F00E37D85 /* SupermarketsMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28F2BC82F7EBD9F00E37D85 /* SupermarketsMapView.swift */; };
+		D28F2BCC2F7EBDF300E37D85 /* SupermarketsMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28F2BCB2F7EBDF300E37D85 /* SupermarketsMapViewModel.swift */; };
+		D28F2BCE2F7ECBA600E37D85 /* SupermarketSelectionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28F2BCD2F7ECBA600E37D85 /* SupermarketSelectionCard.swift */; };
+		D28F2BD02F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28F2BCF2F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		D23CBCC32E635A70007F5B0A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +43,19 @@
 		D23CBCB02E635A6E007F5B0A /* DoItAll.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DoItAll.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D23CBCC22E635A70007F5B0A /* DoItAllTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DoItAllTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D23CBCCC2E635A70007F5B0A /* DoItAllUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DoItAllUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D27770052F79BB06007CCDDA /* NewSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSettingsView.swift; sourceTree = "<group>"; };
+		D27770082F79BC18007CCDDA /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		D277700A2F79BCB8007CCDDA /* FavouriteSupermarketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavouriteSupermarketManager.swift; sourceTree = "<group>"; };
+		D277700D2F7C0AF8007CCDDA /* SettingsNavigationRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsNavigationRow.swift; sourceTree = "<group>"; };
+		D277700F2F7C0BAF007CCDDA /* SettingsIconCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsIconCircle.swift; sourceTree = "<group>"; };
+		D27770112F7C0CB9007CCDDA /* RowTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowTitle.swift; sourceTree = "<group>"; };
+		D27770172F7C10CE007CCDDA /* SupermarketSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupermarketSettingsView.swift; sourceTree = "<group>"; };
+		D28F2BC42F7EB5A100E37D85 /* RadiusPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadiusPickerView.swift; sourceTree = "<group>"; };
+		D28F2BC62F7EB74700E37D85 /* PausePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PausePickerView.swift; sourceTree = "<group>"; };
+		D28F2BC82F7EBD9F00E37D85 /* SupermarketsMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupermarketsMapView.swift; sourceTree = "<group>"; };
+		D28F2BCB2F7EBDF300E37D85 /* SupermarketsMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupermarketsMapViewModel.swift; sourceTree = "<group>"; };
+		D28F2BCD2F7ECBA600E37D85 /* SupermarketSelectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupermarketSelectionCard.swift; sourceTree = "<group>"; };
+		D28F2BCF2F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupermarketSettingsViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -145,6 +174,7 @@
 		D23CBCA72E635A6D007F5B0A = {
 			isa = PBXGroup;
 			children = (
+				D27770042F79BAF1007CCDDA /* ContentSettings */,
 				D2D1B9A92F7444FF003A18BF /* ThemeManager */,
 				D2D1B99D2F7430A6003A18BF /* Models */,
 				D2D1B9982F742E12003A18BF /* Extensions */,
@@ -174,6 +204,82 @@
 				D23CBCCC2E635A70007F5B0A /* DoItAllUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D27770042F79BAF1007CCDDA /* ContentSettings */ = {
+			isa = PBXGroup;
+			children = (
+				D27770162F7C1020007CCDDA /* Settings */,
+				D27770072F79BBFE007CCDDA /* Supermarket */,
+			);
+			path = ContentSettings;
+			sourceTree = "<group>";
+		};
+		D27770072F79BBFE007CCDDA /* Supermarket */ = {
+			isa = PBXGroup;
+			children = (
+				D28F2BCA2F7EBDD900E37D85 /* ViewModels */,
+				D27770132F7C0FE3007CCDDA /* Helpers */,
+				D277700C2F7C0ADA007CCDDA /* Views */,
+			);
+			path = Supermarket;
+			sourceTree = "<group>";
+		};
+		D277700C2F7C0ADA007CCDDA /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D27770172F7C10CE007CCDDA /* SupermarketSettingsView.swift */,
+				D28F2BC42F7EB5A100E37D85 /* RadiusPickerView.swift */,
+				D28F2BC62F7EB74700E37D85 /* PausePickerView.swift */,
+				D28F2BC82F7EBD9F00E37D85 /* SupermarketsMapView.swift */,
+				D28F2BCD2F7ECBA600E37D85 /* SupermarketSelectionCard.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D27770132F7C0FE3007CCDDA /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				D277700A2F79BCB8007CCDDA /* FavouriteSupermarketManager.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		D27770142F7C0FFF007CCDDA /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D27770112F7C0CB9007CCDDA /* RowTitle.swift */,
+				D277700F2F7C0BAF007CCDDA /* SettingsIconCircle.swift */,
+				D277700D2F7C0AF8007CCDDA /* SettingsNavigationRow.swift */,
+				D27770052F79BB06007CCDDA /* NewSettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D27770152F7C1013007CCDDA /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				D27770082F79BC18007CCDDA /* SettingsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		D27770162F7C1020007CCDDA /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				D27770142F7C0FFF007CCDDA /* Views */,
+				D27770152F7C1013007CCDDA /* ViewModels */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		D28F2BCA2F7EBDD900E37D85 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				D28F2BCB2F7EBDF300E37D85 /* SupermarketsMapViewModel.swift */,
+				D28F2BCF2F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift */,
+			);
+			path = ViewModels;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -334,6 +440,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D27770102F7C0BAF007CCDDA /* SettingsIconCircle.swift in Sources */,
+				D28F2BC52F7EB5A100E37D85 /* RadiusPickerView.swift in Sources */,
+				D28F2BCE2F7ECBA600E37D85 /* SupermarketSelectionCard.swift in Sources */,
+				D28F2BC72F7EB74700E37D85 /* PausePickerView.swift in Sources */,
+				D28F2BD02F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift in Sources */,
+				D28F2BCC2F7EBDF300E37D85 /* SupermarketsMapViewModel.swift in Sources */,
+				D27770062F79BB06007CCDDA /* NewSettingsView.swift in Sources */,
+				D27770182F7C10CE007CCDDA /* SupermarketSettingsView.swift in Sources */,
+				D27770122F7C0CB9007CCDDA /* RowTitle.swift in Sources */,
+				D277700B2F79BCB8007CCDDA /* FavouriteSupermarketManager.swift in Sources */,
+				D28F2BC92F7EBD9F00E37D85 /* SupermarketsMapView.swift in Sources */,
+				D277700E2F7C0AF8007CCDDA /* SettingsNavigationRow.swift in Sources */,
+				D27770092F79BC18007CCDDA /* SettingsViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
