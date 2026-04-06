@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-enum NoteType: String, CaseIterable, Identifiable {
+enum ItemType: String, CaseIterable, Identifiable {
     case journal, shoppingList, scribblePad, freeForm, lifeAdmin, generalList
 
     var id: String { self.rawValue }
@@ -61,6 +61,23 @@ enum NoteType: String, CaseIterable, Identifiable {
             return .yellow
         case .generalList:
             return .orange
+        }
+    }
+    
+    var entryType: String {
+        switch self {
+        case .journal:
+            return "Journal"
+        case .shoppingList:
+            return "Shopping list"
+        case .scribblePad:
+            return "Scribble pad"
+        case .freeForm:
+            return "Freeform"
+        case .lifeAdmin:
+            return "Life Admin"
+        case .generalList:
+            return "List"
         }
     }
 }

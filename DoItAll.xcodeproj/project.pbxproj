@@ -20,6 +20,7 @@
 		D28F2BCC2F7EBDF300E37D85 /* SupermarketsMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28F2BCB2F7EBDF300E37D85 /* SupermarketsMapViewModel.swift */; };
 		D28F2BCE2F7ECBA600E37D85 /* SupermarketSelectionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28F2BCD2F7ECBA600E37D85 /* SupermarketSelectionCard.swift */; };
 		D28F2BD02F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28F2BCF2F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift */; };
+		D2A844BB2F844E6500D5BB2B /* SwipeToDeleteRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A844BA2F844E6500D5BB2B /* SwipeToDeleteRow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,11 +57,25 @@
 		D28F2BCB2F7EBDF300E37D85 /* SupermarketsMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupermarketsMapViewModel.swift; sourceTree = "<group>"; };
 		D28F2BCD2F7ECBA600E37D85 /* SupermarketSelectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupermarketSelectionCard.swift; sourceTree = "<group>"; };
 		D28F2BCF2F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupermarketSettingsViewModel.swift; sourceTree = "<group>"; };
+		D2A844BA2F844E6500D5BB2B /* SwipeToDeleteRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeToDeleteRow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D2A844B12F82C3E000D5BB2B /* Exceptions for "DoItAll" folder in "DoItAll" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D23CBCAF2E635A6D007F5B0A /* DoItAll */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D23CBCB22E635A6E007F5B0A /* DoItAll */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D2A844B12F82C3E000D5BB2B /* Exceptions for "DoItAll" folder in "DoItAll" target */,
+			);
 			path = DoItAll;
 			sourceTree = "<group>";
 		};
@@ -209,6 +224,7 @@
 		D27770042F79BAF1007CCDDA /* ContentSettings */ = {
 			isa = PBXGroup;
 			children = (
+				D2A844B62F8445D800D5BB2B /* ContentView */,
 				D27770162F7C1020007CCDDA /* Settings */,
 				D27770072F79BBFE007CCDDA /* Supermarket */,
 			);
@@ -280,6 +296,22 @@
 				D28F2BCF2F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift */,
 			);
 			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		D2A844B62F8445D800D5BB2B /* ContentView */ = {
+			isa = PBXGroup;
+			children = (
+				D2A844B72F8445F000D5BB2B /* Views */,
+			);
+			path = ContentView;
+			sourceTree = "<group>";
+		};
+		D2A844B72F8445F000D5BB2B /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D2A844BA2F844E6500D5BB2B /* SwipeToDeleteRow.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -453,6 +485,7 @@
 				D28F2BC92F7EBD9F00E37D85 /* SupermarketsMapView.swift in Sources */,
 				D277700E2F7C0AF8007CCDDA /* SettingsNavigationRow.swift in Sources */,
 				D27770092F79BC18007CCDDA /* SettingsViewModel.swift in Sources */,
+				D2A844BB2F844E6500D5BB2B /* SwipeToDeleteRow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -617,6 +650,9 @@
 				DEVELOPMENT_TEAM = YU65V62LAA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DoItAll/Info.plist;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Same as the supermarket for when backgrounded";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app will use the location to determine if the user is close to a supermarket they have chosen";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the microphone to capture voice notes";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app uses Apple Music";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -647,6 +683,9 @@
 				DEVELOPMENT_TEAM = YU65V62LAA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DoItAll/Info.plist;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Same as the supermarket for when backgrounded";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app will use the location to determine if the user is close to a supermarket they have chosen";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the microphone to capture voice notes";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app uses Apple Music";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

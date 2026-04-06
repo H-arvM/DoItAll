@@ -32,15 +32,15 @@ struct NewSettingsView: View {
     @ViewBuilder
     private var noteSettingsSection: some View {
         Section {
-            r(
+            SettingsNavigationRow(
                 icon: "cart.fill",
                 title: "Shopping List",
                 iconColours: [.green, .green.opacity(0.7)],
-                destination: SupermarketSettingsView
+                destination: SupermarketSettingsView()
             )
             
             SettingsNavigationRow(
-                icon: "book.journal",
+                icon: "book",
                 title: "Journal",
                 iconColours: [.green, .green.opacity(0.7)],
                 destination: EmptyView() /// Getting journal settings in here later
@@ -49,7 +49,6 @@ struct NewSettingsView: View {
             Text("Note Settings")
         }
     }
-
     
     @ViewBuilder
     private var appearanceSettingsSection: some View {

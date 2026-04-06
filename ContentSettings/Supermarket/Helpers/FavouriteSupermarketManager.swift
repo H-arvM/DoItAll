@@ -159,7 +159,7 @@ class FavouriteSupermarketManager: NSObject, ObservableObject {
         locationManager.requestAlwaysAuthorization()
         
         let region = CLCircularRegion(
-            center: supermarket.,
+            center: supermarket.coordinate,
             radius: geofenceRadius,
             identifier: geofenceIdentifier)
         

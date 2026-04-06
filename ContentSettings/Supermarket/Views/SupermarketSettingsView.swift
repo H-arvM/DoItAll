@@ -19,13 +19,13 @@ struct SupermarketSettingsView: View {
         }
         .navigationTitle("Supermarket Settings")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: viewModel.showSupermarketMap) {
+        .sheet(isPresented: $viewModel.showSupermarketsMap) {
             SupermarketsMapView()
         }
-        .sheet(isPresented: viewModel.showRadiusPicker) {
+        .sheet(isPresented: $viewModel.showRadiusPicker) {
             radiusPickerSheet
         }
-        .sheet(isPresented: viewModel.showPausePicker) {
+        .sheet(isPresented: $viewModel.showPausePicker) {
             pausePickerSheet
         }
     }
@@ -47,16 +47,16 @@ struct SupermarketSettingsView: View {
     var geofenceSettingsSection: some View {
         Section {
             Button(action: {
-                viewModel.shadowRadiusPicker = true
+                viewModel.showRadiusPicker = true
             }) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Notification Radius")
                             .font(.body)
-                            .foregroundStyle(viewModel.primaryTextColor)
+                            .foregroundStyle(viewModel.primaryTextColour)
                         Text("\(Int(viewModel.geofenceRadius)) metres")
                             .font(.caption)
-                            .foregroundStyle(.viewModel.secondaryTextColor)
+                            .foregroundStyle(viewModel.secondaryTextColor)
                     }
                     Spacer()
                     Image(systemName: "chevron.right")
@@ -97,7 +97,7 @@ struct SupermarketSettingsView: View {
                 Text(favourite.name)
                     .font(.title)
                     .fontWeight(.semibold)
-                    .foregroundStyle(viewModel.primaryTextColor)
+                    .foregroundStyle(viewModel.primaryTextColour)
             }
             Spacer()
         }
@@ -122,7 +122,7 @@ struct SupermarketSettingsView: View {
             
             Text("Set a favourite supermarket to recieve notifications when you're ready")
                 .font(.caption)
-                .foregroundStyle(viewModel.secondaryTextColour)
+                .foregroundStyle(viewModel.secondaryTextColor)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
             
@@ -147,7 +147,7 @@ struct SupermarketSettingsView: View {
             if let pauseDate = viewModel.pausedUntilDate {
                 Text("Until \(pauseDate.formatted(date: .abbreviated, time: .shortened))")
                     .font(.caption)
-                    .foregroundStyle(viewModel.secondaryTextColour)
+                    .foregroundStyle(viewModel.secondaryTextColor)
             }
             
             Button(action: {
@@ -204,7 +204,7 @@ extension SupermarketSettingsView {
     @ViewBuilder
     var changeFavouriteButton: some View {
         Button(role: .destructive) {
-            viewModel.showSupermarketMap = true
+            viewModel.showSupermarketsMap = true
         } label: {
             HStack {
                 Image(systemName: "arrow.triangle.2.circlepath")
@@ -217,7 +217,7 @@ extension SupermarketSettingsView {
     @ViewBuilder
     var setFavouriteButton: some View {
         Button(role: .destructive) {
-            viewModel.showSupermarketMap = true
+            viewModel.showSupermarketsMap = true
         } label: {
             HStack {
                 Image(systemName: "plus.circle.fill")
@@ -249,7 +249,7 @@ extension SupermarketSettingsView {
                         .foregroundStyle(viewModel.primaryTextColour)
                     Text("Temporarily disable Notifications")
                         .font(.caption)
-                        .foregroundStyle(.viewModel.secondaryTextColour)
+                        .foregroundStyle(viewModel.secondaryTextColor)
                 }
                 Spacer()
                 Image(systemName: "chevron.right")
