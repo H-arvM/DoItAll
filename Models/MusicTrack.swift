@@ -11,5 +11,5 @@ struct MusicTrack: Codable, Hashable {
     var id: String
     var title: String
     var artist: String
-    var artworkURL: URL
+    var artworkURL: URL?
 }

@@ -14,7 +14,7 @@ import UserNotifications
 import CoreData
 
 struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGPoint = 0
+    static var defaultValue: CGPoint = .zero
     static func reduce(value: inout CGPoint, nextValue: () -> CGPoint) {
         value = nextValue()
     }
@@ -28,14 +28,11 @@ struct ContentView: View {
     @StateObject private var settingsManager = SettingsManager()
     @StateObject private var themeManager = ThemeManager.shared
     @State private var showSortOptions: Bool = false
-    @State private var expandedSections: Set<ItemType> = Set(Item.allcases)
+    @State private var expandedSections: Set<ItemType> = Set(ItemType.allCases)
     @State private var scrollOffSet: CGFloat = 0
     @State private var lastScrollOffset: CGFloat = 0
     @State private var isScrolling: Bool = false
     @State private var hideButtonsWorkItem: DispatchWorkItem?
-    
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Item.journalText, ascending: true)], animation: .default)
-    private var items: FetchedResults<Item>
     
     var body: some View {
         NavigationStack {
@@ -46,7 +43,7 @@ struct ContentView: View {
                 floatingButtonOverlay
             }
             /// Only navigate directly to if not hidden or if authenticated
-            .navigationDestination(for: Item.self) { item in
+            .navigationDestination(for: ItemEntity.self) { item in
                 if !viewModel.isItemHidden(item) || viewModel.selectedItem == item {
                     destinationView(for: ItemType(rawValue: item.type) ?? .typeA, item: item)
                 }
@@ -56,7 +53,7 @@ struct ContentView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: SelectEntryView()) {
+                    NavigationLink(destination: SelectEntryTypeView()) {
                         Image(systemName: "plus")
                             .font(.system(size: 18, weight: .semibold))
                             .foregroundStyle(themeManager.selectedTheme.iconColour)
@@ -68,13 +65,11 @@ struct ContentView: View {
             Button("Ok", role: .cancel) { }
         } message: {
             if let error = viewModel.authError {
-                Text(error.errorDescription ?? "An erroor occured")
+                Text(error.errorDescription ?? "An error occured")
             }
         }
         .fullScreenCover(isPresented: $viewModel.showOnboarding) {
-            content: {
-                OnboardingView(isPresented: $viewModel.showOnboarding, dontShowAgain: $viewModel.hasSeenOnboarding)
-            }
+            OnboardingView(isPresented: $viewModel.showOnboarding, dontShowAgain: $viewModel.hasSeenOnboarding)
         }
         .onAppear {
             viewModel.setupViewModel()
@@ -88,7 +83,7 @@ struct ContentView: View {
         .onChange(of: viewModel.items) { _, _ in
         }
         .confirmationDialog("Sort by", isPresented: $showSortOptions, titleVisibility: .visible) {
-            ForEach(SortOption.AllCases, id: \.self) { option in
+            ForEach(SortOption.allCases, id: \.self) { option in
                 Button {
                     withAnimation {
                         viewModel.setSortOption(option)
@@ -112,7 +107,7 @@ struct ContentView: View {
     }
     
     @ViewBuilder
-    private itemsList: some View {
+    private var itemsList: some View {
         if viewModel.currentSortOption == .type {
             groupedList
                 .cornerRadius(10)
@@ -127,19 +122,19 @@ struct ContentView: View {
             ForEach(viewModel.sortedItemTypes, id: \.self) { type in
                 Section {
                     VStack(spacing: 0) {
-                        groupedHeader(for: type)
+                        groupHeader(for: type)
                             .padding(.horizontal, 8)
                         
-                        if expandedOptions.contains(type) {
+                        if expandedSections.contains(type) {
                             Rectangle()
                                 .frame(height: 1)
                                 .foregroundStyle(
                                     LinearGradient(
                                         colors: [themeManager.selectedTheme.primaryColour.opacity(0.6),
                                                  themeManager.selectedTheme.secondaryColour.opacity(0.4),
-                                                 themeManager.selectedTheme.primaryColour.opacity(0.6),
-                                                 startPoint: .leading,
-                                                 endPoint: .trailing
+                                                 themeManager.selectedTheme.primaryColour.opacity(0.6)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
                                     )
                                 )
                                 .transition(.opacity.combined(with: .scale(scale: 1.0, anchor: .top)))
@@ -197,7 +192,7 @@ struct ContentView: View {
                     GeometryReader { geometry in
                         Color.clear.preference(
                             key: ScrollOffsetPreferenceKey.self,
-                            value: geometry.frame(in: .name("scroll")).minY
+                            value: geometry.frame(in: .named("scroll")).minY
                         )
                     }
                 )
@@ -205,7 +200,7 @@ struct ContentView: View {
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
         }
-        .coordinateSpace("scroll")
+        .coordinateSpace(name: "scroll")
         .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
             handleScroll(offset: value)
         }
@@ -230,11 +225,11 @@ struct ContentView: View {
             GeometryReader { geometry in
                 Color.clear.preference(
                     key: ScrollOffsetPreferenceKey.self,
-                    value: geometry.frame(in: .name("scroll")).minY
+                    value: geometry.frame(in: .named("scroll")).minY
                 )
             }
         )
-        .coordinateSpace("scroll")
+        .coordinateSpace(name: "scroll")
         .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
             handleScroll(offset: value)
         }
@@ -280,7 +275,7 @@ struct ContentView: View {
     }
     
     @ViewBuilder
-    private func listRow(for item: Item) -> some View {
+    private func listRow(for item: ItemEntity) -> some View {
         if viewModel.isItemHidden(item) {
             hiddenListRow(for: item)
         } else {
@@ -289,7 +284,7 @@ struct ContentView: View {
     }
     
     @ViewBuilder
-    private func groupedListRow(for item: Item) -> some View {
+    private func groupedListRow(for item: ItemEntity) -> some View {
         if viewModel.isItemHidden(item) {
             hiddenGroupedListRow(for: item)
         } else {
@@ -297,7 +292,7 @@ struct ContentView: View {
         }
     }
     
-    private func hiddenListRow(for item: Item) -> some View {
+    private func hiddenListRow(for item: ItemEntity) -> some View {
         Button {
             viewModel.handleHiddenItemTap(item)
         } label: {
@@ -307,19 +302,19 @@ struct ContentView: View {
         .padding(.leading, viewModel.currentSortOption == .type ? -16 : -8)
         .padding(.trailing, viewModel.currentSortOption == .type ? 0 : 10)
         .buttonStyle(.plain)
-        .contentShape(.rect)
+        .contentShape(Rectangle())
         .listRowInsets(EdgeInsets())
         .listRowBackground(rowBackground(for: item))
         .listRowSeparator(.hidden)
-        .background(glassBackground(for: item)
+        .background(glassBackground(for: item))
     }
     
-    private func hiddenRowContent(for item: Item) -> some View {
+    private func hiddenRowContent(for item: ItemEntity) -> some View {
         ZStack(alignment: .leading) {
             HStack(spacing: 0) {
                 rowContent(for: item)
             }
-            .contentShape(.rect)
+            .contentShape(Rectangle())
             .frame(height: rowHeight)
             
             hiddenIndicatorIcon(for: item)
@@ -334,7 +329,7 @@ struct ContentView: View {
     }
     
     // Normal row
-    private func normalListRow(for item: Item) -> some View {
+    private func normalListRow(for item: ItemEntity) -> some View {
         NavigationLink(value: item) {
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
@@ -344,7 +339,7 @@ struct ContentView: View {
                             .frame(width: 18)
                     }
                 }
-                .contentShape(.rect)
+                .contentShape(Rectangle())
                 .frame(height: rowHeight)
                 
                 if item.objectID != viewModel.items.last?.objectID && viewModel.currentSortOption == .dateCreated {
@@ -365,7 +360,7 @@ struct ContentView: View {
         .listRowSeparator(.hidden)
     }
     
-    private func normaleGroupedListRow(for item: Item) -> some View {
+    private func normalGroupedListRow(for item: ItemEntity) -> some View {
         Button {
             viewModel.selectedItem = item
         } label: {
@@ -375,7 +370,7 @@ struct ContentView: View {
                     Spacer()
                         .frame(width: 18)
                 }
-                .contentShape(.rect)
+                .contentShape(Rectangle())
                 .frame(height: rowHeight)
                 
                 VStack {
@@ -393,23 +388,23 @@ struct ContentView: View {
         .simultaneousGesture(longPressGesture(for: item))
     }
     
-    private func hiddenGroupedListRow(for item: Item) -> some View {
-        Button{
+    private func hiddenGroupedListRow(for item: ItemEntity) -> some View {
+        Button {
             viewModel.handleHiddenItemTap(item)
         } label: {
-            hiddenGroupRowContent(for: item)
+            hiddenGroupedRowContent(for: item)
         }
         .frame(height: rowHeight)
         .buttonStyle(.plain)
-        .content(.rect)
+        .contentShape(Rectangle())
     }
     
-    private func hiddenGroupedRowContent(for item: Item) -> some View {
+    private func hiddenGroupedRowContent(for item: ItemEntity) -> some View {
         ZStack(alignment: .leading) {
             HStack(spacing: 0) {
                 rowContent(for: item)
             }
-            .contentShape(.rect)
+            .contentShape(Rectangle())
             .frame(height: rowHeight)
             .allowsHitTesting(true)
             
@@ -432,13 +427,13 @@ struct ContentView: View {
                     Spacer()
                 }
                 .frame(height: rowHeight)
-                .allowsHitTesting(true))
+                .allowsHitTesting(true)
             }
             .zIndex(1)
         }
         .background(
             GeometryReader { geometry in
-                GlassmoprhicBackground()
+                GlassMorphicBackground()
                     .frame(width: UIScreen.screenWidth, height: rowHeight)
                     .offset(x: -geometry.frame(in: .global).minX)
                     .id(item.id)
@@ -448,22 +443,22 @@ struct ContentView: View {
     }
     
     @ViewBuilder
-    private func rowBackground(for item: Item) -> some View {
+    private func rowBackground(for item: ItemEntity) -> some View {
         Color.clear
     }
     
     @ViewBuilder
-    private func rowContentNotHidden(for item: Item) -> some View {
+    private func rowContentNotHidden(for item: ItemEntity) -> some View {
         if viewModel.isItemHidden(item) {
             HStack(spacing: 0) {
                 rowContent(for: item)
                 
                 if viewModel.currentSortOption == .type {
-                    Spacer
+                    Spacer()
                         .frame(width: 18)
                 }
             }
-            .contentShape(.rect)
+            .contentShape(Rectangle())
             .allowsHitTesting(true)
         } else {
             HStack(spacing: 0) {
@@ -478,12 +473,12 @@ struct ContentView: View {
                         .frame(width: 18)
                 }
             }
-            .contentShape(.rect)
+            .contentShape(Rectangle())
         }
     }
     
     @ViewBuilder
-    private func navigationArrow(for item: Item) -> some View {
+    private func navigationArrow(for item: ItemEntity) -> some View {
         if viewModel.isItemHidden(item) {
             HStack {
                 Spacer()
@@ -500,7 +495,7 @@ struct ContentView: View {
     }
     
     @ViewBuilder
-    private func hiddenIndicatorIcon(for item: Item) -> some View {
+    private func hiddenIndicatorIcon(for item: ItemEntity) -> some View {
         if viewModel.isItemHidden(item) {
             VStack {
                 Spacer()
@@ -515,7 +510,7 @@ struct ContentView: View {
     }
     
     @ViewBuilder
-    private func glassBackground(for item: Item) -> some View {
+    private func glassBackground(for item: ItemEntity) -> some View {
         GeometryReader { geometry in
             if viewModel.isItemHidden(item) {
                 GlassMorphicBackground()
@@ -528,7 +523,7 @@ struct ContentView: View {
     }
     
     @ViewBuilder
-    private func floatingButtonOverlay(for item: Item) -> some View {
+    private func floatingButtonOverlay() -> some View {
         VStack {
             Spacer()
             HStack(alignment: .bottom) {
@@ -556,7 +551,7 @@ struct ContentView: View {
     
     // TODO: Point AI here and have update the CoreData models and consider all the other entryTypes too
     @ViewBuilder
-    private func rowContent(for item: Item) -> some View {
+    private func rowContent(for item: ItemEntity) -> some View {
         HStack {
             if viewModel.currentSortOption == .dateCreated {
                 Image(systemName: item.itemType.iconName)
@@ -567,9 +562,9 @@ struct ContentView: View {
             }
             
             VStack(alignment: .leading, spacing: 4) {
-                if item.itemType == .typeA, let journalEntry == item.journalEntry {
+                if item.itemType == .journalType, let journalEntry = item.journalEntry {
                     Text(journalEntry.title)
-                        .font(viewModel.currentSortOption == .type ? .subheadline : headline)
+                        .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
                     
                     Text(journalEntry.createdAt.funFormatString)
@@ -592,24 +587,28 @@ struct ContentView: View {
         .padding(.horizontal, 5)
     }
     
-    // TODO: All emptyViews for now. WIll have them navigate properly later
+    // TODO: All emptyViews for now. Will have them navigate properly later
     @ViewBuilder
-    private func destinationView(for type: ItemType, item: Item) -> some View {
+    private func destinationView(for type: ItemType, item: ItemEntity) -> some View {
         switch type {
-        case .journal:
-            if let journalEntry = item.journalText {
+        case .journalType:
+            if let _ = item.journalText {
                 EmptyView()
             }
-//        case .freeForm
-//            if let freeform = item. {
-//            
-//        }
+        case .shoppingListType:
+            return EmptyView()
+            
+        case .freeFormType:
+            return EmptyView()
+            
+        case .lifeAdminType:
+            return EmptyView()
+            
+        case .generalListType:
+            return EmptyView()
+        }
     }
-        
-        
-        
-        
-
+    
     
     // MARK: Helper methods
     
@@ -627,42 +626,37 @@ struct ContentView: View {
         hideButtonsWorkItem?.cancel()
         let workItem = DispatchWorkItem {
             withAnimation {
-                isScrolling = true
+                isScrolling = false
             }
         }
         hideButtonsWorkItem = workItem
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
     }
     
-    private func longPressGesture(for item: Item) -> some Gesture {
+    private func longPressGesture(for item: ItemEntity) -> some Gesture {
         LongPressGesture(minimumDuration: 0.3) /// May need to tweak this after real device test
             .onEnded { _ in
                 viewModel.handleLongPress(for: item)
             }
     }
     
-    private func deleteItem(_ item: Item) {
+    private func deleteItem(_ item: ItemEntity) {
         withAnimation {
             viewContext.delete(item)
             try? viewContext.save()
             viewModel.loadItems()
         }
     }
-    
-    
-    
+    private let itemFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .medium
+        return formatter
+    }()
     
 }
 
 //#Preview {
 //    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 //}
-
-
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
 

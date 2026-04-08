@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24512" systemVersion="25C56" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="Item" representedClassName="Item" syncable="YES" codeGenerationType="class">
-        <attribute name="albumArtURL" optional="YES" attributeType="String"/>
-        <attribute name="artistName" optional="YES" attributeType="String"/>
-        <attribute name="imageData" optional="YES" attributeType="Transformable" valueTransformerName="NSKeyedUnarchiveFromData" customClassName="[Data]"/>
-        <attribute name="isChecked" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24837" systemVersion="25E246" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="ItemEntity" representedClassName="ItemEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isHidden" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="journalHeader" optional="YES" attributeType="String"/>
-        <attribute name="journalText" optional="YES" attributeType="String"/>
-        <attribute name="shoppingEntryID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="shoppingItem" optional="YES" attributeType="String"/>
-        <attribute name="shoppingItemQuantity" optional="YES" attributeType="String"/>
-        <attribute name="songID" optional="YES" attributeType="String"/>
-        <attribute name="songTitle" optional="YES" attributeType="String"/>
-        <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="type" optional="YES" attributeType="String"/>
+        <relationship name="journalEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="JournalEntry" inverseName="item" inverseEntity="JournalEntry"/>
+    </entity>
+    <entity name="JournalEntry" representedClassName="JournalEntry" syncable="YES" codeGenerationType="class">
+        <attribute name="content" optional="YES" attributeType="String"/>
+        <attribute name="createdDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="entryType" attributeType="String" defaultValueString="journal"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="musicArtist" optional="YES" attributeType="String"/>
+        <attribute name="musicArtworkURL" optional="YES" attributeType="String"/>
+        <attribute name="musicTrackID" optional="YES" attributeType="String"/>
+        <attribute name="musicTrackTitle" optional="YES" attributeType="String"/>
+        <attribute name="photoData" optional="YES" attributeType="Binary"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ItemEntity" inverseName="journalEntry" inverseEntity="ItemEntity"/>
     </entity>
 </model>

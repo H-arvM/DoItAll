@@ -9,74 +9,70 @@ import Foundation
 import SwiftUI
 
 enum ItemType: String, CaseIterable, Identifiable {
-    case journal, shoppingList, scribblePad, freeForm, lifeAdmin, generalList
+    case journalType = "Journal"
+    case shoppingListType = "Shopping List"
+    case freeFormType = "FreeForm"
+    case lifeAdminType = "Life Admin"
+    case generalListType = "General List"
 
     var id: String { self.rawValue }
 
     var title: String {
         switch self {
-        case .journal:
+        case .journalType:
             return "Journal"
-        case .shoppingList:
+        case .shoppingListType:
             return "Shopping List"
-        case .scribblePad:
-            return "Scribble Pad"
-        case .freeForm:
+        case .freeFormType:
             return "Freeform"
-        case .lifeAdmin:
+        case .lifeAdminType:
             return "Life Admin"
-        case .generalList:
+        case .generalListType:
             return "List"
         }
     }
 
     var iconName: String {
         switch self {
-        case .journal:
+        case .journalType:
             return "book.fill"
-        case .shoppingList:
+        case .shoppingListType:
             return "list.bullet"
-        case .scribblePad:
-            return "scribble"
-        case .freeForm:
+        case .freeFormType:
             return "brain.head.profile"
-        case .lifeAdmin:
+        case .lifeAdminType:
             return "figure.wave"
-        case .generalList:
+        case .generalListType:
             return "list.clipboard"
         }
     }
     
     var colour: Color {
         switch self {
-        case .journal:
+        case .journalType:
             return .blue
-        case .shoppingList:
+        case .shoppingListType:
             return .red
-        case .scribblePad:
-            return .green
-        case .freeForm:
+        case .freeFormType:
             return .pink
-        case .lifeAdmin:
+        case .lifeAdminType:
             return .yellow
-        case .generalList:
+        case .generalListType:
             return .orange
         }
     }
     
     var entryType: String {
         switch self {
-        case .journal:
+        case .journalType:
             return "Journal"
-        case .shoppingList:
+        case .shoppingListType:
             return "Shopping list"
-        case .scribblePad:
-            return "Scribble pad"
-        case .freeForm:
+        case .freeFormType:
             return "Freeform"
-        case .lifeAdmin:
+        case .lifeAdminType:
             return "Life Admin"
-        case .generalList:
+        case .generalListType:
             return "List"
         }
     }

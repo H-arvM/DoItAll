@@ -11,8 +11,8 @@ import CoreData
 
 @MainActor
 class ContentViewModel: ObservableObject {
-    @Published var items: [Item] = [] // Core Data
-    @Published var selectedItem: Item?
+    @Published var items: [ItemEntity] = [] // Core Data
+    @Published var selectedItem: ItemEntity?
     @Published var showAuthAlert: Bool = false
     @Published var authError: BiometricAuthManager.BiometricError?
     @Published var showOnboarding: Bool = false
@@ -22,7 +22,7 @@ class ContentViewModel: ObservableObject {
     private let authManager = BiometricAuthManager()
     private let viewContext: NSManagedObjectContext
     
-    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding= false
+    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding = false
     @AppStorage("sortOption") private var sortOptionRawValue: String = SortOption.dateCreated.rawValue
     
     nonisolated init(context: NSManagedObjectContext = PersistenceController.shared.container.viewContext) {
@@ -39,7 +39,7 @@ class ContentViewModel: ObservableObject {
     
     // Core Data Management
     func loadItems() {
-        let request = NSFetchRequest<Item>(entityName: "Item")
+        let request = NSFetchRequest<ItemEntity>(entityName: "ItemEntity")
         request.sortDescriptors = getSortDescriptors()
         
         // TODO: Will only fetch journal entries at the moment but need to fetch all
@@ -56,17 +56,17 @@ class ContentViewModel: ObservableObject {
     private func getSortDescriptors() -> [NSSortDescriptor] {
         switch currentSortOption {
         case .dateCreated:
-            return [NSSortDescriptor(keyPath: \Item.createdAt, ascending: false)]
+            return [NSSortDescriptor(keyPath: \ItemEntity.createdAt, ascending: false)]
         case .type:
-            return [NSSortDescriptor(keyPath: \Item.type, ascending: true),
-                    NSSortDescriptor(keyPath: \Item.createdAt, ascending: true)
+            return [NSSortDescriptor(keyPath: \ItemEntity.title, ascending: true),
+                    NSSortDescriptor(keyPath: \ItemEntity.createdAt, ascending: true)
                     ]
         }
     }
     
     func setSortOption(_ option: SortOption) {
         currentSortOption = option
-        sortOption.rawValue = option.rawValue
+        sortOptionRawValue = option.rawValue
         loadItems()
     }
     
@@ -83,7 +83,7 @@ class ContentViewModel: ObservableObject {
         }
     }
     
-    func handleHiddenItemTap(_ item: Item) {
+    func handleHiddenItemTap(_ item: ItemEntity) {
         authManager.authenticateUser(reason: "Authenticate to view hidden items") { [weak self] result in
             
             guard let self = self else { return }
@@ -105,7 +105,7 @@ class ContentViewModel: ObservableObject {
         }
     }
     
-    func handleLongPress(for item: Item) {
+    func handleLongPress(for item: ItemEntity) {
         if item.isHidden {
             pendingItemToUnhide = item.objectID
             authManager.authenticateUser(reason: "Authenticate to unhide item") { [weak self] result in
@@ -118,7 +118,7 @@ class ContentViewModel: ObservableObject {
                     
                     /// Auth success so unhide the item
                     if let objectID = self.pendingItemToUnhide {
-                        let item = try? self.viewContext.existingObject(with: objectID) as? Item {
+                        if let item = try? self.viewContext.existingObject(with: objectID) as? ItemEntity {
                             item.isHidden = false
                             self.saveContext()
                             self.viewContext.refreshAllObjects()
@@ -155,18 +155,18 @@ class ContentViewModel: ObservableObject {
     }
     
     func checkOnboarding() {
-        is !hasSeenOnboarding {
+        if !hasSeenOnboarding {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.showOnboarding = true
             }
         }
     }
     
-    func isItemHidden(_ item: Item) -> Bool {
+    func isItemHidden(_ item: ItemEntity) -> Bool {
         return item.isHidden
     }
     
-    var groupedItems: [ItemType: [Item]] {
+    var groupedItems: [ItemType: [ItemEntity]] {
         Dictionary(grouping: items) { item in
             item.itemType
         }
