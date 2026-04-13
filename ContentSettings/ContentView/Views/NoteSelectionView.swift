@@ -30,7 +30,7 @@ struct SelectEntryTypeView: View {
                     EntryTypeButton(
                         icon: "book.fill",
                         title: "Journal",
-                        colour: .red
+                        colour: themeManager.selectedTheme.primaryColour
                     ) {
                         navigateToJournal = true
                     }
@@ -39,7 +39,7 @@ struct SelectEntryTypeView: View {
                     EntryTypeButton(
                         icon: "pencil.and.outline",
                         title: "Free Writing",
-                        colour: .red
+                        colour: themeManager.selectedTheme.primaryColour
                     ) {
                         navigateToFreeWriting = true
                     }
@@ -48,7 +48,7 @@ struct SelectEntryTypeView: View {
                     EntryTypeButton(
                         icon: "cart.fill",
                         title: "Shopping List",
-                        colour: .red
+                        colour: themeManager.selectedTheme.primaryColour
                     ) {
                         navigateToShoppingList = true
                     }
