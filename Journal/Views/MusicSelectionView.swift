@@ -49,7 +49,7 @@ struct MusicSelectionView: View {
                                 authorizationStatus = MusicAuthorization.currentStatus
                             }
                         }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.glassProminent)
                     }
                 }
             }

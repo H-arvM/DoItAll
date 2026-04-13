@@ -14,15 +14,15 @@ struct Supermarket: Identifiable, Codable, Equatable {
     let latitude: Double
     let longitude: Double
     
-    var coordanates: CLLocationCoordinate2D {
+    var coordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
     
-    init(id: UUID, name: String, latitude: Double, longitude: Double) {
+    init(id: UUID = UUID(), name: String, coordinate: CLLocationCoordinate2D) {
         self.id = id
         self.name = name
-        self.latitude = latitude
-        self.longitude = longitude
+        self.latitude = coordinate.latitude
+        self.longitude = coordinate.longitude
     }
     
     static func == (lhs: Supermarket, rhs: Supermarket) -> Bool {

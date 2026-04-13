@@ -31,7 +31,7 @@ struct FloatingArrowButton: View {
             )
         }
         .sheet(isPresented: $viewModel.showSettings) {
-            EmptyView()
+            NewSettingsView()
             // Insert new SettingsView() here later
         }
     }
@@ -49,13 +49,13 @@ struct ExpandedActions: View {
     var body: some View {
         Group {
             FloatingActionButton(
-                icon: "gearshape.fill",
+                icon: "gearshape",
                 colour: .gray,
                 delay: 0.0,
                 action: onSettingsTap)
             
             FloatingActionButton(
-                icon: "arrow.up,arrow.down",
+                icon: "arrow.up.arrow.down",
                 colour: .orange,
                 delay: 0.0,
                 action: onSortTap)

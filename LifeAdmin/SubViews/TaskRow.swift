@@ -19,7 +19,7 @@ struct TaskRow: View {
                     .font(.title3)
                     .foregroundColor(task.isCompleted ? .green : .gray)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.glass)
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(task.title)
