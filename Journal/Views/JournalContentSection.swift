@@ -14,40 +14,50 @@ struct JournalContentSection: View {
     @Environment(\.colorScheme) private var colourScheme
     
     var body: some View {
+        // 1. Wrap everything in a GeometryReader or use a greedy VStack
         VStack(alignment: .leading, spacing: 8) {
             if mode == .edit {
-                TextEditor(text: $viewModel.content)
-                    .font(.body)
-                    .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                    .scrollContentBackground(.hidden)
-                    .frame(minHeight: 300)
-                    .padding(12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(adaptiveBackgroundColour)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(UIColor.separator), lineWidth: 0.5)
-                            )
-                    )
+                ScrollView {
+                    TextEditor(text: $viewModel.content)
+                        .font(.body)
+                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
+                        .scrollContentBackground(.hidden)
+                        .padding(12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(adaptiveBackgroundColour)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color(UIColor.separator), lineWidth: 0.5)
+                                )
+                        )
+                        .frame(minHeight: 200, maxHeight: .infinity)
+                }
             } else {
-                Text(viewModel.content.isEmpty ? "No entry written" : viewModel.content)
-                    .font(.body)
-                    .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(adaptiveBackgroundColour)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(UIColor.separator), lineWidth: 0.5)
-                            )
-                    )
+                ScrollView {
+                    Text(viewModel.content.isEmpty ? "No entry written" : viewModel.content)
+                        .font(.body)
+                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(12)
+                }
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(adaptiveBackgroundColour)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color(UIColor.separator), lineWidth: 0.5)
+                        )
+                )
+                .frame(minHeight: 200, maxHeight: .infinity)
             }
         }
         .padding(.horizontal, 20)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
+
+
+
     private var adaptiveBackgroundColour: Color {
         colourScheme == .dark ?
         Color(UIColor.secondarySystemBackground)

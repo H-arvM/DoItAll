@@ -16,7 +16,7 @@ struct JournalHeaderSection: View {
         VStack(alignment: .leading, spacing: 12) {
             if mode == .edit {
                 TextField("Journal title", text: $viewModel.title)
-                    .foregroundStyle(Color.red)
+                    .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
                     .font(.system(size: 34, weight: .bold))
                     .textFieldStyle(.plain)
             } else {

@@ -66,7 +66,7 @@ struct SelectEntryTypeView: View {
                     .environment(\.managedObjectContext, PersistenceController.shared.container.viewContext),
                 isActive: $navigateToJournal
             ) {
-                JournalView()
+                EmptyView()
             }
                 .hidden()
             )

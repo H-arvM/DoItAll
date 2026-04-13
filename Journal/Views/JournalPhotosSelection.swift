@@ -37,7 +37,7 @@ struct JournalPhotosSelection: View {
                         .rotationEffect(.degrees(viewModel.isPhotosExpanded ? 0 : -90))
                 }
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.glass)
             .padding(.horizontal, 20)
             
             if viewModel.isPhotosExpanded {

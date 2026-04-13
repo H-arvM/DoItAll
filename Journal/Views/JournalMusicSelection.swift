@@ -34,7 +34,7 @@ struct JournalMusicSelection: View {
                         .rotationEffect(.degrees(viewModel.isMusicExpanded ? 0 : -90))
                 }
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.glass)
             .padding(.horizontal, 20)
             
             if viewModel.isMusicExpanded {

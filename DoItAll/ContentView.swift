@@ -21,7 +21,6 @@ struct ScrollOffsetPreferenceKey: PreferenceKey {
 }
 
 struct ContentView: View {
-    
     @Environment(\.colorScheme) var colourScheme
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var viewModel = ContentViewModel()
@@ -107,22 +106,31 @@ struct ContentView: View {
             }
         }
     }
+    
+    @ViewBuilder
     private func destinationView(for type: ItemType, item: ItemEntity) -> some View {
         switch type {
         case .journalType:
-            if let _ = item.journalEntry {
-                return JournalView()
-            } else {
-                return JournalView()
-            }
+            JournalView(
+                mode: item.journalEntry == nil ? .edit : .view,
+                entry: item.getOrCreateJournalEntry(context: viewContext)
+            )
+            
         case .shoppingListType:
-            return JournalView()
+            // TODO: Create new view
+            EmptyView()
+            
         case .freeFormType:
-            return JournalView()
+            // TODO: Pass item later
+            FreeFormView()
+            
         case .lifeAdminType:
-            return JournalView()
+            // TODO: Pass item later
+            LifeAdminView()
+            
         case .generalListType:
-            return JournalView()
+            // TODO: Create new view
+            EmptyView()
         }
     }
     
@@ -621,29 +629,6 @@ struct ContentView: View {
         .padding(.horizontal, 5)
     }
     
-    // TODO: All emptyViews for now. Will have them navigate properly later
-//    @ViewBuilder
-//    private func destinationView(for type: ItemType, item: ItemEntity) -> some View {
-//        switch type {
-//        case .journalType:
-//            if let _ = item.journalEntry {
-//                EmptyView()
-//            }
-//        case .shoppingListType:
-//            return EmptyView()
-//            
-//        case .freeFormType:
-//            return EmptyView()
-//            
-//        case .lifeAdminType:
-//            return EmptyView()
-//            
-//        case .generalListType:
-//            return EmptyView()
-//        }
-//    }
-    
-    
     // MARK: Helper methods
     
     private func handleScroll(offset: CGFloat) {
@@ -694,3 +679,19 @@ struct ContentView: View {
 //    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 //}
 
+extension ItemEntity {
+    func getOrCreateJournalEntry(context: NSManagedObjectContext) -> JournalEntry {
+        if let existing = self.journalEntry {
+            return existing
+        }
+        let newEntry = JournalEntry(context: context)
+        newEntry.id = self.id
+        newEntry.createdDate = Date()
+        newEntry.title = self.title
+        newEntry.entryType = self.type
+        self.journalEntry = newEntry
+        
+        try? context.save()
+        return newEntry
+    }
+}
