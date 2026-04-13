@@ -27,6 +27,10 @@ final class JournalViewModel: ObservableObject {
 
     private var existingEntry: JournalEntry?
     
+    var formattedDate: String {
+        createdDate.funFormatString
+    }
+    
     init(entry: JournalEntry? = nil, initialEntryType: EntryType = .journal) {
         self.existingEntry = entry
         
@@ -117,7 +121,7 @@ final class JournalViewModel: ObservableObject {
     
     private func updateMediaProperties(_ entry: JournalEntry) {
         if entryType == .journal {
-            updateMediaProperties(entry)
+            updateMusicProperties(entry)
             updatePhotoProperties(entry)
         } else {
             clearMediaProperties(entry)
@@ -150,6 +154,22 @@ final class JournalViewModel: ObservableObject {
         entry.photoData = nil
     }
     
+    func saveJournal(context: NSManagedObjectContext, onSuccess: (() -> Void)? = nil) {
+        let entry = getOrCreateEntry(in: context)
+        updateEntryProperties(entry)
+        updateMediaProperties(entry)
+        
+        do {
+            try context.save()
+            existingEntry = entry
+            postSaveNotification()
+            onSuccess?()
+        } catch {
+            // TODO: Handle this in a nicer way
+            print("Error saving jounrnal")
+        }
+    }
+    
     private func clearMusicProperties(_ entry: JournalEntry) {
         entry.musicTrackID = nil
         entry.musicTrackTitle = nil
@@ -163,5 +183,27 @@ final class JournalViewModel: ObservableObject {
             object: nil
         )
      }
+    
+    func removePhoto(_ photo: UIImage) {
+        selectedPhotos.removeAll { $0 == photo }
+    }
+    
+    func loadPhoto(from items: [PhotosPickerItem]) {
+        guard !items.isEmpty else { return }
+        
+        Task {
+            for item in items {
+                if let data = try? await item.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                    await MainActor.run {
+                        selectedPhotos.append(image)
+                    }
+                }
+            }
+            await MainActor.run {
+                photoSelection = []
+            }
+        }
+    }
 }
 
