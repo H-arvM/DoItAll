@@ -62,10 +62,11 @@ struct SelectEntryTypeView: View {
         .navigationBarTitleDisplayMode(.inline)
         .background(
             NavigationLink(
-                destination: EmptyView().environment(\.managedObjectContext, PersistenceController.shared.container.viewContext),
+                destination: JournalView(mode: .edit, entry: nil, initialEntryType: .journal)
+                    .environment(\.managedObjectContext, PersistenceController.shared.container.viewContext),
                 isActive: $navigateToJournal
             ) {
-                EmptyView()
+                JournalView()
             }
                 .hidden()
             )

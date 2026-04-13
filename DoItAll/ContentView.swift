@@ -14,8 +14,8 @@ import UserNotifications
 import CoreData
 
 struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGPoint = .zero
-    static func reduce(value: inout CGPoint, nextValue: () -> CGPoint) {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
     }
 }
@@ -36,37 +36,12 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                ThemeBackgroundView(theme: themeManager.selectedTheme)
-                
-                itemsList
-                floatingButtonOverlay
-            }
-            /// Only navigate directly to if not hidden or if authenticated
-            .navigationDestination(for: ItemEntity.self) { item in
-                if !viewModel.isItemHidden(item) || viewModel.selectedItem == item {
-                    destinationView(for: ItemType(rawValue: item.type) ?? .typeA, item: item)
-                }
-            }
-            .navigationDestination(item: $viewModel.selectedItem) { item in
-                destinationView(for: ItemType(rawValue: item.type) ?? .typeA, item: item)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: SelectEntryTypeView()) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(themeManager.selectedTheme.iconColour)
-                    }
-                }
-            }
+            mainContent
         }
         .alert("Authentication required", isPresented: $viewModel.showAuthAlert) {
             Button("Ok", role: .cancel) { }
         } message: {
-            if let error = viewModel.authError {
-                Text(error.errorDescription ?? "An error occured")
-            }
+            authAlertMessage
         }
         .fullScreenCover(isPresented: $viewModel.showOnboarding) {
             OnboardingView(isPresented: $viewModel.showOnboarding, dontShowAgain: $viewModel.hasSeenOnboarding)
@@ -74,29 +49,89 @@ struct ContentView: View {
         .onAppear {
             viewModel.setupViewModel()
             viewModel.checkOnboarding()
-            viewModel.loadItems() /// Refresh items when view appears
-        }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("JournalEntrySaved"))) { _ in
-            /// Refresh the list when a journal entry is saved
             viewModel.loadItems()
         }
-        .onChange(of: viewModel.items) { _, _ in
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("JournalEntrySaved"))) { _ in
+            viewModel.loadItems()
         }
         .confirmationDialog("Sort by", isPresented: $showSortOptions, titleVisibility: .visible) {
-            ForEach(SortOption.allCases, id: \.self) { option in
-                Button {
-                    withAnimation {
-                        viewModel.setSortOption(option)
-                    }
-                } label: {
-                    HStack {
-                        Image(systemName: option.systemImage)
-                        Text(option.rawValue)
-                        if viewModel.currentSortOption == option {
-                            Image(systemName: "checkmark")
-                        }
-                    }
+            sortOptionsContent
+        }
+    }
+    
+    private var mainContent: some View {
+        ZStack {
+            ThemeBackgroundView(theme: themeManager.selectedTheme)
+            itemsList
+            floatingButtonOverlay()
+        }
+        .navigationDestination(for: ItemEntity.self) { item in
+            navigationDestination(for: item)
+        }
+        .navigationDestination(item: $viewModel.selectedItem) { item in
+            destinationView(for: ItemType(rawValue: item.type ?? "") ?? .journalType, item: item)
+        }
+        .toolbar {
+            toolbarContent
+        }
+    }
+
+    @ViewBuilder
+    private func navigationDestination(for item: ItemEntity) -> some View {
+        let itemType = ItemType(rawValue: item.type ?? "") ?? .journalType
+        let isVisible = !viewModel.isItemHidden(item) || viewModel.selectedItem == item
+
+        if isVisible {
+            destinationView(for: itemType, item: item)
+        } else {
+            EmptyView()
+        }
+    }
+
+    @ViewBuilder
+    private var authAlertMessage: some View {
+        if let error = viewModel.authError {
+            Text(error.errorDescription ?? "An error occurred")
+        }
+    }
+
+    @ViewBuilder
+    private var sortOptionsContent: some View {
+        ForEach(SortOption.allCases, id: \.self) { option in
+            Button {
+                withAnimation {
+                    viewModel.setSortOption(option)
                 }
+            } label: {
+                Text(option.rawValue)
+            }
+        }
+    }
+    private func destinationView(for type: ItemType, item: ItemEntity) -> some View {
+        switch type {
+        case .journalType:
+            if let _ = item.journalEntry {
+                return JournalView()
+            } else {
+                return JournalView()
+            }
+        case .shoppingListType:
+            return JournalView()
+        case .freeFormType:
+            return JournalView()
+        case .lifeAdminType:
+            return JournalView()
+        case .generalListType:
+            return JournalView()
+        }
+    }
+    
+    var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .primaryAction) { // Updated to modern placement
+            NavigationLink(destination: SelectEntryTypeView()) {
+                Image(systemName: "plus")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(themeManager.selectedTheme.iconColour)
             }
         }
     }
@@ -563,19 +598,18 @@ struct ContentView: View {
             
             VStack(alignment: .leading, spacing: 4) {
                 if item.itemType == .journalType, let journalEntry = item.journalEntry {
-                    Text(journalEntry.title)
+                    Text(journalEntry.title ?? "No title")
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                    
-                    Text(journalEntry.createdAt.funFormatString)
+                    Text(journalEntry.createdDate?.funFormatString ?? "")
                         .font(.caption2)
                         .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
                 } else {
-                    Text(item.title)
+                    Text(item.title ?? "No title")
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
                     
-                    Text(item.createdAt.funFormatString)
+                    Text(item.createdAt?.funFormatString ?? Date().funFormatString)
                         .font(.caption2)
                         .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
                 }
@@ -588,26 +622,26 @@ struct ContentView: View {
     }
     
     // TODO: All emptyViews for now. Will have them navigate properly later
-    @ViewBuilder
-    private func destinationView(for type: ItemType, item: ItemEntity) -> some View {
-        switch type {
-        case .journalType:
-            if let _ = item.journalText {
-                EmptyView()
-            }
-        case .shoppingListType:
-            return EmptyView()
-            
-        case .freeFormType:
-            return EmptyView()
-            
-        case .lifeAdminType:
-            return EmptyView()
-            
-        case .generalListType:
-            return EmptyView()
-        }
-    }
+//    @ViewBuilder
+//    private func destinationView(for type: ItemType, item: ItemEntity) -> some View {
+//        switch type {
+//        case .journalType:
+//            if let _ = item.journalEntry {
+//                EmptyView()
+//            }
+//        case .shoppingListType:
+//            return EmptyView()
+//            
+//        case .freeFormType:
+//            return EmptyView()
+//            
+//        case .lifeAdminType:
+//            return EmptyView()
+//            
+//        case .generalListType:
+//            return EmptyView()
+//        }
+//    }
     
     
     // MARK: Helper methods

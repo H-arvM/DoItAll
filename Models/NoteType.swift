@@ -61,19 +61,4 @@ enum ItemType: String, CaseIterable, Identifiable {
             return .orange
         }
     }
-    
-    var entryType: String {
-        switch self {
-        case .journalType:
-            return "Journal"
-        case .shoppingListType:
-            return "Shopping list"
-        case .freeFormType:
-            return "Freeform"
-        case .lifeAdminType:
-            return "Life Admin"
-        case .generalListType:
-            return "List"
-        }
-    }
 }
