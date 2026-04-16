@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct JournalContentSection: View {
-    let mode: JournalMode
+    let mode: EditOrViewMode
     @ObservedObject var viewModel: JournalViewModel
     @ObservedObject var themeManager: ThemeManager
     @Environment(\.colorScheme) private var colourScheme

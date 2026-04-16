@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct JournalPhotosSelection: View {
-    let mode: JournalMode
+    let mode: EditOrViewMode
     @ObservedObject var viewModel: JournalViewModel
     @ObservedObject var themeManager: ThemeManager
     

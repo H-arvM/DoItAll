@@ -45,7 +45,6 @@ final class JournalViewModel: ObservableObject {
         title = entry.title ?? ""
         content = entry.content ?? ""
         createdDate = entry.createdDate ?? Date()
-        // TODO: Handle this better later rather than !
         entryType = EntryType(rawValue: entry.entryType!) ?? .journal
         
         loadMusicFromEntry(entry)

@@ -8,7 +8,7 @@
 import SwiftUI
 import PhotosUI
 
-enum JournalMode {
+enum EditOrViewMode {
     case edit
     case view
 }
@@ -22,10 +22,10 @@ struct JournalView: View {
     @State private var drawerOffset: CGFloat = 0
     @State private var isExpanded: Bool = false
     
-    let mode: JournalMode
+    let mode: EditOrViewMode
     var onSave: (() -> Void)?
     
-    init(mode: JournalMode = .edit, entry: JournalEntry? = nil, initialEntryType: EntryType = .journal, onSave: (() -> Void)? = nil) {
+    init(mode: EditOrViewMode = .edit, entry: JournalEntry? = nil, initialEntryType: EntryType = .journal, onSave: (() -> Void)? = nil) {
         self.mode = mode
         self.onSave = onSave
         _viewModel = StateObject(wrappedValue: JournalViewModel(entry: entry, initialEntryType: initialEntryType))

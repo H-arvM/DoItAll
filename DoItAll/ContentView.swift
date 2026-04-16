@@ -78,7 +78,7 @@ struct ContentView: View {
             navigationDestination(for: item)
         }
         .navigationDestination(item: $viewModel.selectedItem) { item in
-            destinationView(for: ItemType(rawValue: item.type ?? "") ?? .journalType, item: item)
+            navigationDestination(for: item)
         }
         .toolbar {
             toolbarContent
@@ -131,8 +131,9 @@ struct ContentView: View {
             EmptyView()
             
         case .freeFormType:
-            // TODO: Pass item later
-            FreeFormView()
+            FreeFormView(mode: item.freeWritingEntry == nil ? .edit : .view,
+                         entry: item.getOrCreateFreeWritingEntry(context: viewContext)
+            )
             
         case .lifeAdminType:
             // TODO: Pass item later
@@ -733,6 +734,21 @@ extension ItemEntity {
         newEntry.title = self.title
         newEntry.entryType = self.type
         self.journalEntry = newEntry
+        
+        try? context.save()
+        return newEntry
+    }
+    
+    func getOrCreateFreeWritingEntry(context: NSManagedObjectContext) -> FreeWritingEntry {
+        if let existing = self.freeWritingEntry {
+            return existing
+        }
+        let newEntry = FreeWritingEntry(context: context)
+        newEntry.id = self.id
+        newEntry.createdDate = Date()
+        newEntry.title = self.title
+        newEntry.entryType = self.type
+        self.freeWritingEntry = newEntry
         
         try? context.save()
         return newEntry

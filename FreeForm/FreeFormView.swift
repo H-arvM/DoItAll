@@ -8,46 +8,61 @@
 import SwiftUI
 
 struct FreeFormView: View {
-    @StateObject private var viewModel = FreeFormViewModel()
+    @StateObject private var themeManager = ThemeManager.shared
+    @StateObject private var viewModel: FreeFormViewModel
     @FocusState private var isTextFieldFocused: Bool
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.managedObjectContext) private var viewContext
+    
+    let mode: EditOrViewMode
+    var onSave: (() -> Void)?
+    
+    init(mode: EditOrViewMode = .edit, entry: FreeWritingEntry? = nil, initialEntryType: EntryType = .freeForm, onSave: (() -> Void)? = nil) {
+        self.mode = mode
+        self.onSave = onSave
+        _viewModel = StateObject(wrappedValue: FreeFormViewModel(entry: entry, initialEntryType: initialEntryType))
+    }
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color(uiColor: .systemGroupedBackground)
-                    .ignoresSafeArea()
+        ZStack {
+            Color(uiColor: .systemGroupedBackground)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                textEditorSection
                 
-                VStack(spacing: 0) {
-                    textEditorSection
-                    
-                    if !viewModel.text.isEmpty {
-                        wordCountFooter
-                    }
+                if !viewModel.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    wordCountFooter
                 }
             }
-            .navigationTitle("Free Form")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        viewModel.saveEntry()
-                    } label: {
-                        Text("Save")
-                            .fontWeight(.medium)
+        }
+        .navigationTitle("Free Form")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(false)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    viewModel.saveFreeform(context: viewContext) {
+                        // Crucial: Notify parent BEFORE dismissing or dismissing after save
+                        onSave?()
+                        dismiss()
                     }
-                    .disabled(viewModel.text.trimmingCharacters(in: .whitespaces).isEmpty)
+                } label: {
+                    Image(systemName: "square.and.arrow.down")
+                        .foregroundStyle(themeManager.selectedTheme.primaryColour)
                 }
             }
-            .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    isTextFieldFocused = true
-                }
+        }
+        .onAppear {
+            // Small delay to ensure the keyboard pops up after transition
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                isTextFieldFocused = true
             }
         }
     }
     
     private var textEditorSection: some View {
-        TextEditor(text: $viewModel.text)
+        TextEditor(text: $viewModel.content)
             .focused($isTextFieldFocused)
             .font(.body)
             .scrollContentBackground(.hidden)
@@ -70,5 +85,5 @@ struct FreeFormView: View {
 }
 
 #Preview {
-    FreeFormView()
+    FreeFormView(mode: .edit, entry: nil, initialEntryType: .freeForm)
 }

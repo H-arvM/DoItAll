@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ExpandedPhotosView: View {
-    let mode: JournalMode
+    let mode: EditOrViewMode
     @ObservedObject var viewModel: JournalViewModel
     
     var body: some View {

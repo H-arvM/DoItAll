@@ -15,6 +15,8 @@ struct SelectEntryTypeView: View {
     @State private var navigateToJournal: Bool = false
     @State private var navigateToFreeWriting: Bool = false
     @State private var navigateToShoppingList: Bool = false
+    @State private var navigateToLifeAdmin: Bool = false
+
     
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     
@@ -84,7 +86,23 @@ struct SelectEntryTypeView: View {
                         isActive: $navigateToJournal
                     ) { EmptyView() }
                     
-                    // Add FreeWriting and ShoppingList links here similarly
+                    NavigationLink(
+                        destination: FreeFormView()
+                        .environment(\.managedObjectContext, viewContext),
+                        isActive: $navigateToFreeWriting
+                    ) { EmptyView() }
+                    
+                    NavigationLink(
+                        destination: LifeAdminView()
+                        .environment(\.managedObjectContext, viewContext),
+                        isActive: $navigateToShoppingList
+                    ) { EmptyView() }
+                    
+                    NavigationLink(
+                        destination: LifeAdminView()
+                        .environment(\.managedObjectContext, viewContext),
+                        isActive: $navigateToLifeAdmin
+                    ) { EmptyView() }
                 }
                 .hidden()
             )

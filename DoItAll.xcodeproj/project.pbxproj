@@ -23,6 +23,7 @@
 		D28F2BD02F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28F2BCF2F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift */; };
 		D29C09452F868F7D0015749B /* SelectEntryTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29C09382F868F7D0015749B /* SelectEntryTypeView.swift */; };
 		D29C094E2F86922D0015749B /* EntryTypeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29C094D2F86922D0015749B /* EntryTypeButton.swift */; };
+		D2A316B32F911F80004CB336 /* ShoppingListSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A316B12F911F80004CB336 /* ShoppingListSettingsView.swift */; };
 		D2A844BB2F844E6500D5BB2B /* SwipeToDeleteRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A844BA2F844E6500D5BB2B /* SwipeToDeleteRow.swift */; };
 		D2F85ABA2F901E9B008CB872 /* JournalSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F85AB92F901E9B008CB872 /* JournalSettings.swift */; };
 /* End PBXBuildFile section */
@@ -64,6 +65,7 @@
 		D28F2BCF2F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupermarketSettingsViewModel.swift; sourceTree = "<group>"; };
 		D29C09382F868F7D0015749B /* SelectEntryTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectEntryTypeView.swift; sourceTree = "<group>"; };
 		D29C094D2F86922D0015749B /* EntryTypeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryTypeButton.swift; sourceTree = "<group>"; };
+		D2A316B12F911F80004CB336 /* ShoppingListSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingListSettingsView.swift; sourceTree = "<group>"; };
 		D2A844BA2F844E6500D5BB2B /* SwipeToDeleteRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeToDeleteRow.swift; sourceTree = "<group>"; };
 		D2F85AB92F901E9B008CB872 /* JournalSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalSettings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -276,6 +278,7 @@
 				D277700F2F7C0BAF007CCDDA /* SettingsIconCircle.swift */,
 				D277700D2F7C0AF8007CCDDA /* SettingsNavigationRow.swift */,
 				D27770052F79BB06007CCDDA /* NewSettingsView.swift */,
+				D2A316B12F911F80004CB336 /* ShoppingListSettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -503,6 +506,7 @@
 				D29C09452F868F7D0015749B /* SelectEntryTypeView.swift in Sources */,
 				D29C094E2F86922D0015749B /* EntryTypeButton.swift in Sources */,
 				D27770122F7C0CB9007CCDDA /* RowTitle.swift in Sources */,
+				D2A316B32F911F80004CB336 /* ShoppingListSettingsView.swift in Sources */,
 				D277700B2F79BCB8007CCDDA /* FavouriteSupermarketManager.swift in Sources */,
 				D28F2BC92F7EBD9F00E37D85 /* SupermarketsMapView.swift in Sources */,
 				D2F85ABA2F901E9B008CB872 /* JournalSettings.swift in Sources */,
