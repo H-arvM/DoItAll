@@ -31,6 +31,7 @@ struct ContentView: View {
     @State private var lastScrollOffset: CGFloat = 0
     @State private var isScrolling: Bool = false
     @State private var hideButtonsWorkItem: DispatchWorkItem?
+    @State private var isShowingSelectEntry = false
     
     @State private var lastScrollTime: TimeInterval = 0
     @State private var consecutiveVelocityHits: Int = 0
@@ -47,6 +48,9 @@ struct ContentView: View {
         }
         .fullScreenCover(isPresented: $viewModel.showOnboarding) {
             OnboardingView(isPresented: $viewModel.showOnboarding, dontShowAgain: $viewModel.hasSeenOnboarding)
+        }
+        .fullScreenCover(isPresented: $isShowingSelectEntry) {
+            SelectEntryTypeView()
         }
         .onAppear {
             viewModel.setupViewModel()
@@ -141,8 +145,10 @@ struct ContentView: View {
     }
     
     var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .primaryAction) { // Updated to modern placement
-            NavigationLink(destination: SelectEntryTypeView()) {
+        ToolbarItem(placement: .primaryAction) {
+            Button {
+                isShowingSelectEntry = true
+            } label: {
                 Image(systemName: "plus")
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(themeManager.selectedTheme.iconColour)
