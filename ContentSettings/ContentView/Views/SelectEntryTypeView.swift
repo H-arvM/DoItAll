@@ -79,22 +79,34 @@ struct SelectEntryTypeView: View {
                 // Using a Group to hold multiple hidden NavigationLinks
                 Group {
                     NavigationLink(
-                        destination: JournalView(mode: .edit, entry: nil, initialEntryType: .journal) {
-                            dismiss()
-                        }
-                        .environment(\.managedObjectContext, viewContext),
+                        destination: JournalView(
+                            mode: .edit,
+                            entry: nil,
+                            initialEntryType: .journal) {
+                                dismiss()
+                            }
+                            .environment(\.managedObjectContext, viewContext),
                         isActive: $navigateToJournal
                     ) { EmptyView() }
                     
                     NavigationLink(
-                        destination: FreeFormView()
-                        .environment(\.managedObjectContext, viewContext),
+                        destination: FreeFormView(
+                            mode: .edit,
+                            entry: nil,
+                            initialEntryType: .freeForm) {
+                                dismiss()
+                            }
+                            .environment(\.managedObjectContext, viewContext),
                         isActive: $navigateToFreeWriting
                     ) { EmptyView() }
                     
                     NavigationLink(
-                        destination: LifeAdminView()
-                        .environment(\.managedObjectContext, viewContext),
+                        destination: ShoppingEntryView(
+                            entry: nil,
+                            initialEntryType: .shoppingList) {
+                                dismiss()
+                            }
+                    .environment(\.managedObjectContext, viewContext),
                         isActive: $navigateToShoppingList
                     ) { EmptyView() }
                     

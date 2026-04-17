@@ -14,7 +14,6 @@ struct JournalContentSection: View {
     @Environment(\.colorScheme) private var colourScheme
     
     var body: some View {
-        // 1. Wrap everything in a GeometryReader or use a greedy VStack
         VStack(alignment: .leading, spacing: 8) {
             if mode == .edit {
                 ScrollView {

@@ -44,7 +44,6 @@ struct JournalView: View {
                     
                     Spacer(minLength: 150)
                 }
-                .padding()
             }
             draggablePhotosDrawer
         }
@@ -60,7 +59,7 @@ struct JournalView: View {
     
     @ViewBuilder
     private var headerSection: some View {
-        JournalHeaderSection(
+        GenericHeaderSection(
             mode: mode,
             viewModel: viewModel,
             themeManager: themeManager

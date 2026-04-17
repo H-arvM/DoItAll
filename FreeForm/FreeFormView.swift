@@ -16,7 +16,8 @@ struct FreeFormView: View {
     
     let mode: EditOrViewMode
     var onSave: (() -> Void)?
-    
+    private var isViewMode: Bool { mode == .view }
+
     init(mode: EditOrViewMode = .edit, entry: FreeWritingEntry? = nil, initialEntryType: EntryType = .freeForm, onSave: (() -> Void)? = nil) {
         self.mode = mode
         self.onSave = onSave
@@ -28,7 +29,8 @@ struct FreeFormView: View {
             Color(uiColor: .systemGroupedBackground)
                 .ignoresSafeArea()
             
-            VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 24) {
+                GenericHeaderSection(mode: mode, viewModel: viewModel, themeManager: themeManager)
                 textEditorSection
                 
                 if !viewModel.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -38,25 +40,26 @@ struct FreeFormView: View {
         }
         .navigationTitle("Free Form")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(false)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    viewModel.saveFreeform(context: viewContext) {
-                        // Crucial: Notify parent BEFORE dismissing or dismissing after save
-                        onSave?()
-                        dismiss()
+            if !isViewMode {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        viewModel.saveFreeform(context: viewContext) {
+                            onSave?()
+                            dismiss()
+                        }
+                    } label: {
+                        Image(systemName: "square.and.arrow.down")
+                            .foregroundStyle(themeManager.selectedTheme.primaryColour)
                     }
-                } label: {
-                    Image(systemName: "square.and.arrow.down")
-                        .foregroundStyle(themeManager.selectedTheme.primaryColour)
                 }
             }
         }
         .onAppear {
-            // Small delay to ensure the keyboard pops up after transition
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                isTextFieldFocused = true
+            if !isViewMode {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    isTextFieldFocused = true
+                }
             }
         }
     }
@@ -64,6 +67,7 @@ struct FreeFormView: View {
     private var textEditorSection: some View {
         TextEditor(text: $viewModel.content)
             .focused($isTextFieldFocused)
+            .disabled(isViewMode)
             .font(.body)
             .scrollContentBackground(.hidden)
             .padding()
@@ -73,17 +77,16 @@ struct FreeFormView: View {
     
     private var wordCountFooter: some View {
         HStack {
-            Text("\(viewModel.wordCount) words")
+            Text("\(viewModel.wordCount) \(viewModel.wordCount == "1" ? "word" : "words")")
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Spacer()
         }
         .padding(.horizontal)
-        .padding(.bottom, 8)
+        .padding(.bottom, 12)
         .animation(.easeInOut(duration: 0.2), value: viewModel.wordCount)
     }
 }
-
 #Preview {
     FreeFormView(mode: .edit, entry: nil, initialEntryType: .freeForm)
 }

@@ -16,8 +16,10 @@
         <attribute name="isHidden" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="title" optional="YES" attributeType="String"/>
         <attribute name="type" optional="YES" attributeType="String"/>
+        <attribute name="wordCount" optional="YES" attributeType="String"/>
         <relationship name="freeWritingEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FreeWritingEntry" inverseName="item" inverseEntity="FreeWritingEntry"/>
         <relationship name="journalEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="JournalEntry" inverseName="item" inverseEntity="JournalEntry"/>
+        <relationship name="shoppingEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ShoppingEntry" inverseName="item" inverseEntity="ShoppingEntry"/>
     </entity>
     <entity name="JournalEntry" representedClassName="JournalEntry" syncable="YES" codeGenerationType="class">
         <attribute name="content" optional="YES" attributeType="String"/>
@@ -31,5 +33,22 @@
         <attribute name="photoData" optional="YES" attributeType="Binary"/>
         <attribute name="title" optional="YES" attributeType="String"/>
         <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ItemEntity" inverseName="journalEntry" inverseEntity="ItemEntity"/>
+    </entity>
+    <entity name="ShoppingEntry" representedClassName="ShoppingEntry" syncable="YES" codeGenerationType="class">
+        <attribute name="createdDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="entryType" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isChecked" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="itemQuantity" optional="YES" attributeType="String"/>
+        <attribute name="shoppingItem" optional="YES" attributeType="String"/>
+        <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ItemEntity" inverseName="shoppingEntry" inverseEntity="ItemEntity"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ShoppingItem" inverseName="entry" inverseEntity="ShoppingItem"/>
+    </entity>
+    <entity name="ShoppingItem" representedClassName="ShoppingItem" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isChecked" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="quantity" optional="YES" attributeType="String"/>
+        <relationship name="entry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ShoppingEntry" inverseName="items" inverseEntity="ShoppingEntry"/>
     </entity>
 </model>

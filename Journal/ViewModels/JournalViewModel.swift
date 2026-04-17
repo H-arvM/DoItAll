@@ -11,7 +11,7 @@ import CoreData
 import Combine
 
 @MainActor
-final class JournalViewModel: ObservableObject {
+final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtocol {
     @Published var title: String = ""
     @Published var content: String = ""
     @Published var createdDate: Date = Date()
@@ -26,10 +26,6 @@ final class JournalViewModel: ObservableObject {
     @Published var isMusicExpanded: Bool = false
 
     private var existingEntry: JournalEntry?
-    
-    var formattedDate: String {
-        createdDate.funFormatString
-    }
     
     init(entry: JournalEntry? = nil, initialEntryType: EntryType = .journal) {
         self.existingEntry = entry

@@ -127,8 +127,7 @@ struct ContentView: View {
             )
             
         case .shoppingListType:
-            // TODO: Create new view
-            EmptyView()
+            ShoppingEntryView(entry: item.getOrCreateShoppingEntry(context: viewContext))
             
         case .freeFormType:
             FreeFormView(mode: item.freeWritingEntry == nil ? .edit : .view,
@@ -749,6 +748,20 @@ extension ItemEntity {
         newEntry.title = self.title
         newEntry.entryType = self.type
         self.freeWritingEntry = newEntry
+        
+        try? context.save()
+        return newEntry
+    }
+    
+    func getOrCreateShoppingEntry(context: NSManagedObjectContext) -> ShoppingEntry {
+        if let existing = self.shoppingEntry {
+            return existing
+        }
+        let newEntry = ShoppingEntry(context: context)
+        newEntry.id = self.id
+        newEntry.createdDate = Date()
+        newEntry.entryType = self.type
+        self.shoppingEntry = newEntry
         
         try? context.save()
         return newEntry

@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 import CoreData
 
-class FreeFormViewModel: ObservableObject {
+class FreeFormViewModel: ObservableObject, @MainActor HeaderProviderProtocol {
     @Published var title: String = ""
     @Published var content: String = ""
     @Published var createdDate: Date = Date()
@@ -17,17 +17,14 @@ class FreeFormViewModel: ObservableObject {
     @Published var entryType: EntryType = .freeForm
 
     private var existingEntry: FreeWritingEntry?
-    
-    private var cancellables = Set<AnyCancellable>()
-    
-    init(entry: FreeWritingEntry? = nil, initialEntryType: EntryType = .freeForm) {
         
-//        $text
-       //            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-       //            .map { text in
-       //                text.split(whereSeparator: \.isWhitespace).count
-       //            }
-       //            .assign(to: &$wordCount)
+    init(entry: FreeWritingEntry? = nil, initialEntryType: EntryType = .freeForm) {
+        $content
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .map { text -> String in
+                String(text.split(whereSeparator: \.isWhitespace).count)
+            }
+            .assign(to: &self.$wordCount)
         self.existingEntry = entry
         
         if let entry = entry {
@@ -36,7 +33,7 @@ class FreeFormViewModel: ObservableObject {
             self.entryType = initialEntryType
         }
     }
-    
+        
     private func loadExistingEntry(_ entry: FreeWritingEntry) {
         title = entry.title ?? ""
         content = entry.content ?? ""
@@ -52,6 +49,8 @@ class FreeFormViewModel: ObservableObject {
         
         let entry = FreeWritingEntry(context: context)
         entry.id = UUID()
+        entry.title = title
+        entry.wordCount = wordCount
         entry.createdDate = createdDate
         
         createAssociatedItem(for: entry, in: context)
@@ -62,10 +61,10 @@ class FreeFormViewModel: ObservableObject {
     private func createAssociatedItem(for entry: FreeWritingEntry, in context: NSManagedObjectContext) {
         let item = ItemEntity(context: context)
         item.id = UUID()
-        item.title = title.isEmpty ? "Untitled Entry" : title
+        item.title = title.isEmpty ? "" : title
         item.createdAt = Date()
         item.type = itemTypeForEntryType(entryType)
-//        item.wordCount = Int16(wordCount)
+        item.wordCount = wordCount
         entry.item = item
     }
     
@@ -100,7 +99,7 @@ class FreeFormViewModel: ObservableObject {
             onSuccess?()
         } catch {
             // TODO: Handle this in a nicer way
-            print("Error saving freefor")
+            print("Error saving freeform")
         }
     }
     
