@@ -8,13 +8,23 @@
 import SwiftUI
 
 struct LifeAdminView: View {
-    @StateObject private var viewModel = LifeAdminViewModel()
-    
+    @StateObject private var themeManager = ThemeManager.shared
+    @StateObject private var viewModel: LifeAdminViewModel
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.managedObjectContext) private var viewContext
+
+    var onSave: (() -> Void)?
+
+    init(entry: TaskEntry? = nil, initialEntryType: EntryType = .lifeAdmin, onSave: (() -> Void)? = nil) {
+        self.onSave = onSave
+        _viewModel = StateObject(wrappedValue: LifeAdminViewModel(entry: entry, initialEntryType: initialEntryType))
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
                 contentView
-                floatingSettingsButton
+                floatingAddButton
             }
             .navigationTitle("Life Admin")
             .navigationBarTitleDisplayMode(.large)
@@ -26,11 +36,14 @@ struct LifeAdminView: View {
             .sheet(isPresented: $viewModel.showingSettings) {
                 LifeAdminSettingsView()
             }
+            .onAppear {
+                viewModel.loadTasks(context: viewContext)
+            }
         }
     }
-    
+
     // MARK: - Subviews
-    
+
     private var contentView: some View {
         VStack(spacing: 0) {
             categoryPills
@@ -38,7 +51,7 @@ struct LifeAdminView: View {
             taskList
         }
     }
-    
+
     private var categoryPills: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
@@ -55,7 +68,7 @@ struct LifeAdminView: View {
         }
         .background(Color(.systemBackground))
     }
-    
+
     private var taskList: some View {
         Group {
             if viewModel.filteredTasks.isEmpty {
@@ -64,29 +77,31 @@ struct LifeAdminView: View {
                 List {
                     ForEach(viewModel.filteredTasks) { task in
                         TaskRow(task: task) {
-                            viewModel.toggleTaskCompletion(task)
+                            viewModel.toggleTaskCompletion(task, context: viewContext)
                         }
                     }
-                    .onDelete(perform: viewModel.deleteTask)
+                    .onDelete { offsets in
+                        viewModel.deleteTask(at: offsets, context: viewContext)
+                    }
                 }
                 .listStyle(.insetGrouped)
             }
         }
     }
-    
-    private var floatingSettingsButton: some View {
+
+    private var floatingAddButton: some View {
         VStack {
             Spacer()
             HStack {
                 Spacer()
                 Button {
-                    viewModel.showingSettings = true
+                    viewModel.showingAddTask = true
                 } label: {
-                    Image(systemName: "gearshape.fill")
+                    Image(systemName: "plus")
                         .font(.title2)
                         .foregroundColor(.white)
                         .frame(width: 56, height: 56)
-                        .background(Color.blue)
+                        .background(themeManager.selectedTheme.primaryColour)
                         .clipShape(Circle())
                         .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
                 }
@@ -94,71 +109,25 @@ struct LifeAdminView: View {
                 .padding(.bottom, 20)
             }
         }
+        .sheet(isPresented: $viewModel.showingAddTask) {
+            AddTaskView(viewModel: viewModel)
+        }
     }
     
     private var saveButton: some View {
         Button {
-            viewModel.saveData()
+            viewModel.saveAdminEntry(context: viewContext) {
+            if let onSave = onSave {
+                    onSave()
+                } else {
+                    dismiss()
+                }
+            }
         } label: {
             Image(systemName: "square.and.arrow.down")
-                .font(.body.weight(.medium))
+                .foregroundStyle(themeManager.selectedTheme.primaryColour)
         }
     }
-    
-    private var addButton: some View {
-        Button {
-            viewModel.addNewTask()
-        } label: {
-            Image(systemName: "plus")
-                .font(.body.weight(.medium))
-        }
-    }
-}
-// MARK: - Task Category Enum
-enum TaskCategory: String, CaseIterable {
-    case bills = "Bills"
-    case medical = "Medical"
-    case insurance = "Insurance"
-    case taxes = "Taxes"
-    case home = "Home"
-    case vehicle = "Vehicle"
-    case subscriptions = "Subscriptions"
-    case other = "Other"
-    
-    var icon: String {
-        switch self {
-        case .bills: return "dollarsign.circle.fill"
-        case .medical: return "cross.circle.fill"
-        case .insurance: return "shield.fill"
-        case .taxes: return "doc.text.fill"
-        case .home: return "house.fill"
-        case .vehicle: return "car.fill"
-        case .subscriptions: return "repeat.circle.fill"
-        case .other: return "ellipsis.circle.fill"
-        }
-    }
-    
-    var color: Color {
-        switch self {
-        case .bills: return .green
-        case .medical: return .red
-        case .insurance: return .blue
-        case .taxes: return .purple
-        case .home: return .orange
-        case .vehicle: return .cyan
-        case .subscriptions: return .pink
-        case .other: return .gray
-        }
-    }
-}
-
-// MARK: - Life Admin Task Model
-struct LifeAdminTask: Identifiable {
-    let id = UUID()
-    var title: String
-    var category: TaskCategory
-    var dueDate: Date
-    var isCompleted: Bool
 }
 
 // MARK: - Preview
@@ -167,3 +136,4 @@ struct LifeAdminView_Previews: PreviewProvider {
         LifeAdminView()
     }
 }
+

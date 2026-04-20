@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24837" systemVersion="25E253" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CategorySettings" representedClassName="CategorySettings" syncable="YES" codeGenerationType="class">
+        <attribute name="categoryRawValue" optional="YES" attributeType="String"/>
+        <attribute name="colourHex" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isVisible" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="sortOrder" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="taskEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TaskEntry" inverseName="taskEntry" inverseEntity="TaskEntry"/>
+    </entity>
     <entity name="FreeWritingEntry" representedClassName="FreeWritingEntry" syncable="YES" codeGenerationType="class">
         <attribute name="content" optional="YES" attributeType="String"/>
         <attribute name="createdDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -20,6 +28,7 @@
         <relationship name="freeWritingEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FreeWritingEntry" inverseName="item" inverseEntity="FreeWritingEntry"/>
         <relationship name="journalEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="JournalEntry" inverseName="item" inverseEntity="JournalEntry"/>
         <relationship name="shoppingEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ShoppingEntry" inverseName="item" inverseEntity="ShoppingEntry"/>
+        <relationship name="taskItemEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TaskEntry" inverseName="item" inverseEntity="TaskEntry"/>
     </entity>
     <entity name="JournalEntry" representedClassName="JournalEntry" syncable="YES" codeGenerationType="class">
         <attribute name="content" optional="YES" attributeType="String"/>
@@ -50,5 +59,18 @@
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="quantity" optional="YES" attributeType="String"/>
         <relationship name="entry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ShoppingEntry" inverseName="items" inverseEntity="ShoppingEntry"/>
+    </entity>
+    <entity name="TaskEntry" representedClassName="TaskEntry" syncable="YES" codeGenerationType="class">
+        <attribute name="category" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dueDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="entryType" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isCompleted" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="sortOrder" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ItemEntity" inverseName="taskItemEntry" inverseEntity="ItemEntity"/>
+        <relationship name="taskEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CategorySettings" inverseName="taskEntry" inverseEntity="CategorySettings"/>
     </entity>
 </model>

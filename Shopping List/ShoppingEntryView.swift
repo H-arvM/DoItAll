@@ -109,7 +109,6 @@ struct ShoppingEntryView: View {
             }
         }
     }
-
 }
 
 #Preview {

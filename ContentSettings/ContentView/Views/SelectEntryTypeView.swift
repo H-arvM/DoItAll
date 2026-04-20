@@ -57,6 +57,14 @@ struct SelectEntryTypeView: View {
                         ) {
                             navigateToShoppingList = true
                         }
+                        
+                        EntryTypeButton(
+                            icon: "pencil.and.list.clipboard",
+                            title: "Life admin",
+                            colour: themeManager.selectedTheme.primaryColour
+                        ) {
+                            navigateToLifeAdmin = true
+                        }
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 20)
@@ -67,7 +75,6 @@ struct SelectEntryTypeView: View {
             .navigationTitle("New Entry")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                // Allows user to exit the fullScreenCover without saving
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
                         dismiss()
@@ -75,49 +82,43 @@ struct SelectEntryTypeView: View {
                     .foregroundStyle(themeManager.selectedTheme.primaryColour)
                 }
             }
-            .background(
-                // Using a Group to hold multiple hidden NavigationLinks
-                Group {
-                    NavigationLink(
-                        destination: JournalView(
-                            mode: .edit,
-                            entry: nil,
-                            initialEntryType: .journal) {
-                                dismiss()
-                            }
-                            .environment(\.managedObjectContext, viewContext),
-                        isActive: $navigateToJournal
-                    ) { EmptyView() }
-                    
-                    NavigationLink(
-                        destination: FreeFormView(
-                            mode: .edit,
-                            entry: nil,
-                            initialEntryType: .freeForm) {
-                                dismiss()
-                            }
-                            .environment(\.managedObjectContext, viewContext),
-                        isActive: $navigateToFreeWriting
-                    ) { EmptyView() }
-                    
-                    NavigationLink(
-                        destination: ShoppingEntryView(
-                            entry: nil,
-                            initialEntryType: .shoppingList) {
-                                dismiss()
-                            }
-                    .environment(\.managedObjectContext, viewContext),
-                        isActive: $navigateToShoppingList
-                    ) { EmptyView() }
-                    
-                    NavigationLink(
-                        destination: LifeAdminView()
-                        .environment(\.managedObjectContext, viewContext),
-                        isActive: $navigateToLifeAdmin
-                    ) { EmptyView() }
+            .navigationDestination(isPresented: $navigateToJournal) {
+                JournalView(
+                    mode: .edit,
+                    entry: nil,
+                    initialEntryType: .journal
+                ) {
+                    dismiss()
                 }
-                .hidden()
-            )
+                .environment(\.managedObjectContext, viewContext)
+            }
+            .navigationDestination(isPresented: $navigateToFreeWriting) {
+                FreeFormView(
+                    mode: .edit,
+                    entry: nil,
+                    initialEntryType: .freeForm
+                ) {
+                    dismiss()
+                }
+                .environment(\.managedObjectContext, viewContext)
+            }
+            .navigationDestination(isPresented: $navigateToShoppingList) {
+                ShoppingEntryView(
+                    entry: nil,
+                    initialEntryType: .shoppingList
+                ) {
+                    dismiss()
+                }
+                .environment(\.managedObjectContext, viewContext)
+            }
+            .navigationDestination(isPresented: $navigateToLifeAdmin) {
+                LifeAdminView(entry: nil,
+                              initialEntryType: .lifeAdmin
+                ) {
+                    dismiss()
+                }
+                .environment(\.managedObjectContext, viewContext)
+            }
         }
     }
 }

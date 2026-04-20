@@ -617,21 +617,58 @@ struct ContentView: View {
             }
             
             VStack(alignment: .leading, spacing: 4) {
-                if item.itemType == .journalType, let journalEntry = item.journalEntry {
-                    Text(journalEntry.title ?? "No title")
+                switch item.itemType {
+                    
+                case .journalType:
+                    let journalEntry = item.journalEntry
+                    Text(journalEntry?.title ?? "No title")
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                    Text(journalEntry.createdDate?.funFormatString ?? "")
+                    Text(journalEntry?.createdDate?.funFormatString ?? "")
                         .font(.caption2)
                         .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
-                } else {
-                    Text(item.title ?? "No title")
+                    
+                case .shoppingListType:
+                    let shoppingList = item.shoppingEntry
+                    Text("No title")
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                    
                     Text(item.createdAt?.funFormatString ?? Date().funFormatString)
                         .font(.caption2)
                         .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
+                    
+                case .freeFormType:
+                    let freeForm = item.freeWritingEntry
+                    Text(freeForm?.title ?? item.title ?? "No title")
+                        .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
+                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
+                    Text(item.createdAt?.funFormatString ?? Date().funFormatString)
+                        .font(.caption2)
+                        .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
+                    
+                case .lifeAdminType:
+                    let lifeAdmin = item.taskItemEntry
+                    Text(lifeAdmin?.title ?? item.title ?? "No title")
+                        .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
+                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
+//                    let dueDate = lifeAdmin?.dueDate
+//                    Text(dueDate != nil ? "Due: \(dueDate!.funFormatString)" : item.createdAt?.funFormatString ?? Date().funFormatString)
+//                        .font(.caption2)
+//                        .foregroundStyle(dueDate != nil
+//                                         ? (dueDate! < Date() ? .red : themeManager.selectedTheme.secondaryTextColour ?? .secondary)
+//                                         : themeManager.selectedTheme.secondaryTextColour ?? .secondary
+//                        )
+                    
+                case .generalListType:
+                    EmptyView()
+//                    let generalList = item.generalList
+//                    Text(generalList?.title ?? item.title ?? "No title")
+//                        .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
+//                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
+//                    let listCount = generalList?.listItems?.count ?? 0
+//                    Text(listCount == 0 ? "Empty list" : "\(listCount) item\(listCount == 1 ? "" : "s")")
+//                        .font(.caption2)
+//                        .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
                 }
             }
             .opacity(viewModel.isItemHidden(item) ? 0 : 1)
@@ -640,7 +677,6 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, minHeight: rowHeight, alignment: .leading)
         .padding(.horizontal, 5)
     }
-    
     // MARK: Helper methods
     
     private func handleScroll(offset: CGFloat) {

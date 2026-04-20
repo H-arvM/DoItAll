@@ -37,7 +37,7 @@ enum ItemType: String, CaseIterable, Identifiable {
         case .journalType:
             return "book.fill"
         case .shoppingListType:
-            return "list.bullet"
+            return "cart"
         case .freeFormType:
             return "brain.head.profile"
         case .lifeAdminType:

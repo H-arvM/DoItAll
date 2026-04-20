@@ -13,11 +13,11 @@ import CoreData
 public class ShoppingListViewModel: ObservableObject {
     @Published var itemName: String = ""
     @Published var quantity: String = ""
-    
     @Published var createdDate: Date = Date()
+    
     @Published var entryType: EntryType = .shoppingList
     
-    public var existingEntry: ShoppingEntry? // Made public so the View can see it
+    public var existingEntry: ShoppingEntry?
     
     init(entry: ShoppingEntry? = nil, initialEntryType: EntryType = .shoppingList) {
         self.existingEntry = entry
@@ -39,7 +39,6 @@ public class ShoppingListViewModel: ObservableObject {
         return set.sorted(by: { ($0.name ?? "") < ($1.name ?? "") })
     }
     
-    // 3. The Add Function
     func addItem(context: NSManagedObjectContext) {
         guard !itemName.isEmpty else { return }
 
@@ -58,7 +57,6 @@ public class ShoppingListViewModel: ObservableObject {
         itemName = ""
         quantity = ""
     }
-    // --- Existing Core Data Logic ---
     
     private func getOrCreateEntry(in context: NSManagedObjectContext) -> ShoppingEntry {
         if let existing = existingEntry { return existing }

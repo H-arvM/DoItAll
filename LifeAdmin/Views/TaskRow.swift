@@ -9,7 +9,7 @@ import SwiftUI
 
 // MARK: - Task Row
 struct TaskRow: View {
-    let task: LifeAdminTask
+    let task: TaskEntry
     let onToggle: () -> Void
     
     var body: some View {
@@ -22,33 +22,33 @@ struct TaskRow: View {
             .buttonStyle(.glass)
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(task.title)
+                Text(task.title ?? "Fuck all")
                     .font(.body)
                     .strikethrough(task.isCompleted)
                     .foregroundColor(task.isCompleted ? .secondary : .primary)
                 
                 HStack(spacing: 8) {
                     HStack(spacing: 4) {
-                        Image(systemName: task.category.icon)
+                        Image(systemName: task.category ?? "")
                             .font(.caption2)
-                        Text(task.category.rawValue)
+                        Text(task.category ?? "")
                             .font(.caption)
                     }
-                    .foregroundColor(task.category.color)
+//                    .foregroundColor(task.category)
                     
                     Text("•")
                         .foregroundColor(.secondary)
                         .font(.caption)
                     
-                    Text(formatDate(task.dueDate))
+                    Text(formatDate(task.dueDate ?? Date()))
                         .font(.caption)
-                        .foregroundColor(isOverdue(task.dueDate) ? .red : .secondary)
+                        .foregroundColor(isOverdue(task.dueDate ?? Date()) ? .red : .secondary)
                 }
             }
             
             Spacer()
             
-            if isOverdue(task.dueDate) && !task.isCompleted {
+            if isOverdue(task.dueDate ?? Date()) && !task.isCompleted {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.caption)
                     .foregroundColor(.red)
