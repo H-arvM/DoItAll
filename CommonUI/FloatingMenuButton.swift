@@ -1,5 +1,5 @@
 //
-//  FloatingArrowButton.swift
+//  FloatingMenuButton.swift
 //  DoItAll
 //
 //  Created by Marc Harvey on 25/03/2026.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct FloatingArrowButton: View {
+struct FloatingMenuButton: View {
     @StateObject private var viewModel = FloatingButtonMenuViewModel()
     @Binding var showSortOptions: Bool
     let currentSortOption: SortOption
@@ -116,7 +116,7 @@ struct GradientCircle: View {
         Circle()
             .stroke(
                 LinearGradient(
-                    colors: [.white.opacity(0.5), .clear],
+                    colors: [.white.opacity(0.8), .clear],
                     startPoint: .top,
                     endPoint: .bottom
                 ),

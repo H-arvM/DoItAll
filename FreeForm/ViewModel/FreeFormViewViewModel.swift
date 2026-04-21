@@ -105,7 +105,7 @@ class FreeFormViewModel: ObservableObject, @MainActor HeaderProviderProtocol {
     
     private func postSaveNotification() {
         NotificationCenter.default.post(
-            name: NSNotification.Name("JournalEntrySaved"),
+            name: NSNotification.Name("FreeFormEntrySaved"),
             object: nil
         )
      }

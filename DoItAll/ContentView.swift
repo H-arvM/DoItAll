@@ -63,6 +63,15 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("JournalEntrySaved"))) { _ in
             viewModel.loadItems()
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("LifeAdminEntrySaved"))) { _ in
+            viewModel.loadItems()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("FreeFormEntrySaved"))) { _ in
+            viewModel.loadItems()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ShoppingEntrySaved"))) { _ in
+            viewModel.loadItems()
+        }
         .confirmationDialog("Sort by", isPresented: $showSortOptions, titleVisibility: .visible) {
             sortOptionsContent
         }
@@ -578,7 +587,7 @@ struct ContentView: View {
         VStack {
             Spacer()
             HStack(alignment: .bottom) {
-                FloatingArrowButton(
+                FloatingMenuButton(
                     showSortOptions: $showSortOptions,
                     currentSortOption: viewModel.currentSortOption,
                     onToggleSort: {
@@ -796,37 +805,17 @@ extension ItemEntity {
     }
     
     func getOrCreateAdminEntry(context: NSManagedObjectContext) -> TaskEntry {
-        // 1. Check if the memory property is already set
         if let existing = self.taskItemEntry {
             return existing
         }
+        let newEntry = TaskEntry(context: context)
+        newEntry.id = self.id
+        newEntry.createdAt = Date()
+        newEntry.entryType = self.type
+        self.taskItemEntry = newEntry
         
-        // 2. IMPORTANT: Check the database manually.
-        // We search for a TaskEntry whose ID matches this Item's ID.
-        let request: NSFetchRequest<TaskEntry> = TaskEntry.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", self.id! as CVarArg)
-        request.fetchLimit = 1
-        
-        do {
-            if let fetched = try context.fetch(request).first {
-                self.taskItemEntry = fetched
-                return fetched
-            }
-        } catch {
-            print("Database fetch error: \(error)")
-        }
-        
-        // 3. Only if Step 1 AND Step 2 fail, create a new one
-        print("📍 No existing entry found in DB, creating new one for ID: \(self.id?.uuidString ?? "nil")")
-        let entry = TaskEntry(context: context)
-        entry.id = self.id
-        entry.createdAt = Date()
-        entry.entryType = self.type
-        self.taskItemEntry = entry
-        
-        // Save immediately to pin it to the store
         try? context.save()
-        
-        return entry
-    }}
+        return newEntry
+    }
+}
 

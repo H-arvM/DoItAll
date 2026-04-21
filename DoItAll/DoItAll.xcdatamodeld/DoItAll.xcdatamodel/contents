@@ -28,7 +28,7 @@
         <relationship name="freeWritingEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FreeWritingEntry" inverseName="item" inverseEntity="FreeWritingEntry"/>
         <relationship name="journalEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="JournalEntry" inverseName="item" inverseEntity="JournalEntry"/>
         <relationship name="shoppingEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ShoppingEntry" inverseName="item" inverseEntity="ShoppingEntry"/>
-        <relationship name="taskItemEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TaskEntry"/>
+        <relationship name="taskItemEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TaskEntry" inverseName="item" inverseEntity="TaskEntry"/>
     </entity>
     <entity name="JournalEntry" representedClassName="JournalEntry" syncable="YES" codeGenerationType="class">
         <attribute name="content" optional="YES" attributeType="String"/>
@@ -64,7 +64,7 @@
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="entryType" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ItemEntity"/>
+        <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ItemEntity" inverseName="taskItemEntry" inverseEntity="ItemEntity"/>
         <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TaskItem" inverseName="taskEntry" inverseEntity="TaskItem"/>
     </entity>
     <entity name="TaskItem" representedClassName="TaskItem" syncable="YES" codeGenerationType="class">
