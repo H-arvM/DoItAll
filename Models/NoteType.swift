@@ -35,7 +35,7 @@ enum ItemType: String, CaseIterable, Identifiable {
     var iconName: String {
         switch self {
         case .journalType:
-            return "book.fill"
+            return "pencil.line"
         case .shoppingListType:
             return "cart"
         case .freeFormType:

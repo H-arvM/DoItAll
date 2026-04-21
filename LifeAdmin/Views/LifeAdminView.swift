@@ -17,28 +17,26 @@ struct LifeAdminView: View {
 
     init(entry: TaskEntry? = nil, initialEntryType: EntryType = .lifeAdmin, onSave: (() -> Void)? = nil) {
         self.onSave = onSave
-        _viewModel = StateObject(wrappedValue: LifeAdminViewModel(entry: entry, initialEntryType: initialEntryType))
+        _viewModel = StateObject(wrappedValue: LifeAdminViewModel(entry: entry))
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                contentView
-                floatingAddButton
+        ZStack {
+            contentView
+            floatingAddButton
+        }
+        .navigationTitle("Life Admin")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                saveButton
             }
-            .navigationTitle("Life Admin")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    saveButton
-                }
-            }
-            .sheet(isPresented: $viewModel.showingSettings) {
-                LifeAdminSettingsView()
-            }
-            .onAppear {
-                viewModel.loadTasks(context: viewContext)
-            }
+        }
+        .sheet(isPresented: $viewModel.showingSettings) {
+            LifeAdminSettingsView()
+        }
+        .onAppear {
+            viewModel.loadTasks(context: viewContext)
         }
     }
 
@@ -76,12 +74,11 @@ struct LifeAdminView: View {
             } else {
                 List {
                     ForEach(viewModel.filteredTasks) { task in
-                        TaskRow(task: task) {
-                            viewModel.toggleTaskCompletion(task, context: viewContext)
-                        }
-                    }
-                    .onDelete { offsets in
-                        viewModel.deleteTask(at: offsets, context: viewContext)
+                        TaskRow(
+                            task: task,
+                            onToggle: { viewModel.toggleTaskCompletion(task, context: viewContext) },
+                            onDelete: { viewModel.deleteTask(task, context: viewContext) }
+                        )
                     }
                 }
                 .listStyle(.insetGrouped)

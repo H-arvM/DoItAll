@@ -10,7 +10,7 @@ import CoreData
 
 @MainActor
 class LifeAdminViewModel: ObservableObject {
-    @Published var tasks: [TaskEntry] = []
+    @Published var tasks: [TaskItem] = []
     @Published var selectedCategory: TaskCategory?
     @Published var showingSettings = false
     @Published var createdDate: Date = Date()
@@ -23,7 +23,7 @@ class LifeAdminViewModel: ObservableObject {
 
     public var existingEntry: TaskEntry?
 
-    var filteredTasks: [TaskEntry] {
+    var filteredTasks: [TaskItem] {
         guard let category = selectedCategory else { return tasks }
         return tasks.filter { $0.category == category.rawValue }
     }
@@ -42,56 +42,81 @@ class LifeAdminViewModel: ObservableObject {
         entryType = EntryType(rawValue: entry.entryType ?? "") ?? .lifeAdmin
     }
 
-    // MARK: - Fetch
-
     func loadTasks(context: NSManagedObjectContext) {
-        let request: NSFetchRequest<TaskEntry> = TaskEntry.fetchRequest()
-        request.predicate = NSPredicate(format: "entryType == %@", EntryType.lifeAdmin.rawValue)
-        request.sortDescriptors = [
-            NSSortDescriptor(keyPath: \TaskEntry.sortOrder, ascending: true),
-            NSSortDescriptor(keyPath: \TaskEntry.createdAt, ascending: false)
-        ]
+        guard let entry = existingEntry else {
+            print("⚠️ Load aborted: No entry present.")
+            return
+        }
+
+        context.refresh(entry, mergeChanges: true)
+
+        let request: NSFetchRequest<TaskItem> = TaskItem.fetchRequest()
+        request.predicate = NSPredicate(format: "taskEntry.id == %@", entry.id! as CVarArg)
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \TaskItem.sortOrder, ascending: true)]
+
         do {
-            tasks = try context.fetch(request)
+            let fetched = try context.fetch(request)
+            self.tasks = fetched
+            print("📍 Current ID: \(entry.id?.uuidString ?? "NIL") | Tasks: \(fetched.count)")
         } catch {
-            print("Failed to fetch tasks: \(error)")
+            print("❌ Fetch failed: \(error)")
         }
     }
 
     func addTask(context: NSManagedObjectContext) {
-        guard !itemName.isEmpty else { return }
-
-        let newTask = TaskEntry(context: context)
+        print("Add Task called with name: \(itemName)")
+        guard !itemName.isEmpty else {
+            print("Item name was empty, exiting.")
+            return
+        }
+        
+        let entry = existingEntry ?? getOrCreateEntry(in: context)
+        
+        let newTask = TaskItem(context: context)
         newTask.id = UUID()
         newTask.title = itemName
         newTask.notes = notes.isEmpty ? nil : notes
         newTask.category = selectedCategory?.rawValue
-        newTask.entryType = entryType.rawValue
         newTask.createdAt = Date()
         newTask.isCompleted = false
         newTask.sortOrder = Int32(tasks.count)
-        newTask.dueDate = hasDueDate ? dueDate : nil  // ← new
-
+        newTask.dueDate = hasDueDate ? dueDate : nil
+        newTask.taskEntry = entry
+        
         if let category = selectedCategory {
-            newTask.taskEntry = fetchCategorySettings(for: category, context: context)
+            newTask.categoryEntry = fetchCategorySettings(for: category, context: context)
         }
         
-        // Reset
+        do {
+            try context.save()
+            print("✅ Save successful!")
+        } catch {
+            let nsError = error as NSError
+            print("❌ Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+        
+        loadTasks(context: context)
+        
         itemName = ""
         notes = ""
         dueDate = nil
         hasDueDate = false
         showingAddTask = false
     }
-
-    func toggleTaskCompletion(_ task: TaskEntry, context: NSManagedObjectContext) {
+    
+    func toggleTaskCompletion(_ task: TaskItem, context: NSManagedObjectContext) {
         task.isCompleted.toggle()
         saveAdminEntry(context: context)
     }
 
-    func deleteTask(at offsets: IndexSet, context: NSManagedObjectContext) {
-        offsets.map { filteredTasks[$0] }.forEach { context.delete($0) }
-        saveAdminEntry(context: context)
+    func deleteTask(_ task: TaskItem, context: NSManagedObjectContext) {
+        context.delete(task)
+        do {
+            try context.save()
+        } catch {
+            print("Failed to delete task: \(error)")
+        }
+        loadTasks(context: context)
     }
 
     func selectCategory(_ category: TaskCategory) {
@@ -123,7 +148,7 @@ class LifeAdminViewModel: ObservableObject {
             postSaveNotification()
             onSuccess?()
         } catch {
-            print("Error saving shopping list: \(error)")
+            print("Error saving admin entry: \(error)")
         }
     }
     
@@ -133,7 +158,9 @@ class LifeAdminViewModel: ObservableObject {
         let entry = TaskEntry(context: context)
         entry.id = UUID()
         entry.createdAt = createdDate
+        entry.entryType = entryType.rawValue
         createAssociatedItem(for: entry, in: context)
+        existingEntry = entry
         return entry
     }
     

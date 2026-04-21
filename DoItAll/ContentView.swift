@@ -77,9 +77,6 @@ struct ContentView: View {
         .navigationDestination(for: ItemEntity.self) { item in
             navigationDestination(for: item)
         }
-        .navigationDestination(item: $viewModel.selectedItem) { item in
-            navigationDestination(for: item)
-        }
         .toolbar {
             toolbarContent
         }
@@ -135,8 +132,7 @@ struct ContentView: View {
             )
             
         case .lifeAdminType:
-            // TODO: Pass item later
-            LifeAdminView()
+            LifeAdminView(entry: item.getOrCreateAdminEntry(context: viewContext))
             
         case .generalListType:
             // TODO: Create new view
@@ -648,16 +644,12 @@ struct ContentView: View {
                     
                 case .lifeAdminType:
                     let lifeAdmin = item.taskItemEntry
-                    Text(lifeAdmin?.title ?? item.title ?? "No title")
+                    Text(lifeAdmin?.entryType ?? item.title ?? "No title")
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-//                    let dueDate = lifeAdmin?.dueDate
-//                    Text(dueDate != nil ? "Due: \(dueDate!.funFormatString)" : item.createdAt?.funFormatString ?? Date().funFormatString)
-//                        .font(.caption2)
-//                        .foregroundStyle(dueDate != nil
-//                                         ? (dueDate! < Date() ? .red : themeManager.selectedTheme.secondaryTextColour ?? .secondary)
-//                                         : themeManager.selectedTheme.secondaryTextColour ?? .secondary
-//                        )
+                    Text(item.createdAt?.funFormatString ?? Date().funFormatString)
+                        .font(.caption2)
+                        .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
                     
                 case .generalListType:
                     EmptyView()
@@ -802,5 +794,39 @@ extension ItemEntity {
         try? context.save()
         return newEntry
     }
-}
+    
+    func getOrCreateAdminEntry(context: NSManagedObjectContext) -> TaskEntry {
+        // 1. Check if the memory property is already set
+        if let existing = self.taskItemEntry {
+            return existing
+        }
+        
+        // 2. IMPORTANT: Check the database manually.
+        // We search for a TaskEntry whose ID matches this Item's ID.
+        let request: NSFetchRequest<TaskEntry> = TaskEntry.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", self.id! as CVarArg)
+        request.fetchLimit = 1
+        
+        do {
+            if let fetched = try context.fetch(request).first {
+                self.taskItemEntry = fetched
+                return fetched
+            }
+        } catch {
+            print("Database fetch error: \(error)")
+        }
+        
+        // 3. Only if Step 1 AND Step 2 fail, create a new one
+        print("📍 No existing entry found in DB, creating new one for ID: \(self.id?.uuidString ?? "nil")")
+        let entry = TaskEntry(context: context)
+        entry.id = self.id
+        entry.createdAt = Date()
+        entry.entryType = self.type
+        self.taskItemEntry = entry
+        
+        // Save immediately to pin it to the store
+        try? context.save()
+        
+        return entry
+    }}
 

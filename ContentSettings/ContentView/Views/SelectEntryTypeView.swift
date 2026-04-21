@@ -16,7 +16,6 @@ struct SelectEntryTypeView: View {
     @State private var navigateToFreeWriting: Bool = false
     @State private var navigateToShoppingList: Bool = false
     @State private var navigateToLifeAdmin: Bool = false
-
     
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     
@@ -33,7 +32,7 @@ struct SelectEntryTypeView: View {
                         
                         // Journal Button
                         EntryTypeButton(
-                            icon: "book.fill",
+                            icon: "pencil.line",
                             title: "Journal",
                             colour: themeManager.selectedTheme.primaryColour
                         ) {
@@ -58,6 +57,7 @@ struct SelectEntryTypeView: View {
                             navigateToShoppingList = true
                         }
                         
+                        // Life Admin
                         EntryTypeButton(
                             icon: "pencil.and.list.clipboard",
                             title: "Life admin",
@@ -112,8 +112,9 @@ struct SelectEntryTypeView: View {
                 .environment(\.managedObjectContext, viewContext)
             }
             .navigationDestination(isPresented: $navigateToLifeAdmin) {
-                LifeAdminView(entry: nil,
-                              initialEntryType: .lifeAdmin
+                LifeAdminView(
+                    entry: nil,
+                    initialEntryType: .lifeAdmin
                 ) {
                     dismiss()
                 }

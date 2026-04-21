@@ -6,7 +6,7 @@
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isVisible" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="sortOrder" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="taskEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TaskEntry" inverseName="taskEntry" inverseEntity="TaskEntry"/>
+        <relationship name="taskItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TaskItem"/>
     </entity>
     <entity name="FreeWritingEntry" representedClassName="FreeWritingEntry" syncable="YES" codeGenerationType="class">
         <attribute name="content" optional="YES" attributeType="String"/>
@@ -28,7 +28,7 @@
         <relationship name="freeWritingEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FreeWritingEntry" inverseName="item" inverseEntity="FreeWritingEntry"/>
         <relationship name="journalEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="JournalEntry" inverseName="item" inverseEntity="JournalEntry"/>
         <relationship name="shoppingEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ShoppingEntry" inverseName="item" inverseEntity="ShoppingEntry"/>
-        <relationship name="taskItemEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TaskEntry" inverseName="item" inverseEntity="TaskEntry"/>
+        <relationship name="taskItemEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TaskEntry"/>
     </entity>
     <entity name="JournalEntry" representedClassName="JournalEntry" syncable="YES" codeGenerationType="class">
         <attribute name="content" optional="YES" attributeType="String"/>
@@ -61,16 +61,22 @@
         <relationship name="entry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ShoppingEntry" inverseName="items" inverseEntity="ShoppingEntry"/>
     </entity>
     <entity name="TaskEntry" representedClassName="TaskEntry" syncable="YES" codeGenerationType="class">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="entryType" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ItemEntity"/>
+        <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TaskItem" inverseName="taskEntry" inverseEntity="TaskItem"/>
+    </entity>
+    <entity name="TaskItem" representedClassName="TaskItem" syncable="YES" codeGenerationType="class">
         <attribute name="category" optional="YES" attributeType="String"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="dueDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="entryType" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isCompleted" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="notes" optional="YES" attributeType="String"/>
         <attribute name="sortOrder" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="title" optional="YES" attributeType="String"/>
-        <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ItemEntity" inverseName="taskItemEntry" inverseEntity="ItemEntity"/>
-        <relationship name="taskEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CategorySettings" inverseName="taskEntry" inverseEntity="CategorySettings"/>
+        <relationship name="categoryEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CategorySettings"/>
+        <relationship name="taskEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TaskEntry" inverseName="tasks" inverseEntity="TaskEntry"/>
     </entity>
 </model>

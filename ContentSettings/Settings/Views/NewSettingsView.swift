@@ -41,7 +41,7 @@ struct NewSettingsView: View {
             )
             
             SettingsNavigationRow(
-                icon: "book",
+                icon: "pencil.line",
                 title: "Journal",
                 iconColours: [.green, .green.opacity(0.7)],
                 destination: JournalSettings(settingsManager: SettingsManager())

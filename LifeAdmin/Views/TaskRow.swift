@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-// MARK: - Task Row
 struct TaskRow: View {
-    let task: TaskEntry
+    let task: TaskItem
     let onToggle: () -> Void
+    let onDelete: () -> Void
     
     var body: some View {
         HStack(spacing: 12) {
@@ -55,6 +55,11 @@ struct TaskRow: View {
             }
         }
         .padding(.vertical, 4)
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(role: .destructive, action: onDelete) {
+                Label("Delete", systemImage: "trash")
+            }
+        }
     }
     
     func formatDate(_ date: Date) -> String {
