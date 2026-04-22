@@ -24,7 +24,6 @@ struct ContentView: View {
     @Environment(\.colorScheme) var colourScheme
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var viewModel = ContentViewModel()
-    @StateObject private var settingsManager = SettingsManager()
     @StateObject private var themeManager = ThemeManager.shared
     @State private var showSortOptions: Bool = false
     @State private var expandedSections: Set<ItemType> = Set(ItemType.allCases)
@@ -32,6 +31,11 @@ struct ContentView: View {
     @State private var lastScrollOffset: CGFloat = 0
     @State private var isScrolling: Bool = false
     @State private var hideButtonsWorkItem: DispatchWorkItem?
+    @State private var isShowingSelectEntry = false
+    
+    @State private var lastScrollTime: TimeInterval = 0
+    @State private var consecutiveVelocityHits: Int = 0
+    @State private var scrollDetectionEnabled: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -45,12 +49,30 @@ struct ContentView: View {
         .fullScreenCover(isPresented: $viewModel.showOnboarding) {
             OnboardingView(isPresented: $viewModel.showOnboarding, dontShowAgain: $viewModel.hasSeenOnboarding)
         }
+        .fullScreenCover(isPresented: $isShowingSelectEntry) {
+            SelectEntryTypeView()
+        }
         .onAppear {
             viewModel.setupViewModel()
             viewModel.checkOnboarding()
             viewModel.loadItems()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                scrollDetectionEnabled = true
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("JournalEntrySaved"))) { _ in
+            viewModel.loadItems()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("LifeAdminEntrySaved"))) { _ in
+            viewModel.loadItems()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("FreeFormEntrySaved"))) { _ in
+            viewModel.loadItems()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ShoppingEntrySaved"))) { _ in
+            viewModel.loadItems()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CheckListEntrySaved"))) { _ in
             viewModel.loadItems()
         }
         .confirmationDialog("Sort by", isPresented: $showSortOptions, titleVisibility: .visible) {
@@ -66,9 +88,6 @@ struct ContentView: View {
         }
         .navigationDestination(for: ItemEntity.self) { item in
             navigationDestination(for: item)
-        }
-        .navigationDestination(item: $viewModel.selectedItem) { item in
-            destinationView(for: ItemType(rawValue: item.type ?? "") ?? .journalType, item: item)
         }
         .toolbar {
             toolbarContent
@@ -117,26 +136,26 @@ struct ContentView: View {
             )
             
         case .shoppingListType:
-            // TODO: Create new view
-            EmptyView()
+            ShoppingEntryView(entry: item.getOrCreateShoppingEntry(context: viewContext))
             
         case .freeFormType:
-            // TODO: Pass item later
-            FreeFormView()
+            FreeFormView(mode: item.freeWritingEntry == nil ? .edit : .view,
+                         entry: item.getOrCreateFreeWritingEntry(context: viewContext)
+            )
             
         case .lifeAdminType:
-            // TODO: Pass item later
-            LifeAdminView()
+            LifeAdminView(entry: item.getOrCreateAdminEntry(context: viewContext))
             
         case .generalListType:
-            // TODO: Create new view
-            EmptyView()
+            NoteListView(entry: item.getOrCreateChecklistEntry(context: viewContext))
         }
     }
     
     var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .primaryAction) { // Updated to modern placement
-            NavigationLink(destination: SelectEntryTypeView()) {
+        ToolbarItem(placement: .primaryAction) {
+            Button {
+                isShowingSelectEntry = true
+            } label: {
                 Image(systemName: "plus")
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(themeManager.selectedTheme.iconColour)
@@ -146,7 +165,7 @@ struct ContentView: View {
     
     // MARK: ViewBuilders
     private var rowHeight: CGFloat {
-        viewModel.currentSortOption == .type ? 50 : 70
+        viewModel.currentSortOption == .type ? 80 : 100
     }
     
     @ViewBuilder
@@ -570,7 +589,7 @@ struct ContentView: View {
         VStack {
             Spacer()
             HStack(alignment: .bottom) {
-                FloatingArrowButton(
+                FloatingMenuButton(
                     showSortOptions: $showSortOptions,
                     currentSortOption: viewModel.currentSortOption,
                     onToggleSort: {
@@ -605,21 +624,49 @@ struct ContentView: View {
             }
             
             VStack(alignment: .leading, spacing: 4) {
-                if item.itemType == .journalType, let journalEntry = item.journalEntry {
-                    Text(journalEntry.title ?? "No title")
+                switch item.itemType {
+                    
+                case .journalType:
+                    let journalEntry = item.journalEntry
+                    Text(journalEntry?.title ?? "No title")
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                    Text(journalEntry.createdDate?.funFormatString ?? "")
+                    Text(journalEntry?.createdDate?.funFormatString ?? "")
                         .font(.caption2)
                         .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
-                } else {
-                    Text(item.title ?? "No title")
+                    
+                case .shoppingListType:
+                    let shoppingList = item.shoppingEntry
+                    Text("No title")
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                    
                     Text(item.createdAt?.funFormatString ?? Date().funFormatString)
                         .font(.caption2)
                         .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
+                    
+                case .freeFormType:
+                    let freeForm = item.freeWritingEntry
+                    Text(freeForm?.title ?? item.title ?? "No title")
+                        .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
+                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
+                    Text(item.createdAt?.funFormatString ?? Date().funFormatString)
+                        .font(.caption2)
+                        .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
+                    
+                case .lifeAdminType:
+                    let lifeAdmin = item.taskItemEntry
+                    Text(lifeAdmin?.entryType ?? item.title ?? "No title")
+                        .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
+                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
+                    Text(item.createdAt?.funFormatString ?? Date().funFormatString)
+                        .font(.caption2)
+                        .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
+                    
+                case .generalListType:
+                    let listItem = item.checkListEntry
+                    Text(listItem?.title ?? item.title ?? "No title")
+                        .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
+                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
                 }
             }
             .opacity(viewModel.isItemHidden(item) ? 0 : 1)
@@ -628,25 +675,55 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, minHeight: rowHeight, alignment: .leading)
         .padding(.horizontal, 5)
     }
-    
     // MARK: Helper methods
     
     private func handleScroll(offset: CGFloat) {
+        let now = CACurrentMediaTime()
+        let timeDelta = now - lastScrollTime
         let delta = offset - lastScrollOffset
-        
-        if abs(delta) > 5 {
-            withAnimation {
-                isScrolling = true
-            }
-        }
-        
+
+        // Update lastScrollOffset/time for next calculation
         lastScrollOffset = offset
-        
+        lastScrollTime = now
+
+        // Ignore until detection is enabled to avoid initial layout
+        if !scrollDetectionEnabled {
+            return
+        }
+
+        // Guard against extremely small time deltas (first run or same frame)
+        if timeDelta <= 0 {
+            return
+        }
+
+        // Compute absolute velocity (points per second)
+        let velocity = abs(delta) / CGFloat(timeDelta)
+
+        // Tunable thresholds
+        let minDisplacement: CGFloat = viewModel.scrollMinDisplacement
+        let minVelocity: CGFloat = viewModel.scrollMinVelocity
+        let requiredConsecutiveHits = viewModel.scrollRequiredConsecutiveHits
+
+        let qualifies = abs(delta) > minDisplacement && velocity > minVelocity
+
+        if qualifies {
+            consecutiveVelocityHits += 1
+            if consecutiveVelocityHits >= requiredConsecutiveHits {
+                withAnimation {
+                    isScrolling = true
+                }
+            }
+        } else {
+            consecutiveVelocityHits = 0
+        }
+
+        // Debounce hiding reset
         hideButtonsWorkItem?.cancel()
         let workItem = DispatchWorkItem {
             withAnimation {
                 isScrolling = false
             }
+            consecutiveVelocityHits = 0
         }
         hideButtonsWorkItem = workItem
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
@@ -694,4 +771,62 @@ extension ItemEntity {
         try? context.save()
         return newEntry
     }
+    
+    func getOrCreateFreeWritingEntry(context: NSManagedObjectContext) -> FreeWritingEntry {
+        if let existing = self.freeWritingEntry {
+            return existing
+        }
+        let newEntry = FreeWritingEntry(context: context)
+        newEntry.id = self.id
+        newEntry.createdDate = Date()
+        newEntry.title = self.title
+        newEntry.entryType = self.type
+        self.freeWritingEntry = newEntry
+        
+        try? context.save()
+        return newEntry
+    }
+    
+    func getOrCreateShoppingEntry(context: NSManagedObjectContext) -> ShoppingEntry {
+        if let existing = self.shoppingEntry {
+            return existing
+        }
+        let newEntry = ShoppingEntry(context: context)
+        newEntry.id = self.id
+        newEntry.createdDate = Date()
+        newEntry.entryType = self.type
+        self.shoppingEntry = newEntry
+        
+        try? context.save()
+        return newEntry
+    }
+    
+    func getOrCreateAdminEntry(context: NSManagedObjectContext) -> TaskEntry {
+        if let existing = self.taskItemEntry {
+            return existing
+        }
+        let newEntry = TaskEntry(context: context)
+        newEntry.id = self.id
+        newEntry.createdAt = Date()
+        newEntry.entryType = self.type
+        self.taskItemEntry = newEntry
+        
+        try? context.save()
+        return newEntry
+    }
+    
+    func getOrCreateChecklistEntry(context: NSManagedObjectContext) -> CheckListEntry {
+        if let existing = self.checkListEntry {
+            return existing
+        }
+        let newEntry = CheckListEntry(context: context)
+        newEntry.id = self.id
+        newEntry.createdAt = Date()
+        newEntry.entryType = self.type
+        self.checkListEntry = newEntry
+        
+        try? context.save()
+        return newEntry
+    }
 }
+

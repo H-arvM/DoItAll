@@ -45,7 +45,7 @@ final class FloatingActionButtonViewModel: ObservableObject {
     
     func resetAnimation() {
         scale = 0.0
-        opacity = 0.0
+        opacity = 1.0
         rotation = -180.0
     }
     

@@ -18,6 +18,15 @@ class ContentViewModel: ObservableObject {
     @Published var showOnboarding: Bool = false
     @Published var currentSortOption: SortOption = .dateCreated
     
+    /// Minimum displacement in points to consider a scroll movement (to filter jitter)
+    @Published var scrollMinDisplacement: CGFloat = 12
+    
+    /// Minimum velocity in points/second to consider a user-driven scroll
+    @Published var scrollMinVelocity: CGFloat = 150
+    
+    /// Number of consecutive qualifying updates required before hiding overlay
+    @Published var scrollRequiredConsecutiveHits: Int = 2
+    
     private var pendingItemToUnhide: NSManagedObjectID?
     private let authManager = BiometricAuthManager()
     private let viewContext: NSManagedObjectContext

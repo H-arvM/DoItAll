@@ -8,44 +8,23 @@
 import SwiftUI
 
 struct JournalPhotosSelection: View {
-    let mode: JournalMode
+    let mode: EditOrViewMode
     @ObservedObject var viewModel: JournalViewModel
     @ObservedObject var themeManager: ThemeManager
     
+    let isParentExpanded: Bool
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                    viewModel.isPhotosExpanded.toggle()
-                }
-            } label: {
-                HStack {
-                    Text("Photos")
-                        .font(.headline)
-                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                    
-                    Text("\(viewModel.selectedPhotos.count)")
-                        .font(.subheadline)
-                        .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
-                    
-                    Spacer()
-                    
-                    Image(systemName: "chevron.down")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
-                        .rotationEffect(.degrees(viewModel.isPhotosExpanded ? 0 : -90))
-                }
-            }
-            .buttonStyle(.glass)
-            .padding(.horizontal, 20)
-            
-            if viewModel.isPhotosExpanded {
+        Group {
+            if isParentExpanded {
                 ExpandedPhotosView(mode: mode, viewModel: viewModel)
+                    .transition(.opacity)
             } else {
                 CollapsedPhotosView(viewModel: viewModel, themeManager: themeManager)
+                    .transition(.opacity)
             }
         }
+        .padding(.horizontal, 20)
     }
 }
 

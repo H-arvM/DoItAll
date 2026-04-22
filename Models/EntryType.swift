@@ -17,7 +17,7 @@ enum EntryType: String, CaseIterable {
     var iconName: String {
         switch self {
         case .journal: 
-            return "book.fill"
+            return "pencil.line"
         case .shoppingList:
             return "cart.fill"
         case .freeForm:

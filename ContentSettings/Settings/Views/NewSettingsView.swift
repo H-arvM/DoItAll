@@ -10,6 +10,7 @@ import SwiftUI
 struct NewSettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = SettingsViewModel()
+    @StateObject private var themeManager = ThemeManager.shared
     
     var body: some View {
         NavigationStack {
@@ -40,10 +41,10 @@ struct NewSettingsView: View {
             )
             
             SettingsNavigationRow(
-                icon: "book",
+                icon: "pencil.line",
                 title: "Journal",
                 iconColours: [.green, .green.opacity(0.7)],
-                destination: EmptyView() /// Getting journal settings in here later
+                destination: JournalSettings(settingsManager: SettingsManager())
             )
         } header: {
             Text("Note Settings")
@@ -63,11 +64,14 @@ struct NewSettingsView: View {
     
     @ViewBuilder
     private var themePicker: some View {
-        Picker("Background theme", selection: Binding(
-            get: { viewModel.themeManager.selectedTheme },
-            set: { viewModel.updateTheme($0) }
-        )) {
-            ForEach(BackgroundTheme.allCases, id: \.id) { theme in
+        Picker(
+            "Background theme",
+            selection: Binding<BackgroundTheme>(
+                get: { viewModel.themeManager.selectedTheme },
+                set: { viewModel.updateTheme($0) }
+            )
+        ) {
+            ForEach(BackgroundTheme.allCases, id: \.self) { theme in
                 Text(theme.rawValue).tag(theme)
             }
         }

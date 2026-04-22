@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct JournalMusicSelection: View {
-    let mode: JournalMode
+    let mode: EditOrViewMode
     let track: MusicTrack
     @ObservedObject var viewModel: JournalViewModel
     @ObservedObject var themeManager: ThemeManager

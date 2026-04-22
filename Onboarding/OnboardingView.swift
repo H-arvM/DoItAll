@@ -38,7 +38,7 @@ struct OnboardingView: View {
         OnboardingStep(
             icon: "eye.slash.fill",
             title: "Hidden and protected",
-            description: "Hidden rows are marked with an eye icon on the left and chevron on the right",
+            description: "Hidden rows are marked with an 👁️ on the left",
             accentColor: .orange
         ),
         OnboardingStep(
@@ -51,6 +51,12 @@ struct OnboardingView: View {
             icon: "faceid",
             title: "Biometric security",
             description: "Use Face ID or Touch ID to access hidden content, unhide rows, or navigate into hidden items",
+            accentColor: .indigo
+        ),
+        OnboardingStep(
+            icon: "cart.fill",
+            title: "Favourite supermarket",
+            description: "Set your favourite supermarket and get notifications when you're nearby. Find this in the ⚙️",
             accentColor: .indigo
         ),
     ]

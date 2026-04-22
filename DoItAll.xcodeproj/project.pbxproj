@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D2188B542F9025F8006B7710 /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2188B532F9025F8006B7710 /* SettingsManager.swift */; };
 		D27770062F79BB06007CCDDA /* NewSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D27770052F79BB06007CCDDA /* NewSettingsView.swift */; };
 		D27770092F79BC18007CCDDA /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D27770082F79BC18007CCDDA /* SettingsViewModel.swift */; };
 		D277700B2F79BCB8007CCDDA /* FavouriteSupermarketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D277700A2F79BCB8007CCDDA /* FavouriteSupermarketManager.swift */; };
@@ -20,9 +21,11 @@
 		D28F2BCC2F7EBDF300E37D85 /* SupermarketsMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28F2BCB2F7EBDF300E37D85 /* SupermarketsMapViewModel.swift */; };
 		D28F2BCE2F7ECBA600E37D85 /* SupermarketSelectionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28F2BCD2F7ECBA600E37D85 /* SupermarketSelectionCard.swift */; };
 		D28F2BD02F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28F2BCF2F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift */; };
-		D29C09452F868F7D0015749B /* NoteSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29C09382F868F7D0015749B /* NoteSelectionView.swift */; };
+		D29C09452F868F7D0015749B /* SelectEntryTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29C09382F868F7D0015749B /* SelectEntryTypeView.swift */; };
 		D29C094E2F86922D0015749B /* EntryTypeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29C094D2F86922D0015749B /* EntryTypeButton.swift */; };
+		D2A316B32F911F80004CB336 /* ShoppingListSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A316B12F911F80004CB336 /* ShoppingListSettingsView.swift */; };
 		D2A844BB2F844E6500D5BB2B /* SwipeToDeleteRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A844BA2F844E6500D5BB2B /* SwipeToDeleteRow.swift */; };
+		D2F85ABA2F901E9B008CB872 /* JournalSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F85AB92F901E9B008CB872 /* JournalSettings.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +46,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D2188B532F9025F8006B7710 /* SettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
 		D23CBCB02E635A6E007F5B0A /* DoItAll.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DoItAll.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D23CBCC22E635A70007F5B0A /* DoItAllTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DoItAllTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D23CBCCC2E635A70007F5B0A /* DoItAllUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DoItAllUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -59,12 +63,28 @@
 		D28F2BCB2F7EBDF300E37D85 /* SupermarketsMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupermarketsMapViewModel.swift; sourceTree = "<group>"; };
 		D28F2BCD2F7ECBA600E37D85 /* SupermarketSelectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupermarketSelectionCard.swift; sourceTree = "<group>"; };
 		D28F2BCF2F7ECF1700E37D85 /* SupermarketSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupermarketSettingsViewModel.swift; sourceTree = "<group>"; };
-		D29C09382F868F7D0015749B /* NoteSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteSelectionView.swift; sourceTree = "<group>"; };
+		D29C09382F868F7D0015749B /* SelectEntryTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectEntryTypeView.swift; sourceTree = "<group>"; };
 		D29C094D2F86922D0015749B /* EntryTypeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryTypeButton.swift; sourceTree = "<group>"; };
+		D2A316B12F911F80004CB336 /* ShoppingListSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingListSettingsView.swift; sourceTree = "<group>"; };
 		D2A844BA2F844E6500D5BB2B /* SwipeToDeleteRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeToDeleteRow.swift; sourceTree = "<group>"; };
+		D2F85AB92F901E9B008CB872 /* JournalSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalSettings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D26591C82F99163F00FC72A9 /* Exceptions for "Views" folder in "DoItAll" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				NoteListView.swift,
+			);
+			target = D23CBCAF2E635A6D007F5B0A /* DoItAll */;
+		};
+		D26591CB2F99196400FC72A9 /* Exceptions for "ViewModels" folder in "DoItAll" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				NoteListViewModel.swift,
+			);
+			target = D23CBCAF2E635A6D007F5B0A /* DoItAll */;
+		};
 		D2A844B12F82C3E000D5BB2B /* Exceptions for "DoItAll" folder in "DoItAll" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -108,24 +128,30 @@
 			path = CommonUI;
 			sourceTree = "<group>";
 		};
+		D26591C42F99161500FC72A9 /* Views */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D26591C82F99163F00FC72A9 /* Exceptions for "Views" folder in "DoItAll" target */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D26591C52F99161C00FC72A9 /* ViewModels */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D26591CB2F99196400FC72A9 /* Exceptions for "ViewModels" folder in "DoItAll" target */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
 		D26D483B2F43553A009575A7 /* GeneralList */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = GeneralList;
 			sourceTree = "<group>";
 		};
-		D26D48482F438A74009575A7 /* DisplayEntryView */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = DisplayEntryView;
-			sourceTree = "<group>";
-		};
 		D28C51882E6C9A7C00B65946 /* Resources */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Resources;
-			sourceTree = "<group>";
-		};
-		D28C518D2E6CA83500B65946 /* Settings */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Settings;
 			sourceTree = "<group>";
 		};
 		D29930D92F59DF5C00624DCE /* Onboarding */ = {
@@ -141,11 +167,6 @@
 		D29E22D72E63652400000F8A /* Shopping List */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Shopping List";
-			sourceTree = "<group>";
-		};
-		D29E22D82E63653E00000F8A /* Scribble */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Scribble;
 			sourceTree = "<group>";
 		};
 		D2D1B9982F742E12003A18BF /* Extensions */ = {
@@ -193,19 +214,17 @@
 		D23CBCA72E635A6D007F5B0A = {
 			isa = PBXGroup;
 			children = (
+				D26591C32F99160C00FC72A9 /* Checklist */,
 				D27770042F79BAF1007CCDDA /* ContentSettings */,
 				D2D1B9A92F7444FF003A18BF /* ThemeManager */,
 				D2D1B99D2F7430A6003A18BF /* Models */,
 				D2D1B9982F742E12003A18BF /* Extensions */,
 				D29930D92F59DF5C00624DCE /* Onboarding */,
-				D26D48482F438A74009575A7 /* DisplayEntryView */,
 				D26D483B2F43553A009575A7 /* GeneralList */,
 				D25A554B2F3E3E6100BEC4A3 /* CommonUI */,
 				D25A55382F3E256F00BEC4A3 /* LifeAdmin */,
 				D25A55352F3E212B00BEC4A3 /* FreeForm */,
-				D28C518D2E6CA83500B65946 /* Settings */,
 				D28C51882E6C9A7C00B65946 /* Resources */,
-				D29E22D82E63653E00000F8A /* Scribble */,
 				D29E22D72E63652400000F8A /* Shopping List */,
 				D29E22D62E63651900000F8A /* Journal */,
 				D23CBCB22E635A6E007F5B0A /* DoItAll */,
@@ -223,6 +242,15 @@
 				D23CBCCC2E635A70007F5B0A /* DoItAllUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D26591C32F99160C00FC72A9 /* Checklist */ = {
+			isa = PBXGroup;
+			children = (
+				D26591C52F99161C00FC72A9 /* ViewModels */,
+				D26591C42F99161500FC72A9 /* Views */,
+			);
+			path = Checklist;
 			sourceTree = "<group>";
 		};
 		D27770042F79BAF1007CCDDA /* ContentSettings */ = {
@@ -272,6 +300,7 @@
 				D277700F2F7C0BAF007CCDDA /* SettingsIconCircle.swift */,
 				D277700D2F7C0AF8007CCDDA /* SettingsNavigationRow.swift */,
 				D27770052F79BB06007CCDDA /* NewSettingsView.swift */,
+				D2A316B12F911F80004CB336 /* ShoppingListSettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -287,6 +316,7 @@
 		D27770162F7C1020007CCDDA /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				D2F85AB82F901E7A008CB872 /* JournalSettings */,
 				D27770142F7C0FFF007CCDDA /* Views */,
 				D27770152F7C1013007CCDDA /* ViewModels */,
 			);
@@ -313,11 +343,20 @@
 		D2A844B72F8445F000D5BB2B /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				D29C09382F868F7D0015749B /* NoteSelectionView.swift */,
+				D29C09382F868F7D0015749B /* SelectEntryTypeView.swift */,
 				D2A844BA2F844E6500D5BB2B /* SwipeToDeleteRow.swift */,
 				D29C094D2F86922D0015749B /* EntryTypeButton.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		D2F85AB82F901E7A008CB872 /* JournalSettings */ = {
+			isa = PBXGroup;
+			children = (
+				D2188B532F9025F8006B7710 /* SettingsManager.swift */,
+				D2F85AB92F901E9B008CB872 /* JournalSettings.swift */,
+			);
+			path = JournalSettings;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -341,13 +380,10 @@
 				D25A55382F3E256F00BEC4A3 /* LifeAdmin */,
 				D25A554B2F3E3E6100BEC4A3 /* CommonUI */,
 				D26D483B2F43553A009575A7 /* GeneralList */,
-				D26D48482F438A74009575A7 /* DisplayEntryView */,
 				D28C51882E6C9A7C00B65946 /* Resources */,
-				D28C518D2E6CA83500B65946 /* Settings */,
 				D29930D92F59DF5C00624DCE /* Onboarding */,
 				D29E22D62E63651900000F8A /* Journal */,
 				D29E22D72E63652400000F8A /* Shopping List */,
-				D29E22D82E63653E00000F8A /* Scribble */,
 				D2D1B9982F742E12003A18BF /* Extensions */,
 				D2D1B99D2F7430A6003A18BF /* Models */,
 				D2D1B9A92F7444FF003A18BF /* ThemeManager */,
@@ -486,11 +522,14 @@
 				D28F2BCC2F7EBDF300E37D85 /* SupermarketsMapViewModel.swift in Sources */,
 				D27770062F79BB06007CCDDA /* NewSettingsView.swift in Sources */,
 				D27770182F7C10CE007CCDDA /* SupermarketSettingsView.swift in Sources */,
-				D29C09452F868F7D0015749B /* NoteSelectionView.swift in Sources */,
+				D29C09452F868F7D0015749B /* SelectEntryTypeView.swift in Sources */,
 				D29C094E2F86922D0015749B /* EntryTypeButton.swift in Sources */,
 				D27770122F7C0CB9007CCDDA /* RowTitle.swift in Sources */,
+				D2A316B32F911F80004CB336 /* ShoppingListSettingsView.swift in Sources */,
 				D277700B2F79BCB8007CCDDA /* FavouriteSupermarketManager.swift in Sources */,
 				D28F2BC92F7EBD9F00E37D85 /* SupermarketsMapView.swift in Sources */,
+				D2F85ABA2F901E9B008CB872 /* JournalSettings.swift in Sources */,
+				D2188B542F9025F8006B7710 /* SettingsManager.swift in Sources */,
 				D277700E2F7C0AF8007CCDDA /* SettingsNavigationRow.swift in Sources */,
 				D27770092F79BC18007CCDDA /* SettingsViewModel.swift in Sources */,
 				D2A844BB2F844E6500D5BB2B /* SwipeToDeleteRow.swift in Sources */,
@@ -661,6 +700,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DoItAll/Info.plist;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "This app needs biometrics to hide/show rows on the main list";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Same as the supermarket for when backgrounded";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app will use the location to determine if the user is close to a supermarket they have chosen";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the microphone to capture voice notes";
@@ -694,6 +734,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DoItAll/Info.plist;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "This app needs biometrics to hide/show rows on the main list";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Same as the supermarket for when backgrounded";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app will use the location to determine if the user is close to a supermarket they have chosen";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the microphone to capture voice notes";

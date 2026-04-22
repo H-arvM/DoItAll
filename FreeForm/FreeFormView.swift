@@ -8,38 +8,56 @@
 import SwiftUI
 
 struct FreeFormView: View {
-    @StateObject private var viewModel = FreeFormViewModel()
+    @StateObject private var themeManager = ThemeManager.shared
+    @StateObject private var viewModel: FreeFormViewModel
     @FocusState private var isTextFieldFocused: Bool
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.managedObjectContext) private var viewContext
+    
+    let mode: EditOrViewMode
+    var onSave: (() -> Void)?
+    private var isViewMode: Bool { mode == .view }
+
+    init(mode: EditOrViewMode = .edit, entry: FreeWritingEntry? = nil, initialEntryType: EntryType = .freeForm, onSave: (() -> Void)? = nil) {
+        self.mode = mode
+        self.onSave = onSave
+        _viewModel = StateObject(wrappedValue: FreeFormViewModel(entry: entry, initialEntryType: initialEntryType))
+    }
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color(uiColor: .systemGroupedBackground)
-                    .ignoresSafeArea()
+        ZStack {
+            Color(uiColor: .systemGroupedBackground)
+                .ignoresSafeArea()
+            
+            VStack(alignment: .leading, spacing: 24) {
+                GenericHeaderSection(mode: mode, viewModel: viewModel, themeManager: themeManager)
+                textEditorSection
                 
-                VStack(spacing: 0) {
-                    textEditorSection
-                    
-                    if !viewModel.text.isEmpty {
-                        wordCountFooter
-                    }
+                if !viewModel.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    wordCountFooter
                 }
             }
-            .navigationTitle("Free Form")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
+        }
+        .navigationTitle("Free Form")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if !isViewMode {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        viewModel.saveEntry()
+                        viewModel.saveFreeform(context: viewContext) {
+                            onSave?()
+                            dismiss()
+                        }
                     } label: {
-                        Text("Save")
-                            .fontWeight(.medium)
+                        Image(systemName: "square.and.arrow.down")
+                            .foregroundStyle(themeManager.selectedTheme.primaryColour)
                     }
-                    .disabled(viewModel.text.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
-            .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        }
+        .onAppear {
+            if !isViewMode {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     isTextFieldFocused = true
                 }
             }
@@ -47,8 +65,9 @@ struct FreeFormView: View {
     }
     
     private var textEditorSection: some View {
-        TextEditor(text: $viewModel.text)
+        TextEditor(text: $viewModel.content)
             .focused($isTextFieldFocused)
+            .disabled(isViewMode)
             .font(.body)
             .scrollContentBackground(.hidden)
             .padding()
@@ -58,17 +77,16 @@ struct FreeFormView: View {
     
     private var wordCountFooter: some View {
         HStack {
-            Text("\(viewModel.wordCount) words")
+            Text("\(viewModel.wordCount) \(viewModel.wordCount == "1" ? "word" : "words")")
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Spacer()
         }
         .padding(.horizontal)
-        .padding(.bottom, 8)
+        .padding(.bottom, 12)
         .animation(.easeInOut(duration: 0.2), value: viewModel.wordCount)
     }
 }
-
 #Preview {
-    FreeFormView()
+    FreeFormView(mode: .edit, entry: nil, initialEntryType: .freeForm)
 }
