@@ -16,110 +16,86 @@ struct SelectEntryTypeView: View {
     @State private var navigateToFreeWriting: Bool = false
     @State private var navigateToShoppingList: Bool = false
     @State private var navigateToLifeAdmin: Bool = false
-    
-    let columns = [GridItem(.flexible()), GridItem(.flexible())]
+    @State private var navigateToNotes: Bool = false
+
+    private var entryTypes: [(icon: String, title: String, action: () -> Void)] {
+        [
+            ("pencil.line", "Journal", { navigateToJournal = true }),
+            ("pencil.and.outline", "Free Writing", { navigateToFreeWriting = true }),
+            ("cart.fill", "Shopping List", { navigateToShoppingList = true }),
+            ("pencil.and.list.clipboard", "Life admin", { navigateToLifeAdmin = true }),
+            ("list.clipboard.fill", "Notes", { navigateToNotes = true })
+        ]
+    }
     
     var body: some View {
         NavigationStack {
             ZStack {
                 ThemeBackgroundView(theme: themeManager.selectedTheme)
                 
-                VStack(spacing: 20) {
-                    LazyVGrid(columns: [
-                        GridItem(.flexible(), spacing: 20),
-                        GridItem(.flexible(), spacing: 20)
-                    ], spacing: 20) {
+                ScrollView {
+                    VStack(spacing: 20) {
+                        let buttonWidth = (UIScreen.main.bounds.width - 60) / 2
                         
-                        // Journal Button
-                        EntryTypeButton(
-                            icon: "pencil.line",
-                            title: "Journal",
-                            colour: themeManager.selectedTheme.primaryColour
-                        ) {
-                            navigateToJournal = true
-                        }
+                        let rows = entryTypes.chunked(into: 2)
                         
-                        // Free Writing
-                        EntryTypeButton(
-                            icon: "pencil.and.outline",
-                            title: "Free Writing",
-                            colour: themeManager.selectedTheme.primaryColour
-                        ) {
-                            navigateToFreeWriting = true
-                        }
-                        
-                        // Shopping List
-                        EntryTypeButton(
-                            icon: "cart.fill",
-                            title: "Shopping List",
-                            colour: themeManager.selectedTheme.primaryColour
-                        ) {
-                            navigateToShoppingList = true
-                        }
-                        
-                        // Life Admin
-                        EntryTypeButton(
-                            icon: "pencil.and.list.clipboard",
-                            title: "Life admin",
-                            colour: themeManager.selectedTheme.primaryColour
-                        ) {
-                            navigateToLifeAdmin = true
+                        ForEach(0..<rows.count, id: \.self) { rowIndex in
+                            HStack(spacing: 20) {
+                                ForEach(0..<rows[rowIndex].count, id: \.self) { itemIndex in
+                                    let item = rows[rowIndex][itemIndex]
+                                    
+                                    EntryTypeButton(
+                                        icon: item.icon,
+                                        title: item.title,
+                                        colour: themeManager.selectedTheme.primaryColour,
+                                        action: item.action
+                                    )
+                                    // 2. Apply the fixed width here
+                                    .frame(width: buttonWidth)
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
                         }
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 20)                    .padding(.horizontal, 20)
                     .padding(.top, 20)
-                    
-                    Spacer()
                 }
             }
             .navigationTitle("New Entry")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundStyle(themeManager.selectedTheme.primaryColour)
+                    Button("Cancel") { dismiss() }
+                        .foregroundStyle(themeManager.selectedTheme.primaryColour)
                 }
             }
             .navigationDestination(isPresented: $navigateToJournal) {
-                JournalView(
-                    mode: .edit,
-                    entry: nil,
-                    initialEntryType: .journal
-                ) {
-                    dismiss()
-                }
-                .environment(\.managedObjectContext, viewContext)
+                JournalView(mode: .edit, entry: nil, initialEntryType: .journal) { dismiss() }
+                    .environment(\.managedObjectContext, viewContext)
             }
             .navigationDestination(isPresented: $navigateToFreeWriting) {
-                FreeFormView(
-                    mode: .edit,
-                    entry: nil,
-                    initialEntryType: .freeForm
-                ) {
-                    dismiss()
-                }
-                .environment(\.managedObjectContext, viewContext)
+                FreeFormView(mode: .edit, entry: nil, initialEntryType: .freeForm) { dismiss() }
+                    .environment(\.managedObjectContext, viewContext)
             }
             .navigationDestination(isPresented: $navigateToShoppingList) {
-                ShoppingEntryView(
-                    entry: nil,
-                    initialEntryType: .shoppingList
-                ) {
-                    dismiss()
-                }
-                .environment(\.managedObjectContext, viewContext)
+                ShoppingEntryView(entry: nil, initialEntryType: .shoppingList) { dismiss() }
+                    .environment(\.managedObjectContext, viewContext)
             }
             .navigationDestination(isPresented: $navigateToLifeAdmin) {
-                LifeAdminView(
-                    entry: nil,
-                    initialEntryType: .lifeAdmin
-                ) {
-                    dismiss()
-                }
-                .environment(\.managedObjectContext, viewContext)
+                LifeAdminView(entry: nil, initialEntryType: .lifeAdmin) { dismiss() }
+                    .environment(\.managedObjectContext, viewContext)
             }
+            .navigationDestination(isPresented: $navigateToNotes) {
+                NoteListView()
+            }
+        }
+    }
+}
+
+extension Array {
+    func chunked(into size: Int) -> [[Element]] {
+        stride(from: 0, to: count, by: size).map {
+            Array(self[$0 ..< Swift.min($0 + size, count)])
         }
     }
 }

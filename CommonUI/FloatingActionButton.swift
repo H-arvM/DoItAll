@@ -63,9 +63,9 @@ private struct GradientCircleBackground: View {
     
     private var gradient: LinearGradient {
         LinearGradient(
-            colors: [colour, colour.opacity(0.1)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing)
+            colors: [colour, colour.opacity(0.8)],
+            startPoint: .top,
+            endPoint: .bottom)
     }
     
     private var strokeOverlay: some View {

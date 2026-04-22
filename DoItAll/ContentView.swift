@@ -72,6 +72,9 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ShoppingEntrySaved"))) { _ in
             viewModel.loadItems()
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CheckListEntrySaved"))) { _ in
+            viewModel.loadItems()
+        }
         .confirmationDialog("Sort by", isPresented: $showSortOptions, titleVisibility: .visible) {
             sortOptionsContent
         }
@@ -144,8 +147,7 @@ struct ContentView: View {
             LifeAdminView(entry: item.getOrCreateAdminEntry(context: viewContext))
             
         case .generalListType:
-            // TODO: Create new view
-            EmptyView()
+            NoteListView(entry: item.getOrCreateChecklistEntry(context: viewContext))
         }
     }
     
@@ -661,15 +663,10 @@ struct ContentView: View {
                         .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
                     
                 case .generalListType:
-                    EmptyView()
-//                    let generalList = item.generalList
-//                    Text(generalList?.title ?? item.title ?? "No title")
-//                        .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
-//                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-//                    let listCount = generalList?.listItems?.count ?? 0
-//                    Text(listCount == 0 ? "Empty list" : "\(listCount) item\(listCount == 1 ? "" : "s")")
-//                        .font(.caption2)
-//                        .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
+                    let listItem = item.checkListEntry
+                    Text(listItem?.title ?? item.title ?? "No title")
+                        .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
+                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
                 }
             }
             .opacity(viewModel.isItemHidden(item) ? 0 : 1)
@@ -813,6 +810,20 @@ extension ItemEntity {
         newEntry.createdAt = Date()
         newEntry.entryType = self.type
         self.taskItemEntry = newEntry
+        
+        try? context.save()
+        return newEntry
+    }
+    
+    func getOrCreateChecklistEntry(context: NSManagedObjectContext) -> CheckListEntry {
+        if let existing = self.checkListEntry {
+            return existing
+        }
+        let newEntry = CheckListEntry(context: context)
+        newEntry.id = self.id
+        newEntry.createdAt = Date()
+        newEntry.entryType = self.type
+        self.checkListEntry = newEntry
         
         try? context.save()
         return newEntry

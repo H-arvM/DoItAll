@@ -71,6 +71,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D26591C82F99163F00FC72A9 /* Exceptions for "Views" folder in "DoItAll" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				NoteListView.swift,
+			);
+			target = D23CBCAF2E635A6D007F5B0A /* DoItAll */;
+		};
+		D26591CB2F99196400FC72A9 /* Exceptions for "ViewModels" folder in "DoItAll" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				NoteListViewModel.swift,
+			);
+			target = D23CBCAF2E635A6D007F5B0A /* DoItAll */;
+		};
 		D2A844B12F82C3E000D5BB2B /* Exceptions for "DoItAll" folder in "DoItAll" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -114,14 +128,25 @@
 			path = CommonUI;
 			sourceTree = "<group>";
 		};
+		D26591C42F99161500FC72A9 /* Views */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D26591C82F99163F00FC72A9 /* Exceptions for "Views" folder in "DoItAll" target */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D26591C52F99161C00FC72A9 /* ViewModels */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D26591CB2F99196400FC72A9 /* Exceptions for "ViewModels" folder in "DoItAll" target */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
 		D26D483B2F43553A009575A7 /* GeneralList */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = GeneralList;
-			sourceTree = "<group>";
-		};
-		D26D48482F438A74009575A7 /* DisplayEntryView */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = DisplayEntryView;
 			sourceTree = "<group>";
 		};
 		D28C51882E6C9A7C00B65946 /* Resources */ = {
@@ -142,11 +167,6 @@
 		D29E22D72E63652400000F8A /* Shopping List */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Shopping List";
-			sourceTree = "<group>";
-		};
-		D29E22D82E63653E00000F8A /* Scribble */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Scribble;
 			sourceTree = "<group>";
 		};
 		D2D1B9982F742E12003A18BF /* Extensions */ = {
@@ -194,18 +214,17 @@
 		D23CBCA72E635A6D007F5B0A = {
 			isa = PBXGroup;
 			children = (
+				D26591C32F99160C00FC72A9 /* Checklist */,
 				D27770042F79BAF1007CCDDA /* ContentSettings */,
 				D2D1B9A92F7444FF003A18BF /* ThemeManager */,
 				D2D1B99D2F7430A6003A18BF /* Models */,
 				D2D1B9982F742E12003A18BF /* Extensions */,
 				D29930D92F59DF5C00624DCE /* Onboarding */,
-				D26D48482F438A74009575A7 /* DisplayEntryView */,
 				D26D483B2F43553A009575A7 /* GeneralList */,
 				D25A554B2F3E3E6100BEC4A3 /* CommonUI */,
 				D25A55382F3E256F00BEC4A3 /* LifeAdmin */,
 				D25A55352F3E212B00BEC4A3 /* FreeForm */,
 				D28C51882E6C9A7C00B65946 /* Resources */,
-				D29E22D82E63653E00000F8A /* Scribble */,
 				D29E22D72E63652400000F8A /* Shopping List */,
 				D29E22D62E63651900000F8A /* Journal */,
 				D23CBCB22E635A6E007F5B0A /* DoItAll */,
@@ -223,6 +242,15 @@
 				D23CBCCC2E635A70007F5B0A /* DoItAllUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D26591C32F99160C00FC72A9 /* Checklist */ = {
+			isa = PBXGroup;
+			children = (
+				D26591C52F99161C00FC72A9 /* ViewModels */,
+				D26591C42F99161500FC72A9 /* Views */,
+			);
+			path = Checklist;
 			sourceTree = "<group>";
 		};
 		D27770042F79BAF1007CCDDA /* ContentSettings */ = {
@@ -352,12 +380,10 @@
 				D25A55382F3E256F00BEC4A3 /* LifeAdmin */,
 				D25A554B2F3E3E6100BEC4A3 /* CommonUI */,
 				D26D483B2F43553A009575A7 /* GeneralList */,
-				D26D48482F438A74009575A7 /* DisplayEntryView */,
 				D28C51882E6C9A7C00B65946 /* Resources */,
 				D29930D92F59DF5C00624DCE /* Onboarding */,
 				D29E22D62E63651900000F8A /* Journal */,
 				D29E22D72E63652400000F8A /* Shopping List */,
-				D29E22D82E63653E00000F8A /* Scribble */,
 				D2D1B9982F742E12003A18BF /* Extensions */,
 				D2D1B99D2F7430A6003A18BF /* Models */,
 				D2D1B9A92F7444FF003A18BF /* ThemeManager */,
