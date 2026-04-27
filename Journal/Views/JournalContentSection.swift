@@ -30,7 +30,7 @@ struct JournalContentSection: View {
                                         .stroke(Color(UIColor.separator), lineWidth: 0.5)
                                 )
                         )
-                        .frame(minHeight: 200, maxHeight: .infinity)
+                        .frame(minHeight: 400, maxHeight: .infinity)
                 }
             } else {
                 ScrollView {
@@ -48,14 +48,12 @@ struct JournalContentSection: View {
                                 .stroke(Color(UIColor.separator), lineWidth: 0.5)
                         )
                 )
-                .frame(minHeight: 200, maxHeight: .infinity)
+                .frame(minHeight: 400, maxHeight: .infinity)
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 10)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
-
-
 
     private var adaptiveBackgroundColour: Color {
         colourScheme == .dark ?
@@ -65,8 +63,6 @@ struct JournalContentSection: View {
 }
 
 #Preview {
-    // Minimal preview setup without relying on external helpers like `.mock` or `.constant`.
-    // Construct a JournalViewModel with a simple sample entry if needed.
     let sampleViewModel = JournalViewModel()
     sampleViewModel.content = "Sample journal entry..."
     return JournalContentSection(

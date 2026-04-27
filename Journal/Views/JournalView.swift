@@ -16,8 +16,10 @@ enum EditOrViewMode {
 struct JournalView: View {
     @StateObject private var themeManager = ThemeManager.shared
     @StateObject private var viewModel: JournalViewModel
+    
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) var colourScheme
     
     @State private var drawerOffset: CGFloat = 0
     @State private var isExpanded: Bool = false
@@ -32,13 +34,15 @@ struct JournalView: View {
     }
     
     var body: some View {
-        ZStack(alignment: .bottom) {
+        ZStack(alignment: .top) {
             ThemeBackgroundView(theme: themeManager.selectedTheme)
                 .ignoresSafeArea()
-
+            
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     headerSection
+                        .padding(.top, viewModel.selectedPhotos.isEmpty ? 0 : 120)
+                    
                     contentSection
                     musicSection
                     
@@ -46,12 +50,13 @@ struct JournalView: View {
                 }
             }
             draggablePhotosDrawer
+                .padding(.horizontal, 10)
         }
+        
         .onChange(of: viewModel.photoSelection) { oldValue, newValue in
             viewModel.loadPhoto(from: newValue)
         }
-        .navigationTitle("Journal")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.automatic)
         .toolbar { toolbarItems }
     }
     
@@ -157,32 +162,23 @@ struct JournalView: View {
     private var draggablePhotosDrawer: some View {
         if !viewModel.selectedPhotos.isEmpty {
             VStack(spacing: 0) {
+                photosSection
+                .frame(height: isExpanded ? 400 : 110)
+                
                 Capsule()
                     .frame(width: 40, height: 6)
-                    .foregroundStyle(.secondary.opacity(0.5))
-                    .padding(.vertical, 12)
-                
-                JournalPhotosSelection(
-                    mode: mode,
-                    viewModel: viewModel,
-                    themeManager: themeManager,
-                    isParentExpanded: isExpanded
-                )
-                .frame(height: isExpanded ? 400 : 110)
+                    .foregroundStyle(themeManager.selectedTheme.primaryColour.opacity(0.8))
+                    .padding(.bottom, 6)
             }
             .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(.ultraThinMaterial)
-                    .shadow(color: .black.opacity(0.1), radius: 10, y: -5)
-            )
-            // Transition makes it slide in when the first photo is added
-            .transition(.move(edge: .bottom).combined(with: .opacity))
-            .offset(y: drawerOffset)
+            .background(themeManager.selectedTheme.primaryColour.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .transition(.move(edge: .top).combined(with: .opacity))
+            .offset(y: drawerOffset - 10)
             .gesture(
                 DragGesture()
                     .onChanged { value in
-                        if value.translation.height < 0 {
+                        if value.translation.height > 0 {
                             drawerOffset = value.translation.height * 0.3
                         } else {
                             drawerOffset = value.translation.height
@@ -190,9 +186,9 @@ struct JournalView: View {
                     }
                     .onEnded { value in
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                            if value.translation.height < -60 {
+                            if value.translation.height > 60 {
                                 isExpanded = true
-                            } else if value.translation.height > 60 {
+                            } else if value.translation.height < -60 {
                                 isExpanded = false
                             }
                             drawerOffset = 0

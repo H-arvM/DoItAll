@@ -10,13 +10,14 @@ import PhotosUI
 import CoreData
 import Combine
 
+
 @MainActor
 final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtocol {
     @Published var title: String = ""
     @Published var content: String = ""
     @Published var createdDate: Date = Date()
     @Published var entryType: EntryType = .journal
-
+    
     @Published var selectedPhotos: [UIImage] = []
     @Published var photoSelection: [PhotosPickerItem] = []
     @Published var selectedTrack: MusicTrack?
@@ -24,7 +25,7 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
     @Published var showMusicPicker: Bool = false
     @Published var isPhotosExpanded: Bool = false
     @Published var isMusicExpanded: Bool = false
-
+    
     private var existingEntry: JournalEntry?
     
     init(entry: JournalEntry? = nil, initialEntryType: EntryType = .journal) {
@@ -61,10 +62,19 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
     }
     
     private func loadPhotosFromEntry(_ entry: JournalEntry) {
-        guard let photoData = entry.photoData,
-              let image = UIImage(data: photoData) else { return }
+        // 1. Access the "To-Many" relationship
+        // Core Data sets are usually NSSet, so we cast it
+        guard let photoEntities = entry.photos as? Set<PhotoEntity> else { return }
         
-        selectedPhotos = [image]
+        // 2. Map the entities back to UIImages
+        let images = photoEntities.compactMap { entity in
+            if let data = entity.imageData {
+                return UIImage(data: data)
+            }
+            return nil
+        }
+        
+        self.selectedPhotos = images
     }
     
     private func getOrCreateEntry(in context: NSManagedObjectContext) -> JournalEntry {
@@ -107,17 +117,17 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
             return ItemType.generalListType.rawValue
         }
     }
-
+    
     private func updateEntryProperties(_ entry: JournalEntry) {
         entry.title = title.isEmpty ? "Untitled Entry" : title
         entry.content = content
         entry.entryType = entryType.rawValue
     }
     
-    private func updateMediaProperties(_ entry: JournalEntry) {
+    private func updateMediaProperties(_ entry: JournalEntry, in context: NSManagedObjectContext) {
         if entryType == .journal {
             updateMusicProperties(entry)
-            updatePhotoProperties(entry)
+            updatePhotoProperties(entry, in: context)
         } else {
             clearMediaProperties(entry)
         }
@@ -134,13 +144,18 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
         }
     }
     
-    private func updatePhotoProperties(_ entry: JournalEntry) {
-        if !selectedPhotos.isEmpty,
-           let firstPhoto = selectedPhotos.first,
-           let photoData = firstPhoto.jpegData(compressionQuality: 0.8) {
-            entry.photoData = photoData
-        } else {
-            entry.photoData = nil
+    private func updatePhotoProperties(_ entry: JournalEntry, in context: NSManagedObjectContext) {
+        if let existingPhotos = entry.photos as? Set<PhotoEntity> {
+            for photo in existingPhotos {
+                context.delete(photo)
+            }
+        }
+        
+        for image in selectedPhotos {
+            let newPhotoEntity = PhotoEntity(context: context)
+            newPhotoEntity.imageData = image.jpegData(compressionQuality: 0.8)
+            
+            newPhotoEntity.journalEntry = entry
         }
     }
     
@@ -152,7 +167,13 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
     func saveJournal(context: NSManagedObjectContext, onSuccess: (() -> Void)? = nil) {
         let entry = getOrCreateEntry(in: context)
         updateEntryProperties(entry)
-        updateMediaProperties(entry)
+        
+        if entryType == .journal {
+            updateMusicProperties(entry)
+            updatePhotoProperties(entry, in: context)
+        } else {
+            clearMediaProperties(entry)
+        }
         
         do {
             try context.save()
@@ -177,26 +198,36 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
             name: NSNotification.Name("JournalEntrySaved"),
             object: nil
         )
-     }
+    }
     
     func removePhoto(_ photo: UIImage) {
         selectedPhotos.removeAll { $0 == photo }
     }
     
     func loadPhoto(from items: [PhotosPickerItem]) {
-        guard !items.isEmpty else { return }
+        guard !items.isEmpty else {
+            self.selectedPhotos = []
+            return
+        }
         
         Task {
+            var loadedImages: [UIImage] = []
+            
             for item in items {
-                if let data = try? await item.loadTransferable(type: Data.self),
-                   let image = UIImage(data: data) {
-                    await MainActor.run {
-                        selectedPhotos.append(image)
+                do {
+                    if let data = try await item.loadTransferable(type: Data.self) {
+                        if let uiImage = UIImage(data: data) {
+                            loadedImages.append(uiImage)
+                        }
                     }
+                } catch {
+                    print("Error loading image: \(error.localizedDescription)")
                 }
             }
+            
             await MainActor.run {
-                photoSelection = []
+                self.selectedPhotos = loadedImages
+                print("Successfully loaded \(self.selectedPhotos.count) images into the UI")
             }
         }
     }
