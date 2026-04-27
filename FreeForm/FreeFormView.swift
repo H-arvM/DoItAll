@@ -38,7 +38,7 @@ struct FreeFormView: View {
                 }
             }
         }
-        .navigationBarBackButtonHidden(true)
+        .navigationBarBackButtonHidden(mode == .edit)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbarItems }
         .onAppear {
