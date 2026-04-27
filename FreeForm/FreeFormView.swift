@@ -38,28 +38,34 @@ struct FreeFormView: View {
                 }
             }
         }
-        .navigationTitle("Free Form")
+        .navigationBarBackButtonHidden(true)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            if !isViewMode {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        viewModel.saveFreeform(context: viewContext) {
-                            onSave?()
-                            dismiss()
-                        }
-                    } label: {
-                        Image(systemName: "square.and.arrow.down")
-                            .foregroundStyle(themeManager.selectedTheme.primaryColour)
-                    }
-                }
-            }
-        }
+        .toolbar { toolbarItems }
         .onAppear {
             if !isViewMode {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     isTextFieldFocused = true
                 }
+            }
+        }
+    }
+    
+    @ToolbarContentBuilder
+    private var toolbarItems: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            if mode == .edit {
+                CancelButton()
+            }
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                viewModel.saveFreeform(context: viewContext) {
+                    onSave?()
+                    dismiss()
+                }
+            } label: {
+                Image(systemName: "square.and.arrow.down")
+                    .foregroundStyle(themeManager.selectedTheme.primaryColour)
             }
         }
     }

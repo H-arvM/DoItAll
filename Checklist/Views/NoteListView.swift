@@ -31,7 +31,6 @@ struct NoteListView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     headerSection
                     
-                    // Input field with items listed directly beneath it
                     VStack(spacing: 12) {
                         if mode == .edit {
                             newItemInputSection
@@ -47,6 +46,7 @@ struct NoteListView: View {
                 .padding(.horizontal)
             }
         }
+        .navigationBarBackButtonHidden(true)
         .navigationTitle(viewModel.title.isEmpty ? "New List" : viewModel.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbarItems }
@@ -124,6 +124,11 @@ struct NoteListView: View {
     
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            if mode == .edit {
+                CancelButton()
+            }
+        }
         ToolbarItem(placement: .topBarTrailing) {
             if mode == .edit {
                 Button("Done") {

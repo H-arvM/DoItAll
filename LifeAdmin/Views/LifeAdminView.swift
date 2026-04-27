@@ -25,13 +25,8 @@ struct LifeAdminView: View {
             contentView
             floatingAddButton
         }
-        .navigationTitle("Life Admin")
-        .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                saveButton
-            }
-        }
+        .navigationBarBackButtonHidden(true)
+        .toolbar { toolbarItems }
         .sheet(isPresented: $viewModel.showingSettings) {
             LifeAdminSettingsView()
         }
@@ -47,6 +42,17 @@ struct LifeAdminView: View {
             categoryPills
             Divider()
             taskList
+        }
+    }
+    
+    @ToolbarContentBuilder
+    private var toolbarItems: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            
+            CancelButton()
+        }
+        ToolbarItem(placement: .navigationBarTrailing) {
+            saveButton
         }
     }
 

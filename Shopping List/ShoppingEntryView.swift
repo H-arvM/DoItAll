@@ -26,74 +26,20 @@ struct ShoppingEntryView: View {
         ZStack(alignment: .bottomTrailing) {
             VStack {
                 List {
-                    // Use non-binding ForEach — Item is a reference type (NSManagedObject)
-                    // so mutations are reflected without needing a Binding.
-                    ForEach(viewModel.sortedItems, id: \.objectID) { item in
-                        HStack {
-                            Button(action: {
-                                item.isChecked.toggle()
-                                try? viewContext.save()
-                            }) {
-                                Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(item.isChecked ? .green : .gray)
-                                    .font(.title3)
-                            }
-                            .buttonStyle(BorderlessButtonStyle())
-                            
-                            Text(item.name ?? "New Item")
-                                .strikethrough(item.isChecked)
-                                .lineLimit(2)
-                            
-                            Spacer()
-                            
-                          
-                            Text("x \(item.quantity ?? "1")")
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(.vertical, 8)
-                    }
-                    .onDelete { indexSet in
-                        indexSet.map { viewModel.sortedItems[$0] }.forEach(viewContext.delete)
-                        try? viewContext.save()
-                    }
-                    
-                    // Add item row
-                    HStack(alignment: .center, spacing: 0) {
-                        TextField("Item name", text: $viewModel.itemName, axis: .vertical)
-                            .lineLimit(2)
-                            .frame(minHeight: 36)
-                            .padding(.trailing, 12)
-                        
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: 1)
-                            .padding(.vertical, 4)
-                        
-                        TextField("Qty", text: $viewModel.quantity)
-                            .keyboardType(.numberPad)
-                            .frame(width: 60)
-                            .padding(.leading, 12)
-                        
-                        Button(action: {
-                            viewModel.addItem(context: viewContext)
-                        }) {
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundColor(.blue)
-                                .font(.title2)
-                        }
-                        .buttonStyle(BorderlessButtonStyle())
-                        .disabled(viewModel.itemName.isEmpty || viewModel.quantity.isEmpty)
-                        .padding(.leading, 8)
-                    }
-                    .listRowSeparator(.hidden)
+                    itemRows
+                    addItemRow
                 }
             }
         }
-        .navigationTitle("Shopping List")
+        .navigationBarBackButtonHidden(true)
         .toolbar { toolbarItems }
     }
     
+    @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            CancelButton()
+        }
         ToolbarItemGroup(placement: .topBarTrailing) {
             Button {
                 viewModel.saveShoppingEntry(context: viewContext) {
@@ -108,6 +54,85 @@ struct ShoppingEntryView: View {
                     .foregroundStyle(themeManager.selectedTheme.primaryColour)
             }
         }
+    }
+
+    // MARK: - View Builders
+    @ViewBuilder
+    private var itemRows: some View {
+        ForEach(viewModel.sortedItems, id: \.objectID) { item in
+            itemRow(for: item)
+        }
+        .onDelete { indexSet in
+            indexSet.map { viewModel.sortedItems[$0] }.forEach(viewContext.delete)
+            try? viewContext.save()
+        }
+    }
+
+    @ViewBuilder
+    private func itemRow(for item: ShoppingItem) -> some View {
+        HStack {
+            checkmarkButton(for: item)
+
+            Text(item.name ?? "New Item")
+                .strikethrough(item.isChecked)
+                .lineLimit(2)
+
+            Spacer()
+
+            Text("x \(item.quantity ?? "1")")
+                .foregroundColor(.secondary)
+        }
+        .padding(.vertical, 8)
+    }
+
+    @ViewBuilder
+    private func checkmarkButton(for item: ShoppingItem) -> some View {
+        Button {
+            item.isChecked.toggle()
+            try? viewContext.save()
+        } label: {
+            Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
+                .foregroundColor(item.isChecked ? .green : .gray)
+                .font(.title3)
+        }
+        .buttonStyle(BorderlessButtonStyle())
+    }
+
+    @ViewBuilder
+    private var addItemRow: some View {
+        HStack(alignment: .center, spacing: 0) {
+            TextField("Item name", text: $viewModel.itemName, axis: .vertical)
+                .lineLimit(2)
+                .frame(minHeight: 36)
+                .padding(.trailing, 12)
+
+            Rectangle()
+                .fill(Color.gray.opacity(0.3))
+                .frame(width: 1)
+                .padding(.vertical, 4)
+
+            TextField("Qty", text: $viewModel.quantity)
+                .keyboardType(.numberPad)
+                .frame(width: 60)
+                .padding(.leading, 12)
+
+            addItemButton
+        }
+        .listRowSeparator(.hidden)
+    }
+
+    @ViewBuilder
+    private var addItemButton: some View {
+        Button {
+            viewModel.addItem(context: viewContext)
+        } label: {
+            Image(systemName: "plus.circle.fill")
+                .foregroundColor(.blue)
+                .font(.title2)
+        }
+        .buttonStyle(BorderlessButtonStyle())
+        .disabled(viewModel.itemName.isEmpty || viewModel.quantity.isEmpty)
+        .padding(.leading, 8)
     }
 }
 

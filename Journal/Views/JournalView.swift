@@ -52,7 +52,7 @@ struct JournalView: View {
             draggablePhotosDrawer
                 .padding(.horizontal, 10)
         }
-        
+        .navigationBarBackButtonHidden(true)
         .onChange(of: viewModel.photoSelection) { oldValue, newValue in
             viewModel.loadPhoto(from: newValue)
         }
@@ -106,8 +106,13 @@ struct JournalView: View {
     
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
-        if mode == .edit {
-            ToolbarItemGroup(placement: .topBarTrailing) {
+        ToolbarItem(placement: .topBarLeading) {
+            if mode == .edit {
+                CancelButton()
+            }
+        }
+        ToolbarItemGroup(placement: .topBarTrailing) {
+            if mode == .edit {
                 if viewModel.entryType == .journal {
                     photoPickerButton
                     musicPickerButton
@@ -115,6 +120,14 @@ struct JournalView: View {
                 saveButton
             }
         }
+    }
+    
+    @ViewBuilder
+    private var cancelButton: some View {
+        Button("Cancel") {
+            dismiss()
+        }
+        .foregroundStyle(themeManager.selectedTheme.primaryColour)
     }
     
     // MARK: - Toolbar Buttons
