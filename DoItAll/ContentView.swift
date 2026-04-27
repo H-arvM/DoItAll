@@ -170,11 +170,21 @@ struct ContentView: View {
     
     @ViewBuilder
     private var itemsList: some View {
-        if viewModel.currentSortOption == .type {
-            groupedList
-                .cornerRadius(10)
+        if viewModel.items.isEmpty {
+            PlaceHolderContentView()
         } else {
-            simpleList
+            listViewContent
+        }
+    }
+    
+    private var listViewContent: some View {
+        Group {
+            if viewModel.currentSortOption == .type {
+                groupedList
+                    .cornerRadius(10)
+            } else {
+                simpleList
+            }
         }
     }
     
@@ -610,8 +620,6 @@ struct ContentView: View {
         .ignoresSafeArea(.keyboard)
     }
     
-    
-    // TODO: Point AI here and have update the CoreData models and consider all the other entryTypes too
     @ViewBuilder
     private func rowContent(for item: ItemEntity) -> some View {
         HStack {
@@ -755,78 +763,3 @@ struct ContentView: View {
 //#Preview {
 //    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 //}
-
-extension ItemEntity {
-    func getOrCreateJournalEntry(context: NSManagedObjectContext) -> JournalEntry {
-        if let existing = self.journalEntry {
-            return existing
-        }
-        let newEntry = JournalEntry(context: context)
-        newEntry.id = self.id
-        newEntry.createdDate = Date()
-        newEntry.title = self.title
-        newEntry.entryType = self.type
-        self.journalEntry = newEntry
-        
-        try? context.save()
-        return newEntry
-    }
-    
-    func getOrCreateFreeWritingEntry(context: NSManagedObjectContext) -> FreeWritingEntry {
-        if let existing = self.freeWritingEntry {
-            return existing
-        }
-        let newEntry = FreeWritingEntry(context: context)
-        newEntry.id = self.id
-        newEntry.createdDate = Date()
-        newEntry.title = self.title
-        newEntry.entryType = self.type
-        self.freeWritingEntry = newEntry
-        
-        try? context.save()
-        return newEntry
-    }
-    
-    func getOrCreateShoppingEntry(context: NSManagedObjectContext) -> ShoppingEntry {
-        if let existing = self.shoppingEntry {
-            return existing
-        }
-        let newEntry = ShoppingEntry(context: context)
-        newEntry.id = self.id
-        newEntry.createdDate = Date()
-        newEntry.entryType = self.type
-        self.shoppingEntry = newEntry
-        
-        try? context.save()
-        return newEntry
-    }
-    
-    func getOrCreateAdminEntry(context: NSManagedObjectContext) -> TaskEntry {
-        if let existing = self.taskItemEntry {
-            return existing
-        }
-        let newEntry = TaskEntry(context: context)
-        newEntry.id = self.id
-        newEntry.createdAt = Date()
-        newEntry.entryType = self.type
-        self.taskItemEntry = newEntry
-        
-        try? context.save()
-        return newEntry
-    }
-    
-    func getOrCreateChecklistEntry(context: NSManagedObjectContext) -> CheckListEntry {
-        if let existing = self.checkListEntry {
-            return existing
-        }
-        let newEntry = CheckListEntry(context: context)
-        newEntry.id = self.id
-        newEntry.createdAt = Date()
-        newEntry.entryType = self.type
-        self.checkListEntry = newEntry
-        
-        try? context.save()
-        return newEntry
-    }
-}
-

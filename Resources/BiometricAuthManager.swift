@@ -41,13 +41,13 @@ class BiometricAuthManager: ObservableObject {
     func authenticateUser(reason: String, completion: @escaping (Result<Void, BiometricError>) -> Void) {
         let context = LAContext()
         var error: NSError?
-        
-        /// Try biometic auth first
+
         guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
+            // Biometrics not available/allowed — go straight to passcode
             authenticateWithPasscode(reason: reason, completion: completion)
             return
         }
-        
+
         context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, error in
             DispatchQueue.main.async {
                 if success {
@@ -58,34 +58,24 @@ class BiometricAuthManager: ObservableObject {
                         switch error.code {
                         case .userCancel, .appCancel, .systemCancel:
                             completion(.failure(.userCancel))
-                        case .userFallback:
-                            self.authenticateUser(reason: reason, completion: completion)
-                        case .authenticationFailed:
+                        case .userFallback, .authenticationFailed, .biometryLockout:
+                            // Any of these — fall back to passcode
                             self.authenticateWithPasscode(reason: reason, completion: completion)
                         default:
-                            completion(.failure(.other(error)))
+                            self.authenticateWithPasscode(reason: reason, completion: completion)
                         }
-                    } else if let error = error {
-                        completion(.failure(.other(error)))
+                    } else {
+                        // Unknown error — still try passcode
+                        self.authenticateWithPasscode(reason: reason, completion: completion)
                     }
                 }
             }
         }
     }
-    
-    private func authenticateWithPasscode(reason: String, completion: @escaping (Result<Void, BiometricError>) -> Void ) {
+
+    private func authenticateWithPasscode(reason: String, completion: @escaping (Result<Void, BiometricError>) -> Void) {
         let context = LAContext()
-        var error: NSError?
-        
-        /// Check if device passcode is available
-        guard context.canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
-            if let error = error as NSError? {
-                completion(.failure(.other(error)))
-            }
-            return
-        }
-        
-        /// Perform authentication with passcode
+
         context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { success, error in
             DispatchQueue.main.async {
                 if success {
@@ -96,7 +86,7 @@ class BiometricAuthManager: ObservableObject {
                         switch error.code {
                         case .userCancel, .appCancel, .systemCancel:
                             completion(.failure(.userCancel))
-                        case.authenticationFailed:
+                        case .authenticationFailed:
                             completion(.failure(.authenticationFailed))
                         default:
                             completion(.failure(.other(error)))
