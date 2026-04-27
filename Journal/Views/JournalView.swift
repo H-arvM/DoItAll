@@ -52,7 +52,7 @@ struct JournalView: View {
             draggablePhotosDrawer
                 .padding(.horizontal, 10)
         }
-        .navigationBarBackButtonHidden(true)
+        .navigationBarBackButtonHidden(mode == .edit)
         .onChange(of: viewModel.photoSelection) { oldValue, newValue in
             viewModel.loadPhoto(from: newValue)
         }
