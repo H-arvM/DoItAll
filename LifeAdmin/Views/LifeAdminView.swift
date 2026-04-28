@@ -12,14 +12,15 @@ struct LifeAdminView: View {
     @StateObject private var viewModel: LifeAdminViewModel
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
-
+    @State private var sheetContentHeight = CGFloat(0)
+    
     var onSave: (() -> Void)?
-
+    
     init(entry: TaskEntry? = nil, initialEntryType: EntryType = .lifeAdmin, onSave: (() -> Void)? = nil) {
         self.onSave = onSave
         _viewModel = StateObject(wrappedValue: LifeAdminViewModel(entry: entry))
     }
-
+    
     var body: some View {
         ZStack {
             contentView
@@ -27,16 +28,13 @@ struct LifeAdminView: View {
         }
         .navigationBarBackButtonHidden(true)
         .toolbar { toolbarItems }
-        .sheet(isPresented: $viewModel.showingSettings) {
-            LifeAdminSettingsView()
-        }
         .onAppear {
             viewModel.loadTasks(context: viewContext)
         }
     }
-
+    
     // MARK: - Subviews
-
+    
     private var contentView: some View {
         VStack(spacing: 0) {
             categoryPills
@@ -48,14 +46,13 @@ struct LifeAdminView: View {
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
-            
             CancelButton()
         }
         ToolbarItem(placement: .navigationBarTrailing) {
             saveButton
         }
     }
-
+    
     private var categoryPills: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
@@ -72,7 +69,7 @@ struct LifeAdminView: View {
         }
         .background(Color(.systemBackground))
     }
-
+    
     private var taskList: some View {
         Group {
             if viewModel.filteredTasks.isEmpty {
@@ -91,36 +88,40 @@ struct LifeAdminView: View {
             }
         }
     }
-
+    
     private var floatingAddButton: some View {
-        VStack {
-            Spacer()
-            HStack {
+        GeometryReader { proxy in
+            VStack {
                 Spacer()
-                Button {
-                    viewModel.showingAddTask = true
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                        .frame(width: 56, height: 56)
-                        .background(themeManager.selectedTheme.primaryColour)
-                        .clipShape(Circle())
-                        .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                HStack {
+                    Spacer()
+                    Button {
+                        viewModel.showingAddTask = true
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .frame(width: 56, height: 56)
+                            .background(themeManager.selectedTheme.primaryColour)
+                            .clipShape(Circle())
+                            .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                    }
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 20)
                 }
-                .padding(.trailing, 20)
-                .padding(.bottom, 20)
             }
-        }
-        .sheet(isPresented: $viewModel.showingAddTask) {
-            AddTaskView(viewModel: viewModel)
+            .sheet(isPresented: $viewModel.showingAddTask) {
+                AddTaskView(viewModel: viewModel)
+                    .presentationDetents([.height(proxy.size.height)])
+                    .presentationDragIndicator(.visible)
+            }
         }
     }
     
     private var saveButton: some View {
         Button {
             viewModel.saveAdminEntry(context: viewContext) {
-            if let onSave = onSave {
+                if let onSave = onSave {
                     onSave()
                 } else {
                     dismiss()
@@ -139,4 +140,3 @@ struct LifeAdminView_Previews: PreviewProvider {
         LifeAdminView()
     }
 }
-

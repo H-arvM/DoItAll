@@ -7,6 +7,7 @@
 
 import Foundation
 import MusicKit
+import UIKit
 
 @MainActor
 final class MusicPickerViewModel: ObservableObject {
@@ -30,13 +31,20 @@ final class MusicPickerViewModel: ObservableObject {
         }
         
         isSearching = true
-        defer  { isSearching = false }
+        defer { isSearching = false }
         
         do {
-            var request = MusicCatalogSearchRequest(term: query, types: [Song.self])
-            request.limit = Self.searchLimit
+            var request = MusicLibraryRequest<Song>()
+            request.limit = 200
             let response = try await request.response()
-            searchResults = response.songs.compactMap(mapSongToTrack)
+            let lowercasedQuery = query.lowercased()
+            searchResults = response.items
+                .filter {
+                    $0.title.lowercased().contains(lowercasedQuery) ||
+                    $0.artistName.lowercased().contains(lowercasedQuery)
+                }
+                .prefix(Self.searchLimit)
+                .compactMap(mapSongToTrack)
         } catch {
             print("Music search error: \(error)")
             searchResults = []
@@ -44,15 +52,36 @@ final class MusicPickerViewModel: ObservableObject {
     }
     
     private func mapSongToTrack(_ song: Song) -> MusicTrack? {
-        guard let assetURL = song.artwork?.url(width: Self.artworkSize, height: Self.artworkSize) else {
-            return nil
-        }
-        
+        let artworkURL = song.artwork?.url(width: Self.artworkSize, height: Self.artworkSize)
         return MusicTrack(
             id: song.id.rawValue,
             title: song.title,
             artist: song.artistName,
-            artworkURL: assetURL
+            artworkURL: artworkURL
         )
+    }
+    
+    func openTrack(_ track: MusicTrack) {
+        let query = "\(track.title) \(track.artist)"
+            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        
+        // Try Apple Music first
+        let appleMusicURL = URL(string: "music://music.apple.com/search?term=\(query)")!
+        if UIApplication.shared.canOpenURL(appleMusicURL) {
+            UIApplication.shared.open(appleMusicURL)
+            return
+        }
+        
+        // Try Spotify
+        let spotifyURL = URL(string: "spotify:search:\(query)")!
+        if UIApplication.shared.canOpenURL(spotifyURL) {
+            UIApplication.shared.open(spotifyURL)
+            return
+        }
+        
+        // Fall back to Apple Music web
+        if let webURL = URL(string: "https://music.apple.com/search?term=\(query)") {
+            UIApplication.shared.open(webURL)
+        }
     }
 }

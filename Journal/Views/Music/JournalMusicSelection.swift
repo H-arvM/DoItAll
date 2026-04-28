@@ -13,6 +13,28 @@ struct JournalMusicSelection: View {
     @ObservedObject var viewModel: JournalViewModel
     @ObservedObject var themeManager: ThemeManager
     
+    func openTrack(_ track: MusicTrack) {
+        let query = "\(track.title) \(track.artist)"
+            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        
+        let appleMusicURL = URL(string: "music://music.apple.com/search?term=\(query)")!
+        if UIApplication.shared.canOpenURL(appleMusicURL) {
+            UIApplication.shared.open(appleMusicURL)
+            return
+        }
+        
+        let spotifyURL = URL(string: "spotify:search:\(query)")!
+        if UIApplication.shared.canOpenURL(spotifyURL) {
+            UIApplication.shared.open(spotifyURL)
+            return
+        }
+        
+        // Fall back to Apple Music web
+        if let webURL = URL(string: "https://music.apple.com/search?term=\(query)") {
+            UIApplication.shared.open(webURL)
+        }
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Button {
@@ -38,9 +60,9 @@ struct JournalMusicSelection: View {
             .padding(.horizontal, 20)
             
             if viewModel.isMusicExpanded {
-                ExpandedMusicView(mode: mode, track: track, viewModel: viewModel, themeManager: themeManager)
+                ExpandedMusicView(mode: mode, track: track, viewModel: viewModel, themeManager: themeManager, onPlay: { openTrack(track) })
             } else {
-                CollapsedMusicView(track: track, themeManager: themeManager)
+                CollapsedMusicView(track: track, themeManager: themeManager, onPlay: { openTrack(track) })
             }
         }
     }

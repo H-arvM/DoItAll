@@ -14,15 +14,18 @@ enum EditOrViewMode {
 }
 
 struct JournalView: View {
+    @State private var drawerOffset: CGFloat = 0
+    @State private var isExpanded: Bool = false
+    @State private var showMusicPicker = false
+    @State private var showReplaceTrackAlert = false
+    @State private var showMusicAuthAlert = false
+    
     @StateObject private var themeManager = ThemeManager.shared
     @StateObject private var viewModel: JournalViewModel
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) var colourScheme
-    
-    @State private var drawerOffset: CGFloat = 0
-    @State private var isExpanded: Bool = false
     
     let mode: EditOrViewMode
     var onSave: (() -> Void)?
@@ -39,18 +42,18 @@ struct JournalView: View {
                 .ignoresSafeArea()
             
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 5) {
+                    draggablePhotosDrawer
+                        .padding(.top, 10)
+                        .padding(.horizontal, 10)
                     headerSection
-                        .padding(.top, viewModel.selectedPhotos.isEmpty ? 0 : 120)
-                    
+                        .padding(.bottom, 5)
                     contentSection
-                    musicSection
+//                    musicSection
                     
-                    Spacer(minLength: 150)
+                    Spacer(minLength: 10)
                 }
             }
-            draggablePhotosDrawer
-                .padding(.horizontal, 10)
         }
         .navigationBarBackButtonHidden(mode == .edit)
         .onChange(of: viewModel.photoSelection) { oldValue, newValue in
@@ -113,10 +116,7 @@ struct JournalView: View {
         }
         ToolbarItemGroup(placement: .topBarTrailing) {
             if mode == .edit {
-                if viewModel.entryType == .journal {
-                    photoPickerButton
-                    musicPickerButton
-                }
+                photoPickerButton
                 saveButton
             }
         }
@@ -144,17 +144,7 @@ struct JournalView: View {
                 .foregroundStyle(themeManager.selectedTheme.primaryColour)
         }
     }
-    
-    @ViewBuilder
-    private var musicPickerButton: some View {
-        Button {
-            viewModel.showMusicPicker = true
-        } label: {
-            Image(systemName: "music.note")
-                .foregroundStyle(themeManager.selectedTheme.primaryColour)
-        }
-    }
-    
+        
     @ViewBuilder
     private var saveButton: some View {
         Button {
@@ -176,15 +166,16 @@ struct JournalView: View {
         if !viewModel.selectedPhotos.isEmpty {
             VStack(spacing: 0) {
                 photosSection
-                .frame(height: isExpanded ? 400 : 110)
+                    .frame(height: isExpanded ? 250 : 100)
+                    .padding(.horizontal, 10)
                 
                 Capsule()
                     .frame(width: 40, height: 6)
                     .foregroundStyle(themeManager.selectedTheme.primaryColour.opacity(0.8))
-                    .padding(.bottom, 6)
             }
+            .padding(.horizontal, 10)
             .frame(maxWidth: .infinity)
-            .background(themeManager.selectedTheme.primaryColour.opacity(0.1))
+            .background(Color.systemBackground)
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
             .transition(.move(edge: .top).combined(with: .opacity))
             .offset(y: drawerOffset - 10)

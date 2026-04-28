@@ -24,7 +24,7 @@ struct JournalContentSection: View {
                         .padding(12)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(adaptiveBackgroundColour)
+                                .fill(Color.systemBackground)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
                                         .stroke(Color(UIColor.separator), lineWidth: 0.5)
@@ -42,7 +42,7 @@ struct JournalContentSection: View {
                 }
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(adaptiveBackgroundColour)
+                        .fill(Color.systemBackground)
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(Color(UIColor.separator), lineWidth: 0.5)
@@ -53,12 +53,6 @@ struct JournalContentSection: View {
         }
         .padding(.horizontal, 10)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    }
-
-    private var adaptiveBackgroundColour: Color {
-        colourScheme == .dark ?
-        Color(UIColor.secondarySystemBackground)
-        : Color(UIColor.systemBackground)
     }
 }
 

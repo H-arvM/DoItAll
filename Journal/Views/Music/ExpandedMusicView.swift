@@ -1,5 +1,5 @@
 //
-//  CollapsedMusicView.swift
+//  ExpandedMusicView.swift
 //  DoItAll
 //
 //  Created by Marc Harvey on 13/04/2026.
@@ -7,12 +7,15 @@
 
 import SwiftUI
 
-struct CollapsedMusicView: View {
+struct ExpandedMusicView: View {
+    let mode: EditOrViewMode
     let track: MusicTrack
+    @ObservedObject var viewModel: JournalViewModel
     @ObservedObject var themeManager: ThemeManager
+    let onPlay: () -> Void
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 16) {
             if let artworkURL = track.artworkURL {
                 AsyncImage(url: artworkURL) { phase in
                     switch phase {
@@ -23,12 +26,12 @@ struct CollapsedMusicView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                             ProgressView()
                         }
-                        .frame(width: 50, height: 50)
+                        .frame(width: 80, height: 80)
                     case .success(let image):
                         image
                             .resizable()
                             .scaledToFill()
-                            .frame(width: 50, height: 50)
+                            .frame(width: 80, height: 80)
                             .clipped()
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                     case .failure:
@@ -39,10 +42,10 @@ struct CollapsedMusicView: View {
                             Image(systemName: "music.note")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 50, height: 50)
+                                .frame(width: 40, height: 40)
                                 .foregroundStyle(.secondary)
                         }
-                        .frame(width: 50, height: 50)
+                        .frame(width: 80, height: 80)
                     @unknown default:
                         EmptyView()
                     }
@@ -51,10 +54,9 @@ struct CollapsedMusicView: View {
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(track.title)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
+                    .font(.body)
+                    .fontWeight(.semibold)
                     .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                    .lineLimit(1)
                 
                 Text(track.artist)
                     .font(.subheadline)
@@ -65,25 +67,51 @@ struct CollapsedMusicView: View {
             
             Spacer()
             
-           Image(systemName: "music.note")
-                .font(.caption)
-                .foregroundStyle(themeManager.selectedTheme.primaryColour)
+            if mode == .edit {
+                Button {
+                    viewModel.selectedTrack = nil
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                }
+                
+                Button {
+                    onPlay()
+                } label: {
+                    Image(systemName: "play.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(themeManager.selectedTheme.primaryColour ?? .accentColor)
+                }
+            }
         }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(themeManager.selectedTheme.primaryColour.opacity(0.1))
+                .overlay(RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color(UIColor.separator), lineWidth: 0.5)
+            )
+        )
         .padding(.horizontal, 20)
         .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
     }
 }
 
-#Preview("Collapsed Music View") {
-    let mockTrack = MusicTrack(
-        id: "123",
-        title: "Preview Song",
-        artist: "Preview Artist",
-        artworkURL: URL(string: "https://example.com/artwork.jpg")
-    )
-    let themeManager = ThemeManager()
-    let theme = ThemeManager()
-    CollapsedMusicView(track: mockTrack, themeManager: themeManager)
-        .padding()
-        .background(Color(.systemBackground))
-}
+//#Preview("ExpandedMusicView") {
+//    let sampleTrack = MusicTrack(
+//        id: "sample-id",
+//        title: "Sample Song",
+//        artist: "Sample Artist",
+//        artworkURL: URL(string: "https://example.com/artwork.jpg")
+//    )
+//    let vm = JournalViewModel()
+//    let theme = ThemeManager()
+//    ExpandedMusicView(
+//        mode: .edit,
+//        track: sampleTrack,
+//        viewModel: vm,
+//        themeManager: theme
+//    )
+//}
+//

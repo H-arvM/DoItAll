@@ -85,7 +85,7 @@
 			);
 			target = D23CBCAF2E635A6D007F5B0A /* DoItAll */;
 		};
-		D2A844B12F82C3E000D5BB2B /* Exceptions for "DoItAll" folder in "DoItAll" target */ = {
+		D2773FE52FA11099006A2C86 /* Exceptions for "DoItAll" folder in "DoItAll" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -98,7 +98,7 @@
 		D23CBCB22E635A6E007F5B0A /* DoItAll */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				D2A844B12F82C3E000D5BB2B /* Exceptions for "DoItAll" folder in "DoItAll" target */,
+				D2773FE52FA11099006A2C86 /* Exceptions for "DoItAll" folder in "DoItAll" target */,
 			);
 			path = DoItAll;
 			sourceTree = "<group>";
@@ -694,17 +694,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = DoItAll/DoItAll.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YU65V62LAA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DoItAll/Info.plist;
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = Disclaimer;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "This app needs biometrics to hide/show rows on the main list";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Same as the supermarket for when backgrounded";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Will allow the notification for when you're close to your chosen supermarket";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app will use the location to determine if the user is close to a supermarket they have chosen";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the microphone to capture voice notes";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app uses Apple Music";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This will let you add photos to journal entries";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -717,6 +719,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Marc-Harvey.DoItAll";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -728,17 +731,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = DoItAll/DoItAll.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YU65V62LAA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DoItAll/Info.plist;
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = Disclaimer;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "This app needs biometrics to hide/show rows on the main list";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Same as the supermarket for when backgrounded";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Will allow the notification for when you're close to your chosen supermarket";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app will use the location to determine if the user is close to a supermarket they have chosen";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the microphone to capture voice notes";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app uses Apple Music";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This will let you add photos to journal entries";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -751,6 +756,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Marc-Harvey.DoItAll";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

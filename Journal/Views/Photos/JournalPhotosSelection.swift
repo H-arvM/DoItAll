@@ -24,7 +24,7 @@ struct JournalPhotosSelection: View {
                     .transition(.opacity)
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 10)
     }
 }
 
