@@ -12,7 +12,7 @@ protocol HeaderProviderProtocol: ObservableObject {
     var createdDate: Date { get }
 }
 
-struct GenericHeaderSection<T: HeaderProviderProtocol>: View {
+struct GenericHeaderMultiSection<T: HeaderProviderProtocol>: View {
     let mode: EditOrViewMode
     @ObservedObject var viewModel: T
     @ObservedObject var themeManager: ThemeManager
@@ -30,7 +30,7 @@ struct GenericHeaderSection<T: HeaderProviderProtocol>: View {
                     .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
             }
             
-            Text(viewModel.createdDate.formattedDate)
+            Text(viewModel.createdDate.funFormatString)
                 .font(.title2)
                 .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .primary)
         }
@@ -42,21 +42,5 @@ struct GenericHeaderSection<T: HeaderProviderProtocol>: View {
 #Preview {
     let vm = JournalViewModel()
     vm.title = "Consolidated Header"
-    return GenericHeaderSection(mode: .edit, viewModel: vm, themeManager: ThemeManager.shared)
-}
-
-struct GenericSingularHeaderSection<T: HeaderProviderProtocol>: View {
-    let mode: EditOrViewMode
-    @ObservedObject var viewModel: T
-    @ObservedObject var themeManager: ThemeManager
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(viewModel.createdDate.formattedDate)
-                .font(.title2)
-                .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .primary)
-        }
-        .padding(.horizontal, 20)
-        .padding(.top, 16)
-    }
+    return GenericHeaderMultiSection(mode: .edit, viewModel: vm, themeManager: ThemeManager.shared)
 }

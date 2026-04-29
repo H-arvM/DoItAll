@@ -12,7 +12,7 @@ extension Date {
         let calendar = Calendar.current
         let now = Date()
         
-            // Time formatter
+        // Time formatter
         let timeFormatter = DateFormatter()
         timeFormatter.timeStyle = .short
         let time = timeFormatter.string(from: self)
@@ -50,5 +50,29 @@ extension Date {
         dateFormatter.dateFormat = "MMM d, yyyy"
         let dateString = dateFormatter.string(from: self)
         return "\(dateString) at \(time)"
+    }
+    
+    var formalFormatString: String {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        let day = calendar.component(.day, from: self)
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .ordinal
+        let dayString = formatter.string(from: NSNumber(value: day)) ?? "\(day)"
+        
+        let weekday = self.formatted(.dateTime.weekday(.wide))
+        let month = self.formatted(.dateTime.month(.wide))
+        
+        let datePart = "\(weekday), \(dayString) of \(month)"
+        
+        let createdYear = calendar.component(.year, from: self)
+        let currentYear = calendar.component(.year, from: now)
+        
+        if createdYear == currentYear {
+            return "\(datePart)"
+        } else {
+            return "\(datePart), \(createdYear)"
+        }
     }
 }

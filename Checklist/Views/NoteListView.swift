@@ -31,7 +31,10 @@ struct NoteListView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     headerSection
                     
-                    VStack(spacing: 12) {
+                    PulsingDividerBar()
+                        .padding(.vertical, 4)
+                    
+                    VStack(spacing: 10) {
                         if mode == .edit {
                             newItemInputSection
                         }
@@ -43,7 +46,7 @@ struct NoteListView: View {
                     
                     Spacer(minLength: 150)
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 10)
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -77,19 +80,11 @@ struct NoteListView: View {
     // MARK: - List Content
     @ViewBuilder
     private var listContentSection: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 5) {
             ForEach(viewModel.sortedItems) { item in
-                HStack(spacing: 15) {
-                    // Checkbox Toggle
-                    Button {
-                        withAnimation(.snappy) {
-                            viewModel.toggleItem(item, context: viewContext)
-                        }
-                    } label: {
-                        Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
-                            .font(.title2)
-                            .foregroundStyle(item.isChecked ? themeManager.selectedTheme.primaryColour : .secondary)
-                    }
+                HStack(spacing: 0) {
+                    ListToggleButton(item: item, context: viewContext, action: viewModel.toggleItem(_:context:))
+                        .padding(.trailing, 5)
                     
                     Text(item.note ?? "")
                         .font(.body)
@@ -98,7 +93,6 @@ struct NoteListView: View {
                     
                     Spacer()
                     
-                    // Delete button (Optional, based on your preference)
                     if mode == .edit {
                         Button(role: .destructive) {
                             withAnimation {
@@ -116,10 +110,10 @@ struct NoteListView: View {
             }
         }
     }
-    // MARK: - Helper Sections
+    
     @ViewBuilder
     private var headerSection: some View {
-        GenericHeaderSection(mode: mode, viewModel: viewModel, themeManager: themeManager)
+        GenericHeaderMultiSection(mode: mode, viewModel: viewModel, themeManager: themeManager)
     }
     
     @ToolbarContentBuilder
@@ -130,19 +124,11 @@ struct NoteListView: View {
             }
         }
         ToolbarItem(placement: .topBarTrailing) {
-            if mode == .edit {
-                Button("Done") {
-                    viewModel.saveNotesEntry(context: viewContext) {
-                        if let onSave = onSave {
-                            onSave()
-                        } else {
-                            dismiss()
-                        }
-                    }
-                }
-                .foregroundStyle(themeManager.selectedTheme.primaryColour)
-                .bold()
-            }
+            SaveButton(
+                viewModel: viewModel,
+                context: viewContext,
+                onSave: onSave ?? { dismiss() }
+            )
         }
     }
 }

@@ -41,18 +41,11 @@ struct ShoppingEntryView: View {
             CancelButton()
         }
         ToolbarItemGroup(placement: .topBarTrailing) {
-            Button {
-                viewModel.saveShoppingEntry(context: viewContext) {
-                if let onSave = onSave {
-                        onSave()
-                    } else {
-                        dismiss()
-                    }
-                }
-            } label: {
-                Image(systemName: "square.and.arrow.down")
-                    .foregroundStyle(themeManager.selectedTheme.primaryColour)
-            }
+            SaveButton(
+                viewModel: viewModel,
+                context: viewContext,
+                onSave: onSave ?? { dismiss() }
+            )
         }
     }
 

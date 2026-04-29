@@ -12,7 +12,7 @@ import Combine
 
 
 @MainActor
-final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtocol {
+final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtocol, @MainActor CoreDataSaveable {
     @Published var title: String = ""
     @Published var content: String = ""
     @Published var createdDate: Date = Date()
@@ -39,31 +39,14 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
     }
     
     private func loadExistingEntry(_ entry: JournalEntry) {
-        title = entry.title ?? ""
         content = entry.content ?? ""
         createdDate = entry.createdDate ?? Date()
         entryType = EntryType(rawValue: entry.entryType!) ?? .journal
         
-        loadMusicFromEntry(entry)
         loadPhotosFromEntry(entry)
     }
     
-    private func loadMusicFromEntry(_ entry: JournalEntry) {
-        guard let trackID = entry.musicTrackID,
-              let trackTitle = entry.musicTrackTitle,
-              let trackArtist = entry.musicArtist else { return }
-        
-        let artworkURL = entry.musicArtworkURL.flatMap { URL(string: $0) }
-        selectedTrack = MusicTrack(
-            id: trackID,
-            title: trackTitle,
-            artist: trackArtist,
-            artworkURL: artworkURL)
-    }
-    
     private func loadPhotosFromEntry(_ entry: JournalEntry) {
-        // 1. Access the "To-Many" relationship
-        // Core Data sets are usually NSSet, so we cast it
         guard let photoEntities = entry.photos as? Set<PhotoEntity> else { return }
         
         // 2. Map the entities back to UIImages
@@ -119,28 +102,15 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
     }
     
     private func updateEntryProperties(_ entry: JournalEntry) {
-        entry.title = title.isEmpty ? "Untitled Entry" : title
         entry.content = content
         entry.entryType = entryType.rawValue
     }
     
     private func updateMediaProperties(_ entry: JournalEntry, in context: NSManagedObjectContext) {
         if entryType == .journal {
-            updateMusicProperties(entry)
             updatePhotoProperties(entry, in: context)
         } else {
             clearMediaProperties(entry)
-        }
-    }
-    
-    private func updateMusicProperties(_ entry: JournalEntry) {
-        if let track = selectedTrack {
-            entry.musicTrackID = track.id
-            entry.musicTrackTitle = track.title
-            entry.musicArtist = track.artist
-            entry.musicArtworkURL = track.artworkURL?.absoluteString
-        } else {
-            clearMusicProperties(entry)
         }
     }
     
@@ -160,7 +130,6 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
     }
     
     private func clearMediaProperties(_ entry: JournalEntry) {
-        clearMusicProperties(entry)
         entry.photoData = nil
     }
     
@@ -169,7 +138,6 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
         updateEntryProperties(entry)
         
         if entryType == .journal {
-            updateMusicProperties(entry)
             updatePhotoProperties(entry, in: context)
         } else {
             clearMediaProperties(entry)
@@ -181,16 +149,8 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
             postSaveNotification()
             onSuccess?()
         } catch {
-            // TODO: Handle this in a nicer way
             print("Error saving jounrnal")
         }
-    }
-    
-    private func clearMusicProperties(_ entry: JournalEntry) {
-        entry.musicTrackID = nil
-        entry.musicTrackTitle = nil
-        entry.musicArtist = nil
-        entry.musicArtworkURL = nil
     }
     
     private func postSaveNotification() {
@@ -227,9 +187,12 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
             
             await MainActor.run {
                 self.selectedPhotos = loadedImages
-                print("Successfully loaded \(self.selectedPhotos.count) images into the UI")
             }
         }
+    }
+    
+    func save(context: NSManagedObjectContext, completion: @escaping () -> Void) {
+        saveJournal(context: context, onSuccess: completion)
     }
 }
 

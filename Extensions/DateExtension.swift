@@ -8,7 +8,11 @@
 import Foundation
 
 extension Date {
-    var formattedDate: String {
+    var formattedFunDate: String {
         self.funFormatString
+    }
+    
+    var formattedFormalDate: String {
+        self.formalFormatString
     }
 }

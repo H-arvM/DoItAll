@@ -21,8 +21,6 @@ struct ListView: View {
             VStack(spacing: 0) {
                 listTitleSection
                 
-                PulsingDividerBar()
-                    .padding(.vertical, 8)
                 
                 itemsSection
             }

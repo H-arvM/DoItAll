@@ -30,7 +30,11 @@ struct FreeFormView: View {
                 .ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: 24) {
-                GenericHeaderSection(mode: mode, viewModel: viewModel, themeManager: themeManager)
+                GenericHeaderMultiSection(mode: mode, viewModel: viewModel, themeManager: themeManager)
+                
+                PulsingDividerBar()
+                    .padding(.vertical, 4)
+                
                 textEditorSection
                 
                 if !viewModel.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -58,15 +62,11 @@ struct FreeFormView: View {
             }
         }
         ToolbarItem(placement: .topBarTrailing) {
-            Button {
-                viewModel.saveFreeform(context: viewContext) {
-                    onSave?()
-                    dismiss()
-                }
-            } label: {
-                Image(systemName: "square.and.arrow.down")
-                    .foregroundStyle(themeManager.selectedTheme.primaryColour)
-            }
+            SaveButton(
+                viewModel: viewModel,
+                context: viewContext,
+                onSave: onSave ?? { dismiss() }
+            )
         }
     }
     
@@ -93,6 +93,7 @@ struct FreeFormView: View {
         .animation(.easeInOut(duration: 0.2), value: viewModel.wordCount)
     }
 }
+
 #Preview {
     FreeFormView(mode: .edit, entry: nil, initialEntryType: .freeForm)
 }

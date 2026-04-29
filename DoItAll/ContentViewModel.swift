@@ -11,20 +11,14 @@ import CoreData
 
 @MainActor
 class ContentViewModel: ObservableObject {
-    @Published var items: [ItemEntity] = [] // Core Data
+    @Published var items: [ItemEntity] = []
     @Published var selectedItem: ItemEntity?
     @Published var showAuthAlert: Bool = false
     @Published var authError: BiometricAuthManager.BiometricError?
     @Published var showOnboarding: Bool = false
     @Published var currentSortOption: SortOption = .dateCreated
-    
-    /// Minimum displacement in points to consider a scroll movement (to filter jitter)
     @Published var scrollMinDisplacement: CGFloat = 12
-    
-    /// Minimum velocity in points/second to consider a user-driven scroll
-    @Published var scrollMinVelocity: CGFloat = 150
-    
-    /// Number of consecutive qualifying updates required before hiding overlay
+    @Published var scrollMinVelocity: CGFloat = 50
     @Published var scrollRequiredConsecutiveHits: Int = 2
     
     private var pendingItemToUnhide: NSManagedObjectID?
@@ -50,9 +44,6 @@ class ContentViewModel: ObservableObject {
     func loadItems() {
         let request = NSFetchRequest<ItemEntity>(entityName: "ItemEntity")
         request.sortDescriptors = getSortDescriptors()
-        
-        // TODO: Will only fetch journal entries at the moment but need to fetch all
-//        request.predicate = NSPredicate(format: :, <#T##args: any CVarArg...##any CVarArg#>)
         
         do {
             items = try viewContext.fetch(request)
@@ -92,24 +83,25 @@ class ContentViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     func handleHiddenItemTap(_ item: ItemEntity) {
         authManager.authenticateUser(reason: "Authenticate to view hidden items") { [weak self] result in
-            
             guard let self = self else { return }
             
             switch result {
             case .success:
-                let impact = UIImpactFeedbackGenerator(style: .light)
-                impact.impactOccurred()
-                
-                self.selectedItem = item
+                Task { @MainActor in
+                    let impact = UIImpactFeedbackGenerator(style: .light)
+                    impact.impactOccurred()
+                    self.selectedItem = item
+                }
                 
             case .failure(let error):
-                /// Only show for non cancellation errors
                 if case .userCancel = error { return }
-                
-                let notification = UINotificationFeedbackGenerator()
-                notification.notificationOccurred(.error)
+                Task { @MainActor in
+                    let notification = UINotificationFeedbackGenerator()
+                    notification.notificationOccurred(.error)
+                }
             }
         }
     }

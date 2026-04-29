@@ -16,7 +16,6 @@ extension ItemEntity {
         let newEntry = JournalEntry(context: context)
         newEntry.id = self.id
         newEntry.createdDate = Date()
-        newEntry.title = self.title
         newEntry.entryType = self.type
         self.journalEntry = newEntry
         
@@ -31,7 +30,6 @@ extension ItemEntity {
         let newEntry = FreeWritingEntry(context: context)
         newEntry.id = self.id
         newEntry.createdDate = Date()
-        newEntry.title = self.title
         newEntry.entryType = self.type
         self.freeWritingEntry = newEntry
         

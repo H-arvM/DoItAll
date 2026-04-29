@@ -62,7 +62,6 @@ struct JournalView: View {
         .toolbar { toolbarItems }
     }
     
-    // MARK: - View Builders
     @ViewBuilder
     private var headerSection: some View {
         GenericSingularHeaderSection(
@@ -103,17 +102,13 @@ struct JournalView: View {
         ToolbarItemGroup(placement: .topBarTrailing) {
             if mode == .edit {
                 photoPickerButton
-                saveButton
+                SaveButton(
+                    viewModel: viewModel,
+                    context: viewContext,
+                    onSave: onSave ?? { dismiss() }
+                )
             }
         }
-    }
-    
-    @ViewBuilder
-    private var cancelButton: some View {
-        Button("Cancel") {
-            dismiss()
-        }
-        .foregroundStyle(themeManager.selectedTheme.primaryColour)
     }
     
     // MARK: - Toolbar Buttons
@@ -127,22 +122,6 @@ struct JournalView: View {
             photoLibrary: .shared()
         ) {
             Image(systemName: "photo.on.rectangle.angled")
-                .foregroundStyle(themeManager.selectedTheme.primaryColour)
-        }
-    }
-        
-    @ViewBuilder
-    private var saveButton: some View {
-        Button {
-            viewModel.saveJournal(context: viewContext) {
-                if let onSave = onSave {
-                    onSave()
-                } else {
-                    dismiss()
-                }
-            }
-        } label: {
-            Image(systemName: "square.and.arrow.down")
                 .foregroundStyle(themeManager.selectedTheme.primaryColour)
         }
     }

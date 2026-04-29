@@ -48,13 +48,13 @@ struct ExpandedActions: View {
     
     var body: some View {
         Group {
-            FloatingActionButton(
+            SettingsOptionButton(
                 icon: "gearshape",
                 colour: .gray,
                 delay: 0.0,
                 action: onSettingsTap)
             
-            FloatingActionButton(
+            SettingsOptionButton(
                 icon: "arrow.up.arrow.down",
                 colour: .orange,
                 delay: 0.0,

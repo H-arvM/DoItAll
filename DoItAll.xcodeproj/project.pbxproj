@@ -25,6 +25,8 @@
 		D29C094E2F86922D0015749B /* EntryTypeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29C094D2F86922D0015749B /* EntryTypeButton.swift */; };
 		D2A316B32F911F80004CB336 /* ShoppingListSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A316B12F911F80004CB336 /* ShoppingListSettingsView.swift */; };
 		D2A844BB2F844E6500D5BB2B /* SwipeToDeleteRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A844BA2F844E6500D5BB2B /* SwipeToDeleteRow.swift */; };
+		D2ED5A882FA2283300C70558 /* GlassMorphicBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2ED5A782FA2283300C70558 /* GlassMorphicBackground.swift */; };
+		D2ED5A892FA2283300C70558 /* HiddenIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2ED5A792FA2283300C70558 /* HiddenIndicatorView.swift */; };
 		D2F85ABA2F901E9B008CB872 /* JournalSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F85AB92F901E9B008CB872 /* JournalSettings.swift */; };
 /* End PBXBuildFile section */
 
@@ -67,6 +69,8 @@
 		D29C094D2F86922D0015749B /* EntryTypeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryTypeButton.swift; sourceTree = "<group>"; };
 		D2A316B12F911F80004CB336 /* ShoppingListSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingListSettingsView.swift; sourceTree = "<group>"; };
 		D2A844BA2F844E6500D5BB2B /* SwipeToDeleteRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeToDeleteRow.swift; sourceTree = "<group>"; };
+		D2ED5A782FA2283300C70558 /* GlassMorphicBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassMorphicBackground.swift; sourceTree = "<group>"; };
+		D2ED5A792FA2283300C70558 /* HiddenIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenIndicatorView.swift; sourceTree = "<group>"; };
 		D2F85AB92F901E9B008CB872 /* JournalSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalSettings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -345,6 +349,8 @@
 			children = (
 				D29C09382F868F7D0015749B /* SelectEntryTypeView.swift */,
 				D2A844BA2F844E6500D5BB2B /* SwipeToDeleteRow.swift */,
+				D2ED5A782FA2283300C70558 /* GlassMorphicBackground.swift */,
+				D2ED5A792FA2283300C70558 /* HiddenIndicatorView.swift */,
 				D29C094D2F86922D0015749B /* EntryTypeButton.swift */,
 			);
 			path = Views;
@@ -526,6 +532,8 @@
 				D29C094E2F86922D0015749B /* EntryTypeButton.swift in Sources */,
 				D27770122F7C0CB9007CCDDA /* RowTitle.swift in Sources */,
 				D2A316B32F911F80004CB336 /* ShoppingListSettingsView.swift in Sources */,
+				D2ED5A882FA2283300C70558 /* GlassMorphicBackground.swift in Sources */,
+				D2ED5A892FA2283300C70558 /* HiddenIndicatorView.swift in Sources */,
 				D277700B2F79BCB8007CCDDA /* FavouriteSupermarketManager.swift in Sources */,
 				D28F2BC92F7EBD9F00E37D85 /* SupermarketsMapView.swift in Sources */,
 				D2F85ABA2F901E9B008CB872 /* JournalSettings.swift in Sources */,

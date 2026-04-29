@@ -37,7 +37,7 @@ struct ContentView: View {
     @State private var consecutiveVelocityHits: Int = 0
     @State private var scrollDetectionEnabled: Bool = false
     
-    private let titleLimit = 20
+    private let titleLimit = 50
     
     var body: some View {
         NavigationStack {
@@ -86,7 +86,7 @@ struct ContentView: View {
         ZStack {
             ThemeBackgroundView(theme: themeManager.selectedTheme)
             itemsList
-            floatingButtonOverlay()
+            settingsButton()
         }
         .navigationDestination(for: ItemEntity.self) { item in
             navigationDestination(for: item)
@@ -287,7 +287,6 @@ struct ContentView: View {
     private var simpleList: some View {
         List(viewModel.items) { item in
             if viewModel.isItemHidden(item) {
-                /// Hidden row
                 listRow(for: item)
             } else {
                 SwipeToDeleteRow(onDelete: { deleteItem(item) }) {
@@ -597,7 +596,7 @@ struct ContentView: View {
     }
     
     @ViewBuilder
-    private func floatingButtonOverlay() -> some View {
+    private func settingsButton() -> some View {
         VStack {
             Spacer()
             HStack(alignment: .bottom) {
@@ -641,6 +640,7 @@ struct ContentView: View {
                     let content = journalEntry?.content ?? ""
                     
                     Text(String(content.prefix(titleLimit)))
+                        .lineLimit(1)
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
                     Text(journalEntry?.createdDate?.funFormatString ?? "")
@@ -661,6 +661,7 @@ struct ContentView: View {
                         }
                     }()
                     Text(String(content))
+                        .lineLimit(1)
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
                     Text(item.createdAt?.funFormatString ?? Date().funFormatString)
@@ -670,6 +671,7 @@ struct ContentView: View {
                 case .freeFormType:
                     let freeForm = item.freeWritingEntry
                     Text(freeForm?.title ?? item.title ?? "No title")
+                        .lineLimit(1)
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
                     Text(item.createdAt?.funFormatString ?? Date().funFormatString)
@@ -679,6 +681,7 @@ struct ContentView: View {
                 case .lifeAdminType:
                     let lifeAdmin = item.taskItemEntry
                     Text(lifeAdmin?.entryType ?? item.title ?? "No title")
+                        .lineLimit(1)
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
                     Text(item.createdAt?.funFormatString ?? Date().funFormatString)
@@ -688,6 +691,7 @@ struct ContentView: View {
                 case .generalListType:
                     let listItem = item.checkListEntry
                     Text(listItem?.title ?? item.title ?? "No title")
+                        .lineLimit(1)
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
                 }
@@ -753,7 +757,7 @@ struct ContentView: View {
     }
     
     private func longPressGesture(for item: ItemEntity) -> some Gesture {
-        LongPressGesture(minimumDuration: 0.3) /// May need to tweak this after real device test
+        LongPressGesture(minimumDuration: 0.3)
             .onEnded { _ in
                 viewModel.handleLongPress(for: item)
             }
@@ -766,13 +770,6 @@ struct ContentView: View {
             viewModel.loadItems()
         }
     }
-    private let itemFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .medium
-        return formatter
-    }()
-    
 }
 
 //#Preview {

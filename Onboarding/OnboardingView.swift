@@ -64,17 +64,20 @@ struct OnboardingView: View {
     var body: some View {
         ZStack {
             background
-            VStack(alignment: .center) {
+            
+            VStack {
                 stepCarousel
+            }
+            
+            VStack {
+                Spacer()
                 pageIndicators
                     .padding(.bottom, 10)
                 bottomActions
             }
         }
     }
-    
-    // MARK: - Background
-    
+        
     private var background: some View {
         LinearGradient(
             colors: [
@@ -87,9 +90,7 @@ struct OnboardingView: View {
         )
         .ignoresSafeArea()
     }
-    
-    // MARK: - Step Carousel
-    
+        
     private var stepCarousel: some View {
         TabView(selection: $currentStep) {
             ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
@@ -100,9 +101,7 @@ struct OnboardingView: View {
         .tabViewStyle(.page(indexDisplayMode: .never))
         .frame(maxHeight: 500)
     }
-    
-    // MARK: - Page Indicators
-    
+        
     private var pageIndicators: some View {
         HStack(spacing: 8) {
             ForEach(0..<steps.count, id: \.self) { index in
@@ -113,20 +112,18 @@ struct OnboardingView: View {
         }
         .padding(.top, 8)
     }
-    
-    // MARK: - Bottom Actions
-    
+        
     private var bottomActions: some View {
         VStack(spacing: 5) {
             actionButton
             if currentStep == steps.count - 1 {
-                dontShowAgainToggle
+                doNotShowAgainToggle
                     .transition(.opacity.combined(with: .scale))
             }
         }
     }
     
-    private var dontShowAgainToggle: some View {
+    private var doNotShowAgainToggle: some View {
         Button {
             withAnimation {
                 showDontShowOption.toggle()
@@ -192,74 +189,19 @@ struct OnboardingView: View {
     }
 }
 
-struct OnboardingStepView: View {
-    
-    let step: OnboardingStep
-    @Environment(\.colorScheme) var colourScheme
-    
-    var body: some View {
-        VStack(spacing: 30) {
-            /// Icon
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [step.accentColor.opacity(0.3),
-                                     step.accentColor.opacity(0.1)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 120, height: 120)
-                    .blur(radius: 20)
-                
-                Circle()
-                    .fill(.ultraThinMaterial)
-                    .frame(width: 120, height: 120)
-                    .overlay(
-                        Circle()
-                            .stroke(
-                                LinearGradient(
-                                    colors: [Color.white.opacity(0.5),
-                                             Color.white.opacity(0.2)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 0.0
-                            )
-                        )
-                Image(systemName: step.icon)
-                    .font(.system(size: 50, weight: .semibold))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [step.accentColor,
-                                     step.accentColor.opacity(0.7)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-            }
-            .shadow(color: step.accentColor.opacity(0.3), radius: 20, x: 0, y: 10)
-            
-            /// TItle
-            Text(step.title)
-                .font(.system(size: 32, weight: .bold))
-                .foregroundStyle(colourScheme == .dark ? Color.white.opacity(0.9) : Color.black.opacity(0.9))
-                .multilineTextAlignment(.center)
-            
-            /// Description
-            Text(step.description)
-                .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(colourScheme == .dark ? Color.white.opacity(0.8) : Color.black.opacity(0.8))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .buttonStyle(.glassProminent)
-        .padding()
-    }
+#Preview("Static bindings") {
+    OnboardingView(isPresented: .constant(true), dontShowAgain: .constant(false))
 }
 
-//#Preview {
-//    OnboardingView()
-//}
+#Preview("Interactive state") {
+    PreviewWrapper()
+}
+
+private struct PreviewWrapper: View {
+    @State private var isPresented: Bool = true
+    @State private var dontShowAgain: Bool = false
+
+    var body: some View {
+        OnboardingView(isPresented: $isPresented, dontShowAgain: $dontShowAgain)
+    }
+}

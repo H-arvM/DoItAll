@@ -33,12 +33,11 @@ struct LifeAdminView: View {
         }
     }
     
-    // MARK: - Subviews
-    
     private var contentView: some View {
         VStack(spacing: 0) {
             categoryPills
-            Divider()
+            PulsingDividerBar()
+                .padding(.vertical, 2)
             taskList
         }
     }
@@ -49,7 +48,11 @@ struct LifeAdminView: View {
             CancelButton()
         }
         ToolbarItem(placement: .navigationBarTrailing) {
-            saveButton
+            SaveButton(
+                viewModel: viewModel,
+                context: viewContext,
+                onSave: onSave ?? { dismiss() }
+            )
         }
     }
     

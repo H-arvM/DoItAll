@@ -9,15 +9,15 @@ import SwiftUI
 import Combine
 import CoreData
 
-class FreeFormViewModel: ObservableObject, @MainActor HeaderProviderProtocol {
+class FreeFormViewModel: ObservableObject, @MainActor HeaderProviderProtocol, CoreDataSaveable {
     @Published var title: String = ""
     @Published var content: String = ""
     @Published var createdDate: Date = Date()
     @Published var wordCount: String = ""
     @Published var entryType: EntryType = .freeForm
-
+    
     private var existingEntry: FreeWritingEntry?
-        
+    
     init(entry: FreeWritingEntry? = nil, initialEntryType: EntryType = .freeForm) {
         $content
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
@@ -33,7 +33,7 @@ class FreeFormViewModel: ObservableObject, @MainActor HeaderProviderProtocol {
             self.entryType = initialEntryType
         }
     }
-        
+    
     private func loadExistingEntry(_ entry: FreeWritingEntry) {
         title = entry.title ?? ""
         content = entry.content ?? ""
@@ -108,5 +108,10 @@ class FreeFormViewModel: ObservableObject, @MainActor HeaderProviderProtocol {
             name: NSNotification.Name("FreeFormEntrySaved"),
             object: nil
         )
-     }
+    }
+    
+    func save(context: NSManagedObjectContext, completion: @escaping () -> Void) {
+        saveFreeform(context: context, onSuccess: completion)
+    }
+    
 }
