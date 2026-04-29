@@ -49,7 +49,6 @@ struct JournalView: View {
                     headerSection
                         .padding(.bottom, 5)
                     contentSection
-//                    musicSection
                     
                     Spacer(minLength: 10)
                 }
@@ -64,10 +63,9 @@ struct JournalView: View {
     }
     
     // MARK: - View Builders
-    
     @ViewBuilder
     private var headerSection: some View {
-        GenericHeaderSection(
+        GenericSingularHeaderSection(
             mode: mode,
             viewModel: viewModel,
             themeManager: themeManager
@@ -82,19 +80,7 @@ struct JournalView: View {
             themeManager: themeManager
         )
     }
-    
-    @ViewBuilder
-    private var musicSection: some View {
-        if viewModel.entryType == .journal, let track = viewModel.selectedTrack {
-            JournalMusicSelection(
-                mode: mode,
-                track: track,
-                viewModel: viewModel,
-                themeManager: themeManager
-            )
-        }
-    }
-    
+        
     @ViewBuilder
     private var photosSection: some View {
         if viewModel.entryType == .journal, !viewModel.selectedPhotos.isEmpty {

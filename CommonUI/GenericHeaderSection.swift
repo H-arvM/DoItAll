@@ -31,7 +31,7 @@ struct GenericHeaderSection<T: HeaderProviderProtocol>: View {
             }
             
             Text(viewModel.createdDate.formattedDate)
-                .font(.subheadline)
+                .font(.title2)
                 .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .primary)
         }
         .padding(.horizontal, 20)
@@ -43,4 +43,20 @@ struct GenericHeaderSection<T: HeaderProviderProtocol>: View {
     let vm = JournalViewModel()
     vm.title = "Consolidated Header"
     return GenericHeaderSection(mode: .edit, viewModel: vm, themeManager: ThemeManager.shared)
+}
+
+struct GenericSingularHeaderSection<T: HeaderProviderProtocol>: View {
+    let mode: EditOrViewMode
+    @ObservedObject var viewModel: T
+    @ObservedObject var themeManager: ThemeManager
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(viewModel.createdDate.formattedDate)
+                .font(.title2)
+                .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .primary)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 16)
+    }
 }

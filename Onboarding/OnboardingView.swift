@@ -64,11 +64,10 @@ struct OnboardingView: View {
     var body: some View {
         ZStack {
             background
-            VStack {
-                Spacer()
+            VStack(alignment: .center) {
                 stepCarousel
                 pageIndicators
-                Spacer()
+                    .padding(.bottom, 10)
                 bottomActions
             }
         }
@@ -118,12 +117,12 @@ struct OnboardingView: View {
     // MARK: - Bottom Actions
     
     private var bottomActions: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 5) {
+            actionButton
             if currentStep == steps.count - 1 {
                 dontShowAgainToggle
                     .transition(.opacity.combined(with: .scale))
             }
-            actionButton
         }
     }
     
@@ -158,7 +157,6 @@ struct OnboardingView: View {
                 .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
         }
         .padding(.horizontal, 40)
-        .padding(.bottom, 40)
     }
     
     private var actionButtonBackground: some View {
@@ -227,7 +225,7 @@ struct OnboardingStepView: View {
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 ),
-                                lineWidth: 2
+                                lineWidth: 0.0
                             )
                         )
                 Image(systemName: step.icon)

@@ -53,12 +53,7 @@
         <attribute name="createdDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="entryType" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="musicArtist" optional="YES" attributeType="String"/>
-        <attribute name="musicArtworkURL" optional="YES" attributeType="String"/>
-        <attribute name="musicTrackID" optional="YES" attributeType="String"/>
-        <attribute name="musicTrackTitle" optional="YES" attributeType="String"/>
         <attribute name="photoData" optional="YES" attributeType="Binary"/>
-        <attribute name="title" optional="YES" attributeType="String"/>
         <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ItemEntity" inverseName="journalEntry" inverseEntity="ItemEntity"/>
         <relationship name="photos" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PhotoEntity" inverseName="journalEntry" inverseEntity="PhotoEntity"/>
     </entity>

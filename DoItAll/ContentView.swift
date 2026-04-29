@@ -37,6 +37,8 @@ struct ContentView: View {
     @State private var consecutiveVelocityHits: Int = 0
     @State private var scrollDetectionEnabled: Bool = false
     
+    private let titleLimit = 20
+    
     var body: some View {
         NavigationStack {
             mainContent
@@ -245,7 +247,7 @@ struct ContentView: View {
                             endPoint: .trailing
                         )
                     )
-                    .cornerRadius(20)
+                    .cornerRadius(10)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(Color(UIColor.separator), lineWidth: 0.5)
@@ -636,7 +638,9 @@ struct ContentView: View {
                     
                 case .journalType:
                     let journalEntry = item.journalEntry
-                    Text(journalEntry?.title ?? "No title")
+                    let content = journalEntry?.content ?? ""
+                    
+                    Text(String(content.prefix(titleLimit)))
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
                     Text(journalEntry?.createdDate?.funFormatString ?? "")
@@ -645,7 +649,18 @@ struct ContentView: View {
                     
                 case .shoppingListType:
                     let shoppingList = item.shoppingEntry
-                    Text("No title")
+                    let content: String = {
+                        if let itemsSet = shoppingList?.items as? Set<ShoppingItem>,
+                           let first = itemsSet.first {
+                            return first.name ?? ""
+                        } else if let itemsArray = shoppingList?.items?.allObjects as? [ShoppingItem],
+                                  let first = itemsArray.first {
+                            return first.name ?? ""
+                        } else {
+                            return ""
+                        }
+                    }()
+                    Text(String(content))
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
                     Text(item.createdAt?.funFormatString ?? Date().funFormatString)
@@ -763,3 +778,4 @@ struct ContentView: View {
 //#Preview {
 //    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 //}
+
