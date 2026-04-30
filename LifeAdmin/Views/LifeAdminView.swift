@@ -80,7 +80,7 @@ struct LifeAdminView: View {
             } else {
                 List {
                     ForEach(viewModel.filteredTasks) { task in
-                        TaskRow(
+                        AdminTaskRow(
                             task: task,
                             onToggle: { viewModel.toggleTaskCompletion(task, context: viewContext) },
                             onDelete: { viewModel.deleteTask(task, context: viewContext) }

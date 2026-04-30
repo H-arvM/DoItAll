@@ -12,10 +12,9 @@ protocol CoreDataToggleable: ObservableObject {
     var isChecked: Bool { get }
 }
 
-struct ListToggleButton<Item: CoreDataToggleable>: View {
+struct ListToggleButton<Item: CoreDataToggleable & ObservableObject>: View {
     
-    // MARK: - Properties
-    let item: Item
+    @ObservedObject var item: Item
     let context: NSManagedObjectContext
     let action: (Item, NSManagedObjectContext) -> Void
     
@@ -29,8 +28,8 @@ struct ListToggleButton<Item: CoreDataToggleable>: View {
             }
         } label: {
             Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
-                .font(.title2)
-                .foregroundStyle(item.isChecked ? themeManager.selectedTheme.primaryColour : .secondary)
+                .font(.title3)
+                .foregroundColor(item.isChecked ? .green : .gray)
         }
     }
 }

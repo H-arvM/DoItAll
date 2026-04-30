@@ -21,6 +21,14 @@ class ContentViewModel: ObservableObject {
     @Published var scrollMinVelocity: CGFloat = 50
     @Published var scrollRequiredConsecutiveHits: Int = 2
     
+    @State private var lastScrollTime: TimeInterval = 0
+    @State private var consecutiveVelocityHits: Int = 0
+    @State public var scrollDetectionEnabled: Bool = false
+    @State private var scrollOffSet: CGFloat = 0
+    @State private var lastScrollOffset: CGFloat = 0
+    @State public var isScrolling: Bool = false
+    @State private var hideButtonsWorkItem: DispatchWorkItem?
+    
     private var pendingItemToUnhide: NSManagedObjectID?
     private let authManager = BiometricAuthManager()
     private let viewContext: NSManagedObjectContext
@@ -176,5 +184,57 @@ class ContentViewModel: ObservableObject {
     var sortedItemTypes: [ItemType] {
         groupedItems.keys.sorted { $0.rawValue < $1.rawValue }
     }
+    
+    public func handleScroll(offset: CGFloat) {
+        let now = CACurrentMediaTime()
+        let timeDelta = now - lastScrollTime
+        let delta = offset - lastScrollOffset
+
+        // Update lastScrollOffset/time for next calculation
+        lastScrollOffset = offset
+        lastScrollTime = now
+
+        // Ignore until detection is enabled to avoid initial layout
+        if !scrollDetectionEnabled {
+            return
+        }
+
+        // Guard against extremely small time deltas (first run or same frame)
+        if timeDelta <= 0 {
+            return
+        }
+
+        // Compute absolute velocity (points per second)
+        let velocity = abs(delta) / CGFloat(timeDelta)
+
+        // Tunable thresholds
+        let minDisplacement: CGFloat = scrollMinDisplacement
+        let minVelocity: CGFloat = scrollMinVelocity
+        let requiredConsecutiveHits = scrollRequiredConsecutiveHits
+
+        let qualifies = abs(delta) > minDisplacement && velocity > minVelocity
+
+        if qualifies {
+            consecutiveVelocityHits += 1
+            if consecutiveVelocityHits >= requiredConsecutiveHits {
+                withAnimation {
+                    isScrolling = true
+                }
+            }
+        } else {
+            consecutiveVelocityHits = 0
+        }
+
+        hideButtonsWorkItem?.cancel()
+        let workItem = DispatchWorkItem {
+            withAnimation {
+                self.isScrolling = false
+            }
+            self.consecutiveVelocityHits = 0
+        }
+        hideButtonsWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
+    }
+
     
 }

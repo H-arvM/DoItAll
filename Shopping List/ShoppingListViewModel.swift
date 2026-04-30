@@ -83,7 +83,7 @@ public class ShoppingListViewModel: ObservableObject, @MainActor CoreDataSaveabl
         case .shoppingList: return ItemType.shoppingListType.rawValue
         case .freeForm: return ItemType.freeFormType.rawValue
         case .lifeAdmin: return ItemType.lifeAdminType.rawValue
-        case .list: return ItemType.generalListType.rawValue
+        case .list: return ItemType.generalNoteType.rawValue
         }
     }
     

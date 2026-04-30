@@ -97,7 +97,7 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
         case .lifeAdmin:
             return ItemType.lifeAdminType.rawValue
         case .list:
-            return ItemType.generalListType.rawValue
+            return ItemType.generalNoteType.rawValue
         }
     }
     

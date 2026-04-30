@@ -26,89 +26,38 @@ struct NoteListView: View {
         ZStack(alignment: .bottom) {
             ThemeBackgroundView(theme: themeManager.selectedTheme)
                 .ignoresSafeArea()
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+            
+            List {
+                Group {
                     headerSection
                     
                     PulsingDividerBar()
                         .padding(.vertical, 4)
                     
-                    VStack(spacing: 10) {
-                        if mode == .edit {
-                            newItemInputSection
-                        }
-                        
-                        if !viewModel.sortedItems.isEmpty {
-                            listContentSection
-                        }
+                    if mode == .edit {
+                        itemInputSection
                     }
-                    
-                    Spacer(minLength: 150)
                 }
-                .padding(.horizontal, 10)
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 10, trailing: 16))
+                
+                // The List Content Section now handles its own rows
+                listContentSection
+                
+                // Bottom Spacer
+                Color.clear
+                    .frame(height: 150)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
             }
+            .listStyle(.plain) // Removes default gray background and styling
+            .scrollContentBackground(.hidden) // Makes the ThemeBackgroundView visible
         }
         .navigationBarBackButtonHidden(true)
         .navigationTitle(viewModel.title.isEmpty ? "New List" : viewModel.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbarItems }
-    }
-    
-    // MARK: - New Item Input
-    @ViewBuilder
-    private var newItemInputSection: some View {
-        HStack {
-            TextField("Add an item...", text: $viewModel.newItemText)
-                .textFieldStyle(.plain)
-            
-            Button {
-                withAnimation {
-                    viewModel.addItem(context: viewContext)
-                }
-            } label: {
-                Image(systemName: "plus.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(themeManager.selectedTheme.primaryColour)
-            }
-            .disabled(viewModel.newItemText.isEmpty)
-        }
-        .padding()
-        .background(RoundedRectangle(cornerRadius: 12).fill(.ultraThinMaterial))
-    }
-    
-    // MARK: - List Content
-    @ViewBuilder
-    private var listContentSection: some View {
-        VStack(spacing: 5) {
-            ForEach(viewModel.sortedItems) { item in
-                HStack(spacing: 0) {
-                    ListToggleButton(item: item, context: viewContext, action: viewModel.toggleItem(_:context:))
-                        .padding(.trailing, 5)
-                    
-                    Text(item.note ?? "")
-                        .font(.body)
-                        .strikethrough(item.isChecked)
-                        .foregroundStyle(item.isChecked ? .secondary : .primary)
-                    
-                    Spacer()
-                    
-                    if mode == .edit {
-                        Button(role: .destructive) {
-                            withAnimation {
-                                viewModel.deleteItem(item, context: viewContext)
-                            }
-                        } label: {
-                            Image(systemName: "trash")
-                                .font(.subheadline)
-                                .foregroundStyle(.red.opacity(0.7))
-                        }
-                    }
-                }
-                .padding()
-                .background(RoundedRectangle(cornerRadius: 12).fill(.ultraThinMaterial))
-            }
-        }
     }
     
     @ViewBuilder
@@ -131,9 +80,63 @@ struct NoteListView: View {
             )
         }
     }
+    
+    @ViewBuilder
+    private var itemInputSection: some View {
+        HStack {
+            TextField("Add an item...", text: $viewModel.newItemText)
+                .textFieldStyle(.plain)
+            
+            Button {
+                withAnimation {
+                    viewModel.addItem(context: viewContext)
+                }
+            } label: {
+                Image(systemName: "plus.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(themeManager.selectedTheme.primaryColour)
+            }
+            .disabled(viewModel.newItemText.isEmpty)
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(10)
+    }
+    
+    @ViewBuilder
+    private var listContentSection: some View {
+        ForEach(viewModel.sortedItems) { item in
+            HStack(spacing: 12) {
+                ListToggleButton(item: item, context: viewContext, action: viewModel.toggleItem(_:context:))
+                
+                Text(item.note ?? "")
+                    .font(.body)
+                    .strikethrough(item.isChecked)
+                    .foregroundStyle(item.isChecked ? .secondary : .primary)
+                
+                Spacer()
+            }
+            .padding(.vertical, 16)
+            .padding(.horizontal, 16)
+            .frame(minHeight: 60)
+            .background(Color(.systemBackground))
+            .cornerRadius(12)
+            .listRowSeparator(.hidden)
+            .listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
+            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                if mode == .edit {
+                    Button(role: .destructive) {
+                        viewModel.deleteItem(item, context: viewContext)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
+            }
+        }
+    }
 }
 
 #Preview {
     NoteListView()
 }
-

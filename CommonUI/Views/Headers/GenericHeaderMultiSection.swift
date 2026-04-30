@@ -34,7 +34,6 @@ struct GenericHeaderMultiSection<T: HeaderProviderProtocol>: View {
                 .font(.title2)
                 .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .primary)
         }
-        .padding(.horizontal, 20)
         .padding(.top, 16)
     }
 }

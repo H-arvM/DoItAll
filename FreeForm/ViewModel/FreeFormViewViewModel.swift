@@ -79,7 +79,7 @@ class FreeFormViewModel: ObservableObject, @MainActor HeaderProviderProtocol, Co
         case .lifeAdmin:
             return ItemType.lifeAdminType.rawValue
         case .list:
-            return ItemType.generalListType.rawValue
+            return ItemType.generalNoteType.rawValue
         }
     }
     

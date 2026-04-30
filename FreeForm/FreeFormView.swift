@@ -13,6 +13,9 @@ struct FreeFormView: View {
     @FocusState private var isTextFieldFocused: Bool
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
+    @FocusState private var isEditorFocused: Bool
+
+    
     
     let mode: EditOrViewMode
     var onSave: (() -> Void)?

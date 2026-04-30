@@ -27,15 +27,7 @@ struct ContentView: View {
     @StateObject private var themeManager = ThemeManager.shared
     @State private var showSortOptions: Bool = false
     @State private var expandedSections: Set<ItemType> = Set(ItemType.allCases)
-    @State private var scrollOffSet: CGFloat = 0
-    @State private var lastScrollOffset: CGFloat = 0
-    @State private var isScrolling: Bool = false
-    @State private var hideButtonsWorkItem: DispatchWorkItem?
     @State private var isShowingSelectEntry = false
-    
-    @State private var lastScrollTime: TimeInterval = 0
-    @State private var consecutiveVelocityHits: Int = 0
-    @State private var scrollDetectionEnabled: Bool = false
     
     private let titleLimit = 50
     
@@ -59,7 +51,7 @@ struct ContentView: View {
             viewModel.checkOnboarding()
             viewModel.loadItems()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                scrollDetectionEnabled = true
+                viewModel.scrollDetectionEnabled = true
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("JournalEntrySaved"))) { _ in
@@ -148,7 +140,7 @@ struct ContentView: View {
         case .lifeAdminType:
             LifeAdminView(entry: item.getOrCreateAdminEntry(context: viewContext))
             
-        case .generalListType:
+        case .generalNoteType:
             NoteListView(entry: item.getOrCreateChecklistEntry(context: viewContext))
         }
     }
@@ -276,7 +268,7 @@ struct ContentView: View {
         }
         .coordinateSpace(name: "scroll")
         .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-            handleScroll(offset: value)
+            viewModel.handleScroll(offset: value)
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
@@ -304,7 +296,7 @@ struct ContentView: View {
         )
         .coordinateSpace(name: "scroll")
         .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-            handleScroll(offset: value)
+            viewModel.handleScroll(offset: value)
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
@@ -616,8 +608,8 @@ struct ContentView: View {
                 Spacer()
             }
         }
-        .offset(y: isScrolling ? 200 : 0)
-        .animation(.easeInOut(duration: 0.3), value: isScrolling)
+        .offset(y: viewModel.isScrolling ? 200 : 0)
+        .animation(.easeInOut(duration: 0.3), value: viewModel.isScrolling)
         .ignoresSafeArea(.keyboard)
     }
     
@@ -688,9 +680,22 @@ struct ContentView: View {
                         .font(.caption2)
                         .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
                     
-                case .generalListType:
-                    let listItem = item.checkListEntry
-                    Text(listItem?.title ?? item.title ?? "No title")
+                case .generalNoteType:
+                    let checklist = item.checkListEntry
+                    let firstNote: String = {
+                        if let itemsSet = checklist?.items as? Set<CheckListItem>,
+                           let first = itemsSet.sorted(by: { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }).first {
+                            return first.note ?? ""
+                        } else if let itemsArray = checklist?.items?.allObjects as? [CheckListItem],
+                                  let first = itemsArray.sorted(by: { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }).first {
+                            return first.note ?? ""
+                        } else if let title = checklist?.title, !title.isEmpty {
+                            return title
+                        } else {
+                            return "No title"
+                        }
+                    }()
+                    Text(verbatim: firstNote)
                         .lineLimit(1)
                         .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
@@ -702,59 +707,7 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, minHeight: rowHeight, alignment: .leading)
         .padding(.horizontal, 5)
     }
-    // MARK: Helper methods
     
-    private func handleScroll(offset: CGFloat) {
-        let now = CACurrentMediaTime()
-        let timeDelta = now - lastScrollTime
-        let delta = offset - lastScrollOffset
-
-        // Update lastScrollOffset/time for next calculation
-        lastScrollOffset = offset
-        lastScrollTime = now
-
-        // Ignore until detection is enabled to avoid initial layout
-        if !scrollDetectionEnabled {
-            return
-        }
-
-        // Guard against extremely small time deltas (first run or same frame)
-        if timeDelta <= 0 {
-            return
-        }
-
-        // Compute absolute velocity (points per second)
-        let velocity = abs(delta) / CGFloat(timeDelta)
-
-        // Tunable thresholds
-        let minDisplacement: CGFloat = viewModel.scrollMinDisplacement
-        let minVelocity: CGFloat = viewModel.scrollMinVelocity
-        let requiredConsecutiveHits = viewModel.scrollRequiredConsecutiveHits
-
-        let qualifies = abs(delta) > minDisplacement && velocity > minVelocity
-
-        if qualifies {
-            consecutiveVelocityHits += 1
-            if consecutiveVelocityHits >= requiredConsecutiveHits {
-                withAnimation {
-                    isScrolling = true
-                }
-            }
-        } else {
-            consecutiveVelocityHits = 0
-        }
-
-        // Debounce hiding reset
-        hideButtonsWorkItem?.cancel()
-        let workItem = DispatchWorkItem {
-            withAnimation {
-                isScrolling = false
-            }
-            consecutiveVelocityHits = 0
-        }
-        hideButtonsWorkItem = workItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
-    }
     
     private func longPressGesture(for item: ItemEntity) -> some Gesture {
         LongPressGesture(minimumDuration: 0.3)

@@ -20,7 +20,6 @@ public struct PulsingDividerBar: View {
                 )
             )
             .frame(height: 1)
-            .padding(.horizontal, 16)
             .hueRotation(Angle(degrees: hueRotation))
             .onAppear {
                 withAnimation(

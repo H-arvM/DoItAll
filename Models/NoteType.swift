@@ -13,7 +13,7 @@ enum ItemType: String, CaseIterable, Identifiable {
     case shoppingListType = "Shopping List"
     case freeFormType = "FreeForm"
     case lifeAdminType = "Life Admin"
-    case generalListType = "General List"
+    case generalNoteType = "General Note"
 
     var id: String { self.rawValue }
 
@@ -27,8 +27,8 @@ enum ItemType: String, CaseIterable, Identifiable {
             return "Freeform"
         case .lifeAdminType:
             return "Life Admin"
-        case .generalListType:
-            return "List"
+        case .generalNoteType:
+            return "Note"
         }
     }
 
@@ -42,7 +42,7 @@ enum ItemType: String, CaseIterable, Identifiable {
             return "brain.head.profile"
         case .lifeAdminType:
             return "figure.wave"
-        case .generalListType:
+        case .generalNoteType:
             return "list.clipboard"
         }
     }
@@ -57,7 +57,7 @@ enum ItemType: String, CaseIterable, Identifiable {
             return .pink
         case .lifeAdminType:
             return .yellow
-        case .generalListType:
+        case .generalNoteType:
             return .orange
         }
     }
