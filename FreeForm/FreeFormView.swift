@@ -13,15 +13,16 @@ struct FreeFormView: View {
     @FocusState private var isTextFieldFocused: Bool
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
-    @FocusState private var isEditorFocused: Bool
-
-    
     
     let mode: EditOrViewMode
     var onSave: (() -> Void)?
+    
     private var isViewMode: Bool { mode == .view }
 
-    init(mode: EditOrViewMode = .edit, entry: FreeWritingEntry? = nil, initialEntryType: EntryType = .freeForm, onSave: (() -> Void)? = nil) {
+    init(mode: EditOrViewMode = .edit,
+         entry: FreeWritingEntry? = nil,
+         initialEntryType: EntryType = .freeForm,
+         onSave: (() -> Void)? = nil) {
         self.mode = mode
         self.onSave = onSave
         _viewModel = StateObject(wrappedValue: FreeFormViewModel(entry: entry, initialEntryType: initialEntryType))
@@ -29,11 +30,16 @@ struct FreeFormView: View {
     
     var body: some View {
         ZStack {
-            Color(uiColor: .systemGroupedBackground)
+            ThemeBackgroundView(theme: themeManager.selectedTheme)
                 .ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: 24) {
-                GenericHeaderMultiSection(mode: mode, viewModel: viewModel, themeManager: themeManager)
+                GenericHeaderMultiSection(
+                    mode: mode,
+                    viewModel: viewModel,
+                    themeManager: themeManager
+                )
+                .padding(.horizontal, 20)
                 
                 PulsingDividerBar()
                     .padding(.vertical, 4)

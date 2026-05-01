@@ -1,5 +1,5 @@
 //
-//  ShoppingListEntry.swift
+//  ShoppingListView.swift
 //  DoItAll
 //
 //  Created by Marc Harvey on 30/08/2025.
@@ -8,7 +8,7 @@
 import SwiftUI
 import CoreData
 
-struct ShoppingEntryView: View {
+struct ShoppingListView: View {
     @StateObject private var themeManager = ThemeManager.shared
     @StateObject private var viewModel: ShoppingListViewModel
     @FocusState private var isTextFieldFocused: Bool
@@ -23,12 +23,17 @@ struct ShoppingEntryView: View {
     }
     
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
+        ZStack {
+            ThemeBackgroundView(theme: themeManager.selectedTheme)
+                .ignoresSafeArea()
+            
             VStack {
                 List {
-                    itemRows
                     addItemRow
+                    itemRows
                 }
+                .scrollContentBackground(.hidden)
+                .background(Color.clear)
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -49,11 +54,11 @@ struct ShoppingEntryView: View {
         }
     }
 
-    // MARK: - View Builders
     @ViewBuilder
     private var itemRows: some View {
         ForEach(viewModel.sortedItems, id: \.objectID) { item in
             itemRow(for: item)
+                .listRowBackground(themeManager.selectedTheme.primaryColour.opacity(0.1))
         }
         .onDelete { indexSet in
             indexSet.map { viewModel.sortedItems[$0] }.forEach(viewContext.delete)
@@ -112,6 +117,7 @@ struct ShoppingEntryView: View {
             addItemButton
         }
         .listRowSeparator(.hidden)
+        .listRowBackground(themeManager.selectedTheme.primaryColour.opacity(0.1))
     }
 
     @ViewBuilder
@@ -128,11 +134,10 @@ struct ShoppingEntryView: View {
         .padding(.leading, 8)
     }
 }
-
 #Preview {
     let context = PersistenceController.preview.container.viewContext
     return NavigationView {
-        ShoppingEntryView()
+        ShoppingListView()
             .environment(\.managedObjectContext, context)
     }
 }

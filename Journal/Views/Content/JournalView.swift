@@ -46,8 +46,13 @@ struct JournalView: View {
                     draggablePhotosDrawer
                         .padding(.top, 10)
                         .padding(.horizontal, 10)
+                    
                     headerSection
-                        .padding(.bottom, 5)
+                        .padding(.vertical, 5)
+                    
+                    PulsingDividerBar()
+                        .padding(.vertical, 4)
+                    
                     contentSection
                     
                     Spacer(minLength: 10)
@@ -79,7 +84,7 @@ struct JournalView: View {
             themeManager: themeManager
         )
     }
-        
+    
     @ViewBuilder
     private var photosSection: some View {
         if viewModel.entryType == .journal, !viewModel.selectedPhotos.isEmpty {
@@ -127,45 +132,61 @@ struct JournalView: View {
     }
     
     @ViewBuilder
-    private var draggablePhotosDrawer: some View {
-        if !viewModel.selectedPhotos.isEmpty {
-            VStack(spacing: 0) {
-                photosSection
-                    .frame(height: isExpanded ? 250 : 100)
-                    .padding(.horizontal, 10)
-                
-                Capsule()
-                    .frame(width: 40, height: 6)
-                    .foregroundStyle(themeManager.selectedTheme.primaryColour.opacity(0.8))
-            }
-            .padding(.horizontal, 10)
-            .frame(maxWidth: .infinity)
-            .background(Color.systemBackground)
-            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-            .transition(.move(edge: .top).combined(with: .opacity))
-            .offset(y: drawerOffset - 10)
-            .gesture(
-                DragGesture()
-                    .onChanged { value in
-                        if value.translation.height > 0 {
-                            drawerOffset = value.translation.height * 0.3
-                        } else {
-                            drawerOffset = value.translation.height
-                        }
+        private var draggablePhotosDrawer: some View {
+            if !viewModel.selectedPhotos.isEmpty {
+                VStack(spacing: 8) {
+                    photosSection
+                        .frame(height: isExpanded ? 250 : 100)
+                        .padding(.horizontal, 10)
+                    
+                    // Grabber handle now uses the theme color with transparency
+                    Capsule()
+                        .frame(width: 36, height: 5)
+                        .foregroundStyle(themeManager.selectedTheme.primaryColour.opacity(0.4))
+                        .padding(.bottom, 8)
+                }
+                .background {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 30, style: .continuous)
+                            .fill(.thinMaterial)
+                        
+                        RoundedRectangle(cornerRadius: 30, style: .continuous)
+                            .fill(themeManager.selectedTheme.primaryColour.opacity(0.12))
                     }
-                    .onEnded { value in
-                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                            if value.translation.height > 60 {
-                                isExpanded = true
-                            } else if value.translation.height < -60 {
-                                isExpanded = false
+                }
+                .overlay(
+                    RoundedRectangle(cornerRadius: 30, style: .continuous)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    themeManager.selectedTheme.secondaryColour.opacity(0.5),
+                                    themeManager.selectedTheme.secondaryColour.opacity(0.1)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 0.5
+                        )
+                )
+                .shadow(color: themeManager.selectedTheme.primaryColour.opacity(0.1), radius: 15, y: 10)
+                .offset(y: drawerOffset)
+                .padding(.horizontal, 12)
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            drawerOffset = value.translation.height > 0 ? value.translation.height * 0.3 : value.translation.height
+                        }
+                        .onEnded { value in
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                if value.translation.height > 50 { isExpanded = true }
+                                else if value.translation.height < -50 { isExpanded = false }
+                                drawerOffset = 0
                             }
-                            drawerOffset = 0
                         }
-                    }
-            )
+                )
+            }
         }
-    }
 }
 
 #Preview {

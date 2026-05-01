@@ -50,9 +50,6 @@ struct ContentView: View {
             viewModel.setupViewModel()
             viewModel.checkOnboarding()
             viewModel.loadItems()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                viewModel.scrollDetectionEnabled = true
-            }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("JournalEntrySaved"))) { _ in
             viewModel.loadItems()
@@ -130,7 +127,7 @@ struct ContentView: View {
             )
             
         case .shoppingListType:
-            ShoppingEntryView(entry: item.getOrCreateShoppingEntry(context: viewContext))
+            ShoppingListView(entry: item.getOrCreateShoppingEntry(context: viewContext))
             
         case .freeFormType:
             FreeFormView(mode: item.freeWritingEntry == nil ? .edit : .view,
@@ -157,7 +154,6 @@ struct ContentView: View {
         }
     }
     
-    // MARK: ViewBuilders
     private var rowHeight: CGFloat {
         viewModel.currentSortOption == .type ? 80 : 100
     }
@@ -267,9 +263,6 @@ struct ContentView: View {
                 .listRowBackground(Color.clear)
         }
         .coordinateSpace(name: "scroll")
-        .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-            viewModel.handleScroll(offset: value)
-        }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .transition(.opacity)
@@ -295,9 +288,6 @@ struct ContentView: View {
             }
         )
         .coordinateSpace(name: "scroll")
-        .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-            viewModel.handleScroll(offset: value)
-        }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .transition(.opacity)

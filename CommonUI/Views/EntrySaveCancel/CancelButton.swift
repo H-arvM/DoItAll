@@ -15,6 +15,7 @@ struct CancelButton: View {
         Button("Cancel") {
             dismiss()
         }
+        .font(.footnote)
         .foregroundStyle(themeManager.selectedTheme.primaryColour)
     }
 }

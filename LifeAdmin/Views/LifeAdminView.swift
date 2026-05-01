@@ -23,6 +23,8 @@ struct LifeAdminView: View {
     
     var body: some View {
         ZStack {
+            ThemeBackgroundView(theme: themeManager.selectedTheme)
+                .ignoresSafeArea()
             contentView
             floatingAddButton
         }
@@ -40,6 +42,7 @@ struct LifeAdminView: View {
                 .padding(.vertical, 2)
             taskList
         }
+        .background(Color(.clear))
     }
     
     @ToolbarContentBuilder
@@ -58,7 +61,7 @@ struct LifeAdminView: View {
     
     private var categoryPills: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
+             HStack(spacing: 12) {
                 ForEach(TaskCategory.allCases, id: \.self) { category in
                     CategoryPill(
                         category: category,
@@ -70,7 +73,7 @@ struct LifeAdminView: View {
             .padding(.horizontal)
             .padding(.vertical, 12)
         }
-        .background(Color(.systemBackground))
+        .background(Color.clear)
     }
     
     private var taskList: some View {
@@ -88,10 +91,11 @@ struct LifeAdminView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
+                .scrollContentBackground(.hidden)
+                .background(Color.clear)
             }
         }
     }
-    
     private var floatingAddButton: some View {
         GeometryReader { proxy in
             VStack {
@@ -118,21 +122,6 @@ struct LifeAdminView: View {
                     .presentationDetents([.height(proxy.size.height)])
                     .presentationDragIndicator(.visible)
             }
-        }
-    }
-    
-    private var saveButton: some View {
-        Button {
-            viewModel.saveAdminEntry(context: viewContext) {
-                if let onSave = onSave {
-                    onSave()
-                } else {
-                    dismiss()
-                }
-            }
-        } label: {
-            Image(systemName: "square.and.arrow.down")
-                .foregroundStyle(themeManager.selectedTheme.primaryColour)
         }
     }
 }

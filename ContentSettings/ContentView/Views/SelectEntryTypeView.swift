@@ -74,7 +74,7 @@ struct SelectEntryTypeView: View {
                     .environment(\.managedObjectContext, viewContext)
             }
             .navigationDestination(isPresented: $navigateToShoppingList) {
-                ShoppingEntryView(entry: nil, initialEntryType: .shoppingList) { dismiss() }
+                ShoppingListView(entry: nil, initialEntryType: .shoppingList) { dismiss() }
                     .environment(\.managedObjectContext, viewContext)
             }
             .navigationDestination(isPresented: $navigateToLifeAdmin) {

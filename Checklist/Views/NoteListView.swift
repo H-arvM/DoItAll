@@ -39,20 +39,15 @@ struct NoteListView: View {
                     }
                 }
                 .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
+                .listRowBackground(themeManager.selectedTheme.primaryColour.opacity(0.1))
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 10, trailing: 16))
                 
-                // The List Content Section now handles its own rows
                 listContentSection
                 
-                // Bottom Spacer
-                Color.clear
-                    .frame(height: 150)
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
+               
             }
-            .listStyle(.plain) // Removes default gray background and styling
-            .scrollContentBackground(.hidden) // Makes the ThemeBackgroundView visible
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
         }
         .navigationBarBackButtonHidden(true)
         .navigationTitle(viewModel.title.isEmpty ? "New List" : viewModel.title)
@@ -99,7 +94,7 @@ struct NoteListView: View {
             .disabled(viewModel.newItemText.isEmpty)
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(themeManager.selectedTheme.primaryColour.opacity(0.1))
         .cornerRadius(10)
     }
     
@@ -119,10 +114,10 @@ struct NoteListView: View {
             .padding(.vertical, 16)
             .padding(.horizontal, 16)
             .frame(minHeight: 60)
-            .background(Color(.systemBackground))
+            .background(themeManager.selectedTheme.primaryColour.opacity(0.1))
             .cornerRadius(12)
             .listRowSeparator(.hidden)
-            .listRowBackground(Color.clear)
+            .listRowBackground(themeManager.selectedTheme.primaryColour.opacity(0.1))
             .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                 if mode == .edit {

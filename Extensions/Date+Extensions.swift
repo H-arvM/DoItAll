@@ -31,7 +31,7 @@ extension Date {
         if let daysAgo = calendar.dateComponents([.day], from: self, to: now).day, daysAgo < 7 {
             let weekday = calendar.component(.weekday, from: self)
             let weekdayName = calendar.weekdaySymbols[weekday - 1]
-            return "Last at \(weekdayName) at \(time)"
+            return "Last \(weekdayName) at \(time)"
         }
         
         // Check if this year
