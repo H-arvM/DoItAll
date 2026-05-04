@@ -10,7 +10,8 @@ import Combine
 import CoreData
 
 @MainActor
-class ContentViewModel: ObservableObject, @MainActor ListViewModelProtocol {
+class ContentViewModel: NSObject, ObservableObject, ListViewModelProtocol, NSFetchedResultsControllerDelegate {
+    
     @Published var items: [ItemEntity] = []
     @Published var selectedItem: ItemEntity?
     @Published var showAuthAlert: Bool = false
@@ -19,18 +20,24 @@ class ContentViewModel: ObservableObject, @MainActor ListViewModelProtocol {
     @Published var currentSortOption: SortOption = .dateCreated
     @Published var navigationPath = NavigationPath()
     
-    @State public var isScrolling: Bool = false
-    @State private var hideButtonsWorkItem: DispatchWorkItem?
-    
+    public var isScrolling: Bool = false
+    private var hideButtonsWorkItem: DispatchWorkItem?
     private var pendingItemToUnhide: NSManagedObjectID?
-    private let authManager = BiometricAuthManager()
+    
     private let viewContext: NSManagedObjectContext
+    private let authManager = BiometricAuthManager()
+    
+    private let impactMedium = UIImpactFeedbackGenerator(style: .medium)
+    private let impactLight = UIImpactFeedbackGenerator(style: .light)
+    private let notificationFeedback = UINotificationFeedbackGenerator()
+    private var fetchedResultsController: NSFetchedResultsController<ItemEntity>!
     
     @AppStorage("hasSeenOnboarding") var hasSeenOnboarding = false
     @AppStorage("sortOption") private var sortOptionRawValue: String = SortOption.dateCreated.rawValue
     
     nonisolated init(context: NSManagedObjectContext = PersistenceController.shared.container.viewContext) {
         self.viewContext = context
+        super.init()
     }
     
     func setupViewModel() {
@@ -38,19 +45,40 @@ class ContentViewModel: ObservableObject, @MainActor ListViewModelProtocol {
             currentSortOption = savedSort
         }
         
-        loadItems()
+        if fetchedResultsController == nil {
+            setupFetchedResultsController()
+        }
     }
     
-    func loadItems() {
+    private func setupFetchedResultsController() {
         let request = NSFetchRequest<ItemEntity>(entityName: "ItemEntity")
         request.sortDescriptors = getSortDescriptors()
         
+        fetchedResultsController = NSFetchedResultsController(
+            fetchRequest: request,
+            managedObjectContext: viewContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        fetchedResultsController.delegate = self
+        
         do {
-            items = try viewContext.fetch(request)
+            try fetchedResultsController.performFetch()
+            self.items = fetchedResultsController.fetchedObjects ?? []
         } catch {
-            print("Failed to fetch items \(error)")
-            items = []
+            print("Fetch failed: \(error)")
         }
+    }
+    
+    nonisolated func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        let updatedItems = (controller.fetchedObjects as? [ItemEntity]) ?? []
+        Task { @MainActor in
+            self.items = updatedItems
+        }
+    }
+    
+    func loadItems() {
+        self.items = fetchedResultsController.fetchedObjects ?? []
     }
     
     private func getSortDescriptors() -> [NSSortDescriptor] {
@@ -59,14 +87,16 @@ class ContentViewModel: ObservableObject, @MainActor ListViewModelProtocol {
             return [NSSortDescriptor(keyPath: \ItemEntity.createdAt, ascending: false)]
         case .type:
             return [NSSortDescriptor(keyPath: \ItemEntity.title, ascending: true),
-                    NSSortDescriptor(keyPath: \ItemEntity.createdAt, ascending: true)
-                    ]
+                    NSSortDescriptor(keyPath: \ItemEntity.createdAt, ascending: true)]
         }
     }
     
     func setSortOption(_ option: SortOption) {
         currentSortOption = option
         sortOptionRawValue = option.rawValue
+        
+        fetchedResultsController.fetchRequest.sortDescriptors = getSortDescriptors()
+        try? fetchedResultsController.performFetch()
         loadItems()
     }
     
@@ -74,84 +104,71 @@ class ContentViewModel: ObservableObject, @MainActor ListViewModelProtocol {
         if viewContext.hasChanges {
             do {
                 try viewContext.save()
-                print("Context saved successfully")
             } catch {
                 print("Failed to save context: \(error)")
             }
-        } else {
-            print("No changes to save")
         }
     }
     
-    @MainActor
     func handleHiddenItemTap(_ item: ItemEntity) {
+        impactLight.prepare()
+        
         authManager.authenticateUser(reason: "Authenticate to view hidden items") { [weak self] result in
             guard let self = self else { return }
             
-            switch result {
-            case .success:
-                Task { @MainActor in
-                    let impact = UIImpactFeedbackGenerator(style: .light)
-                    impact.impactOccurred()
-                    self.selectedItem = item
-                }
-                
-            case .failure(let error):
-                if case .userCancel = error { return }
-                Task { @MainActor in
-                    let notification = UINotificationFeedbackGenerator()
-                    notification.notificationOccurred(.error)
+            Task { @MainActor in
+                switch result {
+                case .success:
+                    self.impactLight.impactOccurred()
+                    self.navigationPath.append(
+                        ItemNavigationDestination(itemID: item.objectID, itemType: item.itemType)
+                    )
+                case .failure(let error):
+                    if case .userCancel = error { return }
+                    self.notificationFeedback.prepare()
+                    self.notificationFeedback.notificationOccurred(.error)
                 }
             }
         }
     }
     
     func handleLongPress(for item: ItemEntity) {
+        impactMedium.prepare()
+        
         if item.isHidden {
             pendingItemToUnhide = item.objectID
             authManager.authenticateUser(reason: "Authenticate to unhide item") { [weak self] result in
                 guard let self = self else { return }
                 
-                switch result {
-                case .success:
-                    let impact = UIImpactFeedbackGenerator(style: .medium)
-                    impact.impactOccurred()
-                    
-                    /// Auth success so unhide the item
-                    if let objectID = self.pendingItemToUnhide {
-                        if let item = try? self.viewContext.existingObject(with: objectID) as? ItemEntity {
-                            item.isHidden = false
+                Task { @MainActor in
+                    switch result {
+                    case .success:
+                        self.impactMedium.impactOccurred()
+                        if let objectID = self.pendingItemToUnhide,
+                           let itemToUnhide = try? self.viewContext.existingObject(with: objectID) as? ItemEntity {
+                            itemToUnhide.isHidden = false
                             self.saveContext()
-                            self.viewContext.refreshAllObjects()
-                            self.loadItems()
+                            // FRC automatically updates the 'items' array here
                         }
                         self.pendingItemToUnhide = nil
-                    }
-                    
-                case .failure(let error):
-                    /// Only show error for non-cancellation errors
-                    if case .userCancel = error {
+                        
+                    case .failure(let error):
+                        if case .userCancel = error {
+                            self.pendingItemToUnhide = nil
+                            return
+                        }
+                        self.notificationFeedback.prepare()
+                        self.notificationFeedback.notificationOccurred(.error)
+                        self.authError = error
+                        self.showAuthAlert = true
                         self.pendingItemToUnhide = nil
-                        return
                     }
-                    
-                    let notification = UINotificationFeedbackGenerator()
-                    notification.notificationOccurred(.error)
-                    
-                    self.authError = error
-                    self.showAuthAlert = true
-                    self.pendingItemToUnhide =  nil
                 }
             }
         } else {
-            let impact = UIImpactFeedbackGenerator(style: .medium)
-            impact.impactOccurred()
-            
-            /// No auth needed for hiding an item
+            impactMedium.impactOccurred()
             item.isHidden = true
             saveContext()
-            viewContext.refreshAllObjects()
-            loadItems()
         }
     }
     
@@ -168,9 +185,7 @@ class ContentViewModel: ObservableObject, @MainActor ListViewModelProtocol {
     }
     
     var groupedItems: [ItemType: [ItemEntity]] {
-        Dictionary(grouping: items) { item in
-            item.itemType
-        }
+        Dictionary(grouping: items) { $0.itemType }
     }
     
     var sortedItemTypes: [ItemType] {
@@ -179,39 +194,25 @@ class ContentViewModel: ObservableObject, @MainActor ListViewModelProtocol {
     
     public func getShoppingListContent(_ entry: ShoppingEntry?) -> String {
         guard let entry = entry else { return "" }
-        
-        if let itemsSet = entry.items as? Set<ShoppingItem>,
-           let firstItem = itemsSet.first {
-            return firstItem.name ?? ""
-        }
-        
-        if let itemsArray = entry.items?.allObjects as? [ShoppingItem],
-           let firstItem = itemsArray.first {
-            return firstItem.name ?? ""
-        }
-        
-        return ""
+        let itemsArray = (entry.items?.allObjects as? [ShoppingItem]) ?? []
+        return itemsArray.first?.name ?? ""
     }
     
     public func getChecklistContent(_ entry: CheckListEntry?) -> String {
         guard let entry = entry else { return "No title" }
-        
         let items = (entry.items?.allObjects as? [CheckListItem]) ?? []
         
         if !items.isEmpty {
-            let sortedItems = items.sorted {
-                ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast)
-            }
-            
+            let sortedItems = items.sorted { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }
             if let firstNote = sortedItems.first?.note, !firstNote.isEmpty {
                 return firstNote
             }
         }
-        
-        if let title = entry.title, !title.isEmpty {
-            return title
-        }
-        
-        return "No title"
+        return entry.title ?? "No title"
+    }
+    
+    func triggerSuccessHaptic() {
+        impactMedium.prepare()
+        impactMedium.impactOccurred()
     }
 }

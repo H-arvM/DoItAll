@@ -139,6 +139,73 @@ extension ContentView {
         }
         .frame(height: rowHeight)
     }
+    
+    @ViewBuilder
+    public func rowVariant(for item: ItemEntity, sortOption: SortOption) -> some View {
+        if sortOption == .type {
+            typeGroupedRow(for: item)
+        } else {
+            navigationRow(for: item)
+        }
+    }
+
+    private func typeGroupedRow(for item: ItemEntity) -> some View {
+        Button {
+            viewModel.navigationPath.append(
+                ItemNavigationDestination(itemID: item.objectID, itemType: item.itemType)
+            )
+        } label: {
+            typeGroupedRowLabel(for: item)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func typeGroupedRowLabel(for item: ItemEntity) -> some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                rowContent(for: item)
+                Spacer()
+                    .frame(width: 18)
+            }
+            .contentShape(.rect)
+            .frame(height: rowHeight)
+        }
+    }
+
+    private func navigationRow(for item: ItemEntity) -> some View {
+        NavigationLink(value: ItemNavigationDestination(itemID: item.objectID, itemType: item.itemType)) {
+            navigationRowLabel(for: item)
+        }
+    }
+
+    private func navigationRowLabel(for item: ItemEntity) -> some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                rowContent(for: item)
+            }
+            .contentShape(.rect)
+            .frame(height: rowHeight)
+
+            if item.objectID != viewModel.items.last?.objectID {
+                rowSeparator
+            }
+        }
+    }
+
+    private var rowSeparator: some View {
+        Rectangle()
+            .frame(height: 0.5)
+            .foregroundStyle(Color(UIColor.separator))
+    }
+
+    private func listRowInsets(for sortOption: SortOption) -> EdgeInsets {
+        EdgeInsets(
+            top: 0,
+            leading: 10,
+            bottom: 0,
+            trailing: sortOption == .type ? -5 : 10
+        )
+    }
 }
 
 //#Preview {

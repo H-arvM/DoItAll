@@ -86,52 +86,6 @@ struct ContentView: View {
         }
     }
     
-    @ViewBuilder
-    private var authAlertMessage: some View {
-        if let error = viewModel.authError {
-            Text(error.errorDescription ?? "An error occurred")
-        }
-    }
-    
-    @ViewBuilder
-    private var sortOptionsContent: some View {
-        ForEach(SortOption.allCases, id: \.self) { option in
-            Button {
-                withAnimation {
-                    viewModel.setSortOption(option)
-                }
-            } label: {
-                Text(option.rawValue)
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private func destinationView(for type: ItemType, item: ItemEntity) -> some View {
-        switch type {
-        case .journalType:
-            JournalView(
-                mode: item.journalEntry == nil ? .edit : .view,
-                entry: item.getOrCreateJournalEntry(context: viewContext)
-            )
-            
-        case .shoppingListType:
-            ShoppingListView(entry: item.getOrCreateShoppingEntry(context: viewContext))
-            
-        case .freeFormType:
-            FreeFormView(
-                mode: item.freeWritingEntry == nil ? .edit : .view,
-                entry: item.getOrCreateFreeWritingEntry(context: viewContext)
-            )
-           
-        case .lifeAdminType:
-            LifeAdminView(entry: item.getOrCreateAdminEntry(context: viewContext))
-          
-        case .generalNoteType:
-            NoteListView(entry: item.getOrCreateChecklistEntry(context: viewContext))
-        }
-    }
-    
     var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .primaryAction) {
             Button {
@@ -264,51 +218,10 @@ struct ContentView: View {
     }
     
     private func normalListRow(for item: ItemEntity) -> some View {
-        Group {
-            if viewModel.currentSortOption == .type {
-                Button {
-                    viewModel.navigationPath.append(
-                        ItemNavigationDestination(itemID: item.objectID, itemType: item.itemType)
-                    )
-                } label: {
-                    VStack(spacing: 0) {
-                        HStack(spacing: 0) {
-                            rowContent(for: item)
-                            Spacer()
-                                .frame(width: 18)
-                        }
-                        .contentShape(.rect)
-                        .frame(height: rowHeight)
-                    }
-                }
-                .buttonStyle(.plain)
-            } else {
-                NavigationLink(value: ItemNavigationDestination(itemID: item.objectID, itemType: item.itemType)) {
-                    VStack(spacing: 0) {
-                        HStack(spacing: 0) {
-                            rowContent(for: item)
-                        }
-                        .contentShape(.rect)
-                        .frame(height: rowHeight)
-                        
-                        if item.objectID != viewModel.items.last?.objectID {
-                            Rectangle()
-                                .frame(height: 0.5)
-                                .foregroundStyle(Color(UIColor.separator))
-                        }
-                    }
-                }
-            }
-        }
-        .simultaneousGesture(longPressGesture(for: item))
-        .listRowInsets(EdgeInsets(
-            top: 0,
-            leading: 10,
-            bottom: 0,
-            trailing: viewModel.currentSortOption == .type ? -5 : 10)
-        )
-        .listRowBackground(rowBackground(for: item))
-        .listRowSeparator(.hidden)
+        rowVariant(for: item, sortOption: viewModel.currentSortOption)
+            .simultaneousGesture(longPressGesture(for: item))
+            .listRowInsets(rowInsets(for: viewModel.currentSortOption))                .listRowBackground(rowBackground(for: item))
+            .listRowSeparator(.hidden)
     }
     
     private func hiddenGroupedListRow(for item: ItemEntity) -> some View {
@@ -385,7 +298,7 @@ struct ContentView: View {
         .frame(height: rowHeight)
     }
     
-    private func rowContent(for item: ItemEntity) -> some View {
+    public func rowContent(for item: ItemEntity) -> some View {
         let theme = themeManager.selectedTheme
         let isHidden = viewModel.isItemHidden(item)
         
@@ -457,6 +370,45 @@ struct ContentView: View {
         }
     }
     
+    @ViewBuilder
+    private var sortOptionsContent: some View {
+        ForEach(SortOption.allCases, id: \.self) { option in
+            Button {
+                withAnimation {
+                    viewModel.setSortOption(option)
+                }
+            } label: {
+                Text(option.rawValue)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func destinationView(for type: ItemType, item: ItemEntity) -> some View {
+        switch type {
+        case .journalType:
+            JournalView(
+                mode: item.journalEntry == nil ? .edit : .view,
+                entry: item.getOrCreateJournalEntry(context: viewContext)
+            )
+            
+        case .shoppingListType:
+            ShoppingListView(entry: item.getOrCreateShoppingEntry(context: viewContext))
+            
+        case .freeFormType:
+            FreeFormView(
+                mode: item.freeWritingEntry == nil ? .edit : .view,
+                entry: item.getOrCreateFreeWritingEntry(context: viewContext)
+            )
+           
+        case .lifeAdminType:
+            LifeAdminView(entry: item.getOrCreateAdminEntry(context: viewContext))
+          
+        case .generalNoteType:
+            NoteListView(entry: item.getOrCreateChecklistEntry(context: viewContext))
+        }
+    }
+    
     private func longPressGesture(for item: ItemEntity) -> some Gesture {
         LongPressGesture(minimumDuration: 0.3)
             .onEnded { _ in
@@ -474,6 +426,17 @@ struct ContentView: View {
     
     public var rowHeight: CGFloat {
         viewModel.currentSortOption == .type ? 80 : 100
+    }
+    
+    @ViewBuilder
+    private var authAlertMessage: some View {
+        if let error = viewModel.authError {
+            Text(error.errorDescription ?? "An error occurred")
+        }
+    }
+    
+    private func rowInsets(for sortOption: SortOption) -> EdgeInsets {
+        EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: sortOption == .type ? -5 : 10)
     }
 }
 
