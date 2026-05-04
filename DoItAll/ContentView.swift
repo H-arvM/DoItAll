@@ -139,24 +139,21 @@ struct ContentView: View {
     
     @ViewBuilder
     private var simpleList: some View {
-        ZStack {
-            List {
-                ForEach(viewModel.items) { item in
-                    if viewModel.isItemHidden(item) {
-                        listRow(for: item)
-                    } else {
-                        SwipeToDeleteRow(onDelete: { deleteItem(item) }) {
-                            listRow(for: item)
-                        }
-                    }
-                }
+        List {
+            ForEach(viewModel.items) { item in
+                listRow(for: item)
+                    .listRowInsets(rowInsets(for: viewModel.currentSortOption))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
-            .transition(.opacity)
-            .background(Color.clear)
+            .onDelete { indexSet in
+                indexSet.forEach { deleteItem(viewModel.items[$0]) }
+            }
         }
-        .coordinateSpace(name: "scroll")
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .transition(.opacity)
+        .background(Color.clear)
     }
     
     @ViewBuilder
