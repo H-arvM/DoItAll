@@ -19,7 +19,6 @@ extension ItemEntity {
         newEntry.entryType = self.type
         self.journalEntry = newEntry
         
-        try? context.save()
         return newEntry
     }
     
@@ -32,8 +31,6 @@ extension ItemEntity {
         newEntry.createdDate = Date()
         newEntry.entryType = self.type
         self.freeWritingEntry = newEntry
-        
-        try? context.save()
         return newEntry
     }
     
@@ -46,8 +43,6 @@ extension ItemEntity {
         newEntry.createdDate = Date()
         newEntry.entryType = self.type
         self.shoppingEntry = newEntry
-        
-        try? context.save()
         return newEntry
     }
     
@@ -60,8 +55,6 @@ extension ItemEntity {
         newEntry.createdAt = Date()
         newEntry.entryType = self.type
         self.taskItemEntry = newEntry
-        
-        try? context.save()
         return newEntry
     }
     
@@ -74,8 +67,6 @@ extension ItemEntity {
         newEntry.createdAt = Date()
         newEntry.entryType = self.type
         self.checkListEntry = newEntry
-        
-        try? context.save()
         return newEntry
     }
 }

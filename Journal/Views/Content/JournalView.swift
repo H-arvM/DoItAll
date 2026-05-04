@@ -30,9 +30,13 @@ struct JournalView: View {
     let mode: EditOrViewMode
     var onSave: (() -> Void)?
     
-    init(mode: EditOrViewMode = .edit, entry: JournalEntry? = nil, initialEntryType: EntryType = .journal, onSave: (() -> Void)? = nil) {
+    let parentItem: ItemEntity?
+    
+    init(item: ItemEntity? = nil, mode: EditOrViewMode = .edit, entry: JournalEntry? = nil, initialEntryType: EntryType = .journal, onSave: (() -> Void)? = nil) {
+        self.parentItem = item // Store the item reference
         self.mode = mode
         self.onSave = onSave
+        
         _viewModel = StateObject(wrappedValue: JournalViewModel(entry: entry, initialEntryType: initialEntryType))
     }
     

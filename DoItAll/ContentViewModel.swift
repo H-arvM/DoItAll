@@ -10,13 +10,14 @@ import Combine
 import CoreData
 
 @MainActor
-class ContentViewModel: ObservableObject {
+class ContentViewModel: ObservableObject, @MainActor ListViewModelProtocol {
     @Published var items: [ItemEntity] = []
     @Published var selectedItem: ItemEntity?
     @Published var showAuthAlert: Bool = false
     @Published var authError: BiometricAuthManager.BiometricError?
     @Published var showOnboarding: Bool = false
     @Published var currentSortOption: SortOption = .dateCreated
+    @Published var navigationPath = NavigationPath()
     
     @State public var isScrolling: Bool = false
     @State private var hideButtonsWorkItem: DispatchWorkItem?
@@ -40,7 +41,6 @@ class ContentViewModel: ObservableObject {
         loadItems()
     }
     
-    // Core Data Management
     func loadItems() {
         let request = NSFetchRequest<ItemEntity>(entityName: "ItemEntity")
         request.sortDescriptors = getSortDescriptors()
@@ -175,5 +175,43 @@ class ContentViewModel: ObservableObject {
     
     var sortedItemTypes: [ItemType] {
         groupedItems.keys.sorted { $0.rawValue < $1.rawValue }
+    }
+    
+    public func getShoppingListContent(_ entry: ShoppingEntry?) -> String {
+        guard let entry = entry else { return "" }
+        
+        if let itemsSet = entry.items as? Set<ShoppingItem>,
+           let firstItem = itemsSet.first {
+            return firstItem.name ?? ""
+        }
+        
+        if let itemsArray = entry.items?.allObjects as? [ShoppingItem],
+           let firstItem = itemsArray.first {
+            return firstItem.name ?? ""
+        }
+        
+        return ""
+    }
+    
+    public func getChecklistContent(_ entry: CheckListEntry?) -> String {
+        guard let entry = entry else { return "No title" }
+        
+        let items = (entry.items?.allObjects as? [CheckListItem]) ?? []
+        
+        if !items.isEmpty {
+            let sortedItems = items.sorted {
+                ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast)
+            }
+            
+            if let firstNote = sortedItems.first?.note, !firstNote.isEmpty {
+                return firstNote
+            }
+        }
+        
+        if let title = entry.title, !title.isEmpty {
+            return title
+        }
+        
+        return "No title"
     }
 }

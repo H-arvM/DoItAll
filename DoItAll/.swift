@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreData
 import LocalAuthentication
 import MapKit
 import Combine
@@ -31,7 +32,7 @@ struct ContentView: View {
     private let titleLimit = 50
     
     var body: some View {
-        NavigationStack(path: $viewModel.navigationPath) {
+        NavigationStack {
             mainContent
         }
         .alert("Authentication required", isPresented: $viewModel.showAuthAlert) {
@@ -76,13 +77,23 @@ struct ContentView: View {
             itemsList
             SettingsButton(viewModel: viewModel)
         }
-        .navigationDestination(for: ItemNavigationDestination.self) { destination in
-            if let item = try? viewContext.existingObject(with: destination.itemID) as? ItemEntity {
-                destinationView(for: destination.itemType, item: item)
-            }
+        .navigationDestination(for: ItemEntity.self) { item in
+            navigationDestination(for: item)
         }
         .toolbar {
             toolbarContent
+        }
+    }
+    
+    @ViewBuilder
+    private func navigationDestination(for item: ItemEntity) -> some View {
+        let itemType = ItemType(rawValue: item.type ?? "") ?? .journalType
+        let isVisible = !viewModel.isItemHidden(item) || viewModel.selectedItem == item
+        
+        if isVisible {
+            destinationView(for: itemType, item: item)
+        } else {
+            EmptyView()
         }
     }
     
@@ -119,14 +130,13 @@ struct ContentView: View {
             ShoppingListView(entry: item.getOrCreateShoppingEntry(context: viewContext))
             
         case .freeFormType:
-            FreeFormView(
-                mode: item.freeWritingEntry == nil ? .edit : .view,
-                entry: item.getOrCreateFreeWritingEntry(context: viewContext)
+            FreeFormView(mode: item.freeWritingEntry == nil ? .edit : .view,
+                         entry: item.getOrCreateFreeWritingEntry(context: viewContext)
             )
-           
+            
         case .lifeAdminType:
             LifeAdminView(entry: item.getOrCreateAdminEntry(context: viewContext))
-          
+            
         case .generalNoteType:
             NoteListView(entry: item.getOrCreateChecklistEntry(context: viewContext))
         }
@@ -142,6 +152,10 @@ struct ContentView: View {
                     .foregroundStyle(themeManager.selectedTheme.iconColour)
             }
         }
+    }
+    
+    public var rowHeight: CGFloat {
+        viewModel.currentSortOption == .type ? 80 : 100
     }
     
     @ViewBuilder
@@ -210,6 +224,41 @@ struct ContentView: View {
     }
     
     @ViewBuilder
+    public func groupHeader(for type: ItemType) -> some View {
+        Button {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                if expandedSections.contains(type) {
+                    expandedSections.remove(type)
+                } else {
+                    expandedSections.insert(type)
+                }
+            }
+        } label: {
+            HStack(alignment: .center, spacing: 5) {
+                Image(systemName: type.iconName)
+                    .font(.system(size: 22))
+                    .foregroundStyle(themeManager.selectedTheme.iconColour)
+                    .frame(width: 30)
+                
+                Text(type.rawValue)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.down")
+                    .font(.body)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
+                    .rotationEffect(.degrees(expandedSections.contains(type) ? 0 : -90))
+            }
+            .frame(height: 50)
+        }
+        .buttonStyle(.plain)
+    }
+    
+    @ViewBuilder
     private func listRow(for item: ItemEntity) -> some View {
         if viewModel.isItemHidden(item) {
             hiddenListRow(for: item)
@@ -237,7 +286,7 @@ struct ContentView: View {
         .padding(.leading, viewModel.currentSortOption == .type ? -16 : -8)
         .padding(.trailing, viewModel.currentSortOption == .type ? 0 : 10)
         .buttonStyle(.plain)
-        .contentShape(.rect)
+        .contentShape(Rectangle())
         .listRowInsets(EdgeInsets())
         .listRowBackground(rowBackground(for: item))
         .listRowSeparator(.hidden)
@@ -264,39 +313,22 @@ struct ContentView: View {
     }
     
     private func normalListRow(for item: ItemEntity) -> some View {
-        Group {
-            if viewModel.currentSortOption == .type {
-                Button {
-                    viewModel.navigationPath.append(
-                        ItemNavigationDestination(itemID: item.objectID, itemType: item.itemType)
-                    )
-                } label: {
-                    VStack(spacing: 0) {
-                        HStack(spacing: 0) {
-                            rowContent(for: item)
-                            Spacer()
-                                .frame(width: 18)
-                        }
-                        .contentShape(.rect)
-                        .frame(height: rowHeight)
+        NavigationLink(value: item) {
+            VStack(spacing: 0) {
+                HStack(spacing: 0) {
+                    rowContent(for: item)
+                    if viewModel.currentSortOption == .type {
+                        Spacer()
+                            .frame(width: 18)
                     }
                 }
-                .buttonStyle(.plain)
-            } else {
-                NavigationLink(value: ItemNavigationDestination(itemID: item.objectID, itemType: item.itemType)) {
-                    VStack(spacing: 0) {
-                        HStack(spacing: 0) {
-                            rowContent(for: item)
-                        }
-                        .contentShape(.rect)
-                        .frame(height: rowHeight)
-                        
-                        if item.objectID != viewModel.items.last?.objectID {
-                            Rectangle()
-                                .frame(height: 0.5)
-                                .foregroundStyle(Color(UIColor.separator))
-                        }
-                    }
+                .contentShape(.rect)
+                .frame(height: rowHeight)
+                
+                if item.objectID != viewModel.items.last?.objectID && viewModel.currentSortOption == .dateCreated {
+                    Rectangle()
+                        .frame(height: 0.5)
+                        .foregroundStyle(Color(UIColor.separator))
                 }
             }
         }
@@ -470,10 +502,6 @@ struct ContentView: View {
             try? viewContext.save()
             viewModel.loadItems()
         }
-    }
-    
-    public var rowHeight: CGFloat {
-        viewModel.currentSortOption == .type ? 80 : 100
     }
 }
 
