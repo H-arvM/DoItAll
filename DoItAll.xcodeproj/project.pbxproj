@@ -92,29 +92,17 @@
 		D2773FE52FA11099006A2C86 /* Exceptions for "DoItAll" folder in "DoItAll" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				.swift,
 				Info.plist,
 			);
 			target = D23CBCAF2E635A6D007F5B0A /* DoItAll */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		D2AD4C902FA9480600B1A712 /* Exceptions for "DoItAll" folder in "Compile Sources" phase from "DoItAll" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = D23CBCAC2E635A6D007F5B0A /* Sources */;
-			membershipExceptions = (
-				.swift,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D23CBCB22E635A6E007F5B0A /* DoItAll */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				D2773FE52FA11099006A2C86 /* Exceptions for "DoItAll" folder in "DoItAll" target */,
-				D2AD4C902FA9480600B1A712 /* Exceptions for "DoItAll" folder in "Compile Sources" phase from "DoItAll" target */,
 			);
 			path = DoItAll;
 			sourceTree = "<group>";

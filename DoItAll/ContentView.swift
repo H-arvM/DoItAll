@@ -136,40 +136,61 @@ struct ContentView: View {
         .scrollContentBackground(.hidden)
         .transition(.opacity)
     }
-        
+    
     @ViewBuilder
     private var simpleList: some View {
-        List(viewModel.items) { item in
-            if viewModel.isItemHidden(item) {
-                listRow(for: item)
-            } else {
-                SwipeToDeleteRow(onDelete: { deleteItem(item) }) {
-                    listRow(for: item)
+        ZStack {
+            List {
+                ForEach(viewModel.items) { item in
+                    if viewModel.isItemHidden(item) {
+                        listRow(for: item)
+                    } else {
+                        SwipeToDeleteRow(onDelete: { deleteItem(item) }) {
+                            listRow(for: item)
+                        }
+                    }
                 }
             }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .transition(.opacity)
+            .background(Color.clear)
         }
-        .background(
-            GeometryReader { geometry in
-                Color.clear.preference(
-                    key: ScrollOffsetPreferenceKey.self,
-                    value: geometry.frame(in: .named("scroll")).minY
-                )
-            }
-        )
         .coordinateSpace(name: "scroll")
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-        .transition(.opacity)
-        .background(Color.clear)
     }
     
     @ViewBuilder
     private func listRow(for item: ItemEntity) -> some View {
-        if viewModel.isItemHidden(item) {
-            hiddenListRow(for: item)
-        } else {
-            normalListRow(for: item)
-        }
+        let isHidden = viewModel.isItemHidden(item)
+        
+        rowVariant(for: item, sortOption: viewModel.currentSortOption)
+            .overlay(alignment: .leading) {
+                if isHidden {
+                    HiddenIndicatorView(onLongPress: {
+                        viewModel.handleLongPress(for: item)
+                    })
+                    .padding(.leading, 20)
+                }
+            }
+            .overlay(alignment: .trailing) {
+                if isHidden {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                        .padding(.trailing, 12)
+                }
+            }
+            .background(isHidden ? AnyView(GlassMorphicBackground()) : AnyView(Color.clear))
+            .contentShape(.rect)
+            .simultaneousGesture(
+                isHidden ? nil : longPressGesture(for: item)
+            )
+            .onTapGesture {
+                if isHidden { viewModel.handleHiddenItemTap(item) }
+            }
+            .listRowInsets(rowInsets(for: viewModel.currentSortOption))
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
     }
     
     @ViewBuilder
@@ -182,20 +203,15 @@ struct ContentView: View {
     }
     
     public func hiddenListRow(for item: ItemEntity) -> some View {
-        Button {
-            viewModel.handleHiddenItemTap(item)
-        } label: {
-            hiddenRowContent(for: item)
-        }
-        .frame(height: rowHeight)
-        .padding(.leading, viewModel.currentSortOption == .type ? -16 : -8)
-        .padding(.trailing, viewModel.currentSortOption == .type ? 0 : 10)
-        .buttonStyle(.plain)
-        .contentShape(.rect)
-        .listRowInsets(EdgeInsets())
-        .listRowBackground(rowBackground(for: item))
-        .listRowSeparator(.hidden)
-        .background(glassBackground(for: item))
+        hiddenRowContent(for: item)
+            .contentShape(.rect)
+            .onTapGesture {
+                viewModel.handleHiddenItemTap(item)
+            }
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(rowBackground(for: item))
+            .listRowSeparator(.hidden)
+            .background(glassBackground(for: item))
     }
     
     public func hiddenRowContent(for item: ItemEntity) -> some View {
@@ -225,14 +241,11 @@ struct ContentView: View {
     }
     
     private func hiddenGroupedListRow(for item: ItemEntity) -> some View {
-        Button {
-            viewModel.handleHiddenItemTap(item)
-        } label: {
-            hiddenGroupedRowContent(for: item)
-        }
-        .frame(height: rowHeight)
-        .buttonStyle(.plain)
-        .contentShape(.rect)
+        hiddenGroupedRowContent(for: item)
+            .contentShape(.rect)
+            .onTapGesture {
+                viewModel.handleHiddenItemTap(item)
+            }
     }
     
     private func hiddenGroupedRowContent(for item: ItemEntity) -> some View {
@@ -353,7 +366,7 @@ struct ContentView: View {
         .padding(.horizontal, 5)
         .background(Color.clear)
     }
-
+    
     @ViewBuilder
     private func themedTextStack(title: String, subtitle: String?) -> some View {
         let theme = themeManager.selectedTheme
@@ -400,10 +413,10 @@ struct ContentView: View {
                 mode: item.freeWritingEntry == nil ? .edit : .view,
                 entry: item.getOrCreateFreeWritingEntry(context: viewContext)
             )
-           
+            
         case .lifeAdminType:
             LifeAdminView(entry: item.getOrCreateAdminEntry(context: viewContext))
-          
+            
         case .generalNoteType:
             NoteListView(entry: item.getOrCreateChecklistEntry(context: viewContext))
         }

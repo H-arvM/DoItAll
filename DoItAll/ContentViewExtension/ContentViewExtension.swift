@@ -95,10 +95,12 @@ extension ContentView {
         Color.clear
             .frame(height: 0)
             .background(
-                GeometryReader { geo in
-                    Color.clear.preference(
+                GeometryReader { geometry in
+                    let raw = geometry.frame(in: .named("scroll")).minY
+                    let rounded = (raw / 10).rounded() * 10 
+                    return Color.clear.preference(
                         key: ScrollOffsetPreferenceKey.self,
-                        value: geo.frame(in: .named("scroll")).minY
+                        value: rounded
                     )
                 }
             )
