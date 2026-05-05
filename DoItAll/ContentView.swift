@@ -125,16 +125,12 @@ struct ContentView: View {
                     sectionCard(for: type)
                 }
                 .listRowInsets(EdgeInsets())
-                .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
             }
-            
-            scrollTrackingElement
         }
-        .coordinateSpace(name: "scroll")
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
-        .transition(.opacity)
     }
     
     @ViewBuilder
@@ -232,8 +228,16 @@ struct ContentView: View {
     
     private func normalListRow(for item: ItemEntity) -> some View {
         rowVariant(for: item, sortOption: viewModel.currentSortOption)
+            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                Button(role: .destructive) {
+                    deleteItem(item)
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
             .simultaneousGesture(longPressGesture(for: item))
-            .listRowInsets(rowInsets(for: viewModel.currentSortOption))                .listRowBackground(rowBackground(for: item))
+            .listRowInsets(rowInsets(for: viewModel.currentSortOption))
+            .listRowBackground(rowBackground(for: item))
             .listRowSeparator(.hidden)
     }
     

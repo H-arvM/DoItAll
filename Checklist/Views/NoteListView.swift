@@ -39,13 +39,12 @@ struct NoteListView: View {
                     }
                 }
                 .listRowSeparator(.hidden)
-                .listRowBackground(themeManager.selectedTheme.primaryColour.opacity(0.1))
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 10, trailing: 16))
+                .listRowBackground(Color.clear)
                 
                 listContentSection
-                
-               
             }
+            .padding(.horizontal, 5)
+            .cornerRadius(10)
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
         }
@@ -93,6 +92,7 @@ struct NoteListView: View {
             }
             .disabled(viewModel.newItemText.isEmpty)
         }
+        .frame(height: 50)
         .padding()
         .background(themeManager.selectedTheme.primaryColour.opacity(0.1))
         .cornerRadius(10)
@@ -101,7 +101,7 @@ struct NoteListView: View {
     @ViewBuilder
     private var listContentSection: some View {
         ForEach(viewModel.sortedItems) { item in
-            HStack(spacing: 12) {
+            HStack(spacing: 5) {
                 ListToggleButton(item: item, context: viewContext, action: viewModel.toggleItem(_:context:))
                 
                 Text(item.note ?? "")
@@ -114,11 +114,12 @@ struct NoteListView: View {
             .padding(.vertical, 16)
             .padding(.horizontal, 16)
             .frame(minHeight: 60)
-            .background(themeManager.selectedTheme.primaryColour.opacity(0.1))
-            .cornerRadius(12)
+            .cornerRadius(10)
             .listRowSeparator(.hidden)
-            .listRowBackground(themeManager.selectedTheme.primaryColour.opacity(0.1))
-            .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
+            .listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets(top: 4, leading: 15, bottom: 4, trailing: 15))
+            .background(themeManager.selectedTheme.primaryColour.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                 if mode == .edit {
                     Button(role: .destructive) {

@@ -13,61 +13,81 @@ extension ContentView {
     public func sectionCard(for type: ItemType) -> some View {
         let isExpanded = expandedSections.contains(type)
         let theme = themeManager.selectedTheme
-        
-        VStack(spacing: 0) {
-            GroupHeader(
-                type: type,
-                isExpanded: Binding(
-                    get: { self.expandedSections.contains(type) },
-                    set: { isOpen in
+        let items = viewModel.groupedItems[type] ?? []
+
+        GroupHeader(
+            type: type,
+            isExpanded: Binding(
+                get: { self.expandedSections.contains(type) },
+                set: { isOpen in
+                    withAnimation {
                         if isOpen { self.expandedSections.insert(type) }
                         else { self.expandedSections.remove(type) }
                     }
-                )
-            )
-            .padding(.horizontal, 8)
-            
-            if isExpanded {
-                expansionDivider(theme: theme)
-                
-                let items = viewModel.groupedItems[type] ?? []
-                ForEach(items, id: \.objectID) { item in
-                    itemRow(item: item, isLast: item == items.last)
                 }
+            )
+        )
+        .padding(.horizontal, 8)
+        .background(
+            cardGradient(isExpanded: isExpanded, theme: theme)
+                .cornerRadius(10)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color(.separator), lineWidth: 0.5)
+        )
+        .padding(.horizontal, 10)
+        .padding(.top, 10)
+
+        if isExpanded {
+            let itemsArray = items
+            
+            ForEach(itemsArray, id: \.objectID) { item in
+                let isLast = item.objectID == itemsArray.last?.objectID
+                
+                itemRow(item: item, isLast: isLast)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            deleteItem(item)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+                    .background(
+                        cardGradient(isExpanded: true, theme: themeManager.selectedTheme)
+                            // If you don't have a custom corner extension, use a standard clip
+                            .cornerRadius(isLast ? 10 : 0)
+                    )
+                    .padding(.horizontal, 10)
             }
         }
-        .background(cardGradient(isExpanded: isExpanded, theme: theme))
-        .cornerRadius(10)
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.separator), lineWidth: 0.5))
-        .padding(.vertical, 10)
-        .padding(.horizontal, 10)
     }
-
+    
     @ViewBuilder
     public func itemRow(item: ItemEntity, isLast: Bool) -> some View {
-        Group {
-            if viewModel.isItemHidden(item) {
-                groupedListRow(for: item)
-                    .padding(.horizontal, 15)
-            } else {
-                SwipeToDeleteRow(onDelete: { deleteItem(item) }) {
-                    groupedListRow(for: item)
-                        .padding(.horizontal, 15)
-                        .background(Color.clear)
-                        .contentShape(.rect)
+        VStack(spacing: 0) {
+            groupedListRow(for: item)
+                .padding(.horizontal, 15)
+                .frame(minHeight: 44)
+                .background(Color.clear)
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button(role: .destructive) {
+                        deleteItem(item)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
                 }
+            
+            if !isLast {
+                Rectangle()
+                    .frame(height: 0.5)
+                    .foregroundStyle(Color(.separator))
+                    .padding(.horizontal, 15)
             }
         }
-        .id(item.objectID)
-        
-        if !isLast {
-            Rectangle()
-                .frame(height: 0.5)
-                .foregroundStyle(Color(.separator))
-                .padding(.horizontal, 15)
-        }
     }
-
+    
+    
     public func expansionDivider(theme: BackgroundTheme) -> some View {
         Rectangle()
             .frame(height: 1)

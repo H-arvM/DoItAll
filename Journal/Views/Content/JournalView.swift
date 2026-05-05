@@ -52,10 +52,11 @@ struct JournalView: View {
                         .padding(.horizontal, 10)
                     
                     headerSection
-                        .padding(.vertical, 5)
+                        .padding(.vertical, 15)
                     
                     PulsingDividerBar()
                         .padding(.vertical, 4)
+                        .padding(.horizontal, 20)
                     
                     contentSection
                     

@@ -148,11 +148,6 @@
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
-		D26D483B2F43553A009575A7 /* GeneralList */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = GeneralList;
-			sourceTree = "<group>";
-		};
 		D28C51882E6C9A7C00B65946 /* Resources */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Resources;
@@ -224,7 +219,6 @@
 				D2D1B99D2F7430A6003A18BF /* Models */,
 				D2D1B9982F742E12003A18BF /* Extensions */,
 				D29930D92F59DF5C00624DCE /* Onboarding */,
-				D26D483B2F43553A009575A7 /* GeneralList */,
 				D25A554B2F3E3E6100BEC4A3 /* CommonUI */,
 				D25A55382F3E256F00BEC4A3 /* LifeAdmin */,
 				D25A55352F3E212B00BEC4A3 /* FreeForm */,
@@ -385,7 +379,6 @@
 				D25A55352F3E212B00BEC4A3 /* FreeForm */,
 				D25A55382F3E256F00BEC4A3 /* LifeAdmin */,
 				D25A554B2F3E3E6100BEC4A3 /* CommonUI */,
-				D26D483B2F43553A009575A7 /* GeneralList */,
 				D28C51882E6C9A7C00B65946 /* Resources */,
 				D29930D92F59DF5C00624DCE /* Onboarding */,
 				D29E22D62E63651900000F8A /* Journal */,

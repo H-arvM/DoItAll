@@ -43,6 +43,7 @@ struct FreeFormView: View {
                 
                 PulsingDividerBar()
                     .padding(.vertical, 4)
+                    .padding(.horizontal, 20)
                 
                 textEditorSection
                 

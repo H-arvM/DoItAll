@@ -15,7 +15,7 @@ struct GenericSingularHeaderSection<T: HeaderProviderProtocol>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(viewModel.createdDate.formalFormatString)
-                .font(.title2)
+                .font(.largeTitle)
                 .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .primary)
         }
         .padding(.horizontal, 20)
