@@ -138,7 +138,7 @@ struct ContentView: View {
         List {
             ForEach(viewModel.items, id: \.self) { item in
                 listRow(for: item)
-                    .listRowInsets(rowInsets(for: viewModel.currentSortOption))
+                    .listRowInsets(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10))
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
             }
@@ -181,8 +181,7 @@ struct ContentView: View {
                     }
                         .opacity(0)
                 )
-                .listRowInsets(rowInsets(for: viewModel.currentSortOption))
-                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10))                .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
         }
     }
@@ -237,6 +236,7 @@ struct ContentView: View {
                 .zIndex(2)
                 .allowsHitTesting(true)
         }
+        .padding(.trailing, 10)
     }
     
     private func hiddenGroupedListRow(for item: ItemEntity) -> some View {
