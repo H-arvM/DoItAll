@@ -20,49 +20,61 @@ extension ContentView {
             isExpanded: Binding(
                 get: { self.expandedSections.contains(type) },
                 set: { isOpen in
-                    withAnimation {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                         if isOpen { self.expandedSections.insert(type) }
-                        else { self.expandedSections.remove(type) }
+                        else      { self.expandedSections.remove(type) }
                     }
                 }
             )
         )
         .padding(.horizontal, 8)
         .background(
-            cardGradient(isExpanded: isExpanded, theme: theme)
-                .cornerRadius(10)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Color(.separator), lineWidth: 0.5)
+            ZStack {
+                RoundedCorner(radius: 10, corners: isExpanded ? [.topLeft, .topRight] : .allCorners)
+                    .fill(.ultraThinMaterial)
+                    .opacity(0.85)
+
+                cardGradient(isExpanded: isExpanded, theme: theme)
+                    .clipShape(RoundedCorner(radius: 10, corners: isExpanded ? [.topLeft, .topRight] : .allCorners))
+                    .opacity(0.6)
+            }
         )
         .padding(.horizontal, 10)
         .padding(.top, 10)
 
         if isExpanded {
             let itemsArray = items
-            
+
             ForEach(itemsArray, id: \.objectID) { item in
                 let isLast = item.objectID == itemsArray.last?.objectID
-                
+
                 itemRow(item: item, isLast: isLast)
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button(role: .destructive) {
-                            deleteItem(item)
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
-                    }
                     .background(
-                        cardGradient(isExpanded: true, theme: themeManager.selectedTheme)
-                            // If you don't have a custom corner extension, use a standard clip
-                            .cornerRadius(isLast ? 10 : 0)
+                        ZStack {
+                            RoundedCorner(radius: isLast ? 10 : 0, corners: [.bottomLeft, .bottomRight])
+                                .fill(.thinMaterial)
+                                .opacity(0.75)
+
+                            cardGradient(isExpanded: true, theme: theme)
+                                .clipShape(RoundedCorner(radius: isLast ? 10 : 0, corners: [.bottomLeft, .bottomRight]))
+                                .opacity(0.5)
+                        }
+                    )
+                    .overlay(
+                        VStack {
+                            if item.objectID != itemsArray.first?.objectID {
+                                Rectangle()
+                                    .frame(height: 0.5)
+                                    .foregroundStyle(Color.white.opacity(0.15))
+                            }
+                            Spacer()
+                        }
                     )
                     .padding(.horizontal, 10)
             }
         }
     }
-    
+
     @ViewBuilder
     public func itemRow(item: ItemEntity, isLast: Bool) -> some View {
         VStack(spacing: 0) {
@@ -70,14 +82,6 @@ extension ContentView {
                 .padding(.horizontal, 15)
                 .frame(minHeight: 44)
                 .background(Color.clear)
-                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                    Button(role: .destructive) {
-                        deleteItem(item)
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                }
-            
             if !isLast {
                 Rectangle()
                     .frame(height: 0.5)
@@ -87,24 +91,11 @@ extension ContentView {
         }
     }
     
-    
-    public func expansionDivider(theme: BackgroundTheme) -> some View {
-        Rectangle()
-            .frame(height: 1)
-            .foregroundStyle(
-                LinearGradient(
-                    colors: [theme.primaryColour.opacity(0.6), theme.secondaryColour.opacity(0.4), theme.primaryColour.opacity(0.6)],
-                    startPoint: .leading, endPoint: .trailing
-                )
-            )
-            .transition(.opacity.combined(with: .scale(scale: 1.0, anchor: .top)))
-    }
-
     public func cardGradient(isExpanded: Bool, theme: BackgroundTheme) -> LinearGradient {
         LinearGradient(
             colors: [
-                theme.primaryColour.opacity(isExpanded ? 0.15 : 0.1),
-                theme.secondaryColour.opacity(isExpanded ? 0.1 : 0.05)
+                theme.primaryColour.opacity(isExpanded ? 0.25 : 0.15),
+                theme.secondaryColour.opacity(isExpanded ? 0.18 : 0.08)
             ],
             startPoint: .leading,
             endPoint: .trailing
@@ -116,8 +107,8 @@ extension ContentView {
             .frame(height: 0)
             .background(
                 GeometryReader { geometry in
-                    let raw = geometry.frame(in: .named("scroll")).minY
-                    let rounded = (raw / 10).rounded() * 10 
+                    let raw     = geometry.frame(in: .named("scroll")).minY
+                    let rounded = (raw / 10).rounded() * 10
                     return Color.clear.preference(
                         key: ScrollOffsetPreferenceKey.self,
                         value: rounded
@@ -128,18 +119,18 @@ extension ContentView {
             .listRowSeparator(.hidden)
             .listRowBackground(Color.clear)
     }
-    
+
     @ViewBuilder
     public func hiddenOverlay(for item: ItemEntity) -> some View {
         let theme = themeManager.selectedTheme
-        
+
         HStack {
             HiddenIndicatorView(onLongPress: {
                 viewModel.handleLongPress(for: item)
             })
             .frame(height: rowHeight)
             .padding(.trailing, 5)
-            
+
             VStack {
                 Spacer()
                 Image(systemName: "chevron.right")
@@ -152,16 +143,22 @@ extension ContentView {
     }
 
     @ViewBuilder
-    public func hiddenRowBackground(for item: ItemEntity) -> some View {
-        GeometryReader { geometry in
+    public func hiddenRowBackground(for item: ItemEntity, isGrouped: Bool = false) -> some View {
+        if isGrouped {
             GlassMorphicBackground()
-                .frame(width: UIScreen.screenWidth, height: rowHeight)
-                .offset(x: -geometry.frame(in: .global).minX)
+                .frame(height: rowHeight)
                 .id(item.id)
+        } else {
+            GeometryReader { geometry in
+                GlassMorphicBackground()
+                    .frame(width: UIScreen.screenWidth, height: rowHeight)
+                    .offset(x: -geometry.frame(in: .global).minX)
+                    .id(item.id)
+            }
+            .frame(height: rowHeight)
         }
-        .frame(height: rowHeight)
     }
-    
+
     @ViewBuilder
     public func rowVariant(for item: ItemEntity, sortOption: SortOption) -> some View {
         if sortOption == .type {
@@ -186,8 +183,9 @@ extension ContentView {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 rowContent(for: item)
-                Spacer()
-                    .frame(width: 18)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
             }
             .contentShape(.rect)
             .frame(height: rowHeight)
@@ -227,6 +225,30 @@ extension ContentView {
             bottom: 0,
             trailing: sortOption == .type ? -5 : 10
         )
+    }
+
+    private struct RoundedCorner: Shape {
+        var radius: CGFloat = .infinity
+        var corners: UIRectCorner = .allCorners
+
+        func path(in rect: CGRect) -> Path {
+            let path = UIBezierPath(
+                roundedRect: rect,
+                byRoundingCorners: corners,
+                cornerRadii: CGSize(width: radius, height: radius)
+            )
+            return Path(path.cgPath)
+        }
+    }
+
+    private struct AnyShape: Shape {
+        private let _path: (CGRect) -> Path
+
+        init<S: Shape>(_ shape: S) {
+            _path = { rect in shape.path(in: rect) }
+        }
+
+        func path(in rect: CGRect) -> Path { _path(rect) }
     }
 }
 

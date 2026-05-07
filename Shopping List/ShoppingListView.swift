@@ -108,7 +108,7 @@ struct ShoppingListView: View {
             
             Text(item.name ?? "New Item")
                 .strikethrough(item.isChecked)
-                .lineLimit(2)
+                .lineLimit(1)
             
             Spacer()
             
