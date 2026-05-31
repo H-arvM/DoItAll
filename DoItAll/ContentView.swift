@@ -143,7 +143,7 @@ struct ContentView: View {
                     .listRowSeparator(.hidden)
             }
             .onDelete { indexSet in
-                indexSet.forEach { deleteItem(viewModel.items[$0]) }
+                indexSet.forEach { viewModel.deleteItem(viewModel.items[$0]) }
             }
         }
         .listStyle(.plain)
@@ -190,7 +190,7 @@ struct ContentView: View {
         rowVariant(for: item, sortOption: viewModel.currentSortOption)
             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                 Button(role: .destructive) {
-                    deleteItem(item)
+                    viewModel.deleteItem(item)
                 } label: {
                     Label("Delete", systemImage: "trash")
                 }
@@ -205,38 +205,6 @@ struct ContentView: View {
         } else {
             normalListRow(for: item)
         }
-    }
-    
-    public func hiddenListRow(for item: ItemEntity) -> some View {
-        hiddenRowContent(for: item)
-            .contentShape(.rect)
-            .onTapGesture {
-                viewModel.handleHiddenItemTap(item)
-            }
-            .listRowInsets(EdgeInsets())
-            .listRowBackground(rowBackground(for: item))
-            .listRowSeparator(.hidden)
-            .background(glassBackground(for: item))
-    }
-    
-    public func hiddenRowContent(for item: ItemEntity) -> some View {
-        ZStack(alignment: .leading) {
-            HStack(spacing: 0) {
-                rowContent(for: item)
-            }
-            .contentShape(Rectangle())
-            .frame(height: rowHeight)
-            
-            hiddenIndicatorIcon(for: item)
-                .frame(height: rowHeight)
-                .zIndex(1)
-                .allowsHitTesting(true)
-            
-            navigationArrow(for: item)
-                .zIndex(2)
-                .allowsHitTesting(true)
-        }
-        .padding(.trailing, 10)
     }
     
     private func hiddenGroupedListRow(for item: ItemEntity) -> some View {
@@ -257,7 +225,7 @@ struct ContentView: View {
                 .frame(height: rowHeight)
                 .allowsHitTesting(true)
             
-            hiddenOverlay(for: item)
+            hiddenGroupedOverlay(for: item)
                 .zIndex(1)
         }
         .frame(maxWidth: .infinity)
@@ -267,51 +235,6 @@ struct ContentView: View {
     @ViewBuilder
     private func rowBackground(for item: ItemEntity) -> some View {
         Color.clear
-    }
-    
-    @ViewBuilder
-    private func navigationArrow(for item: ItemEntity) -> some View {
-        if viewModel.isItemHidden(item) {
-            HStack {
-                Spacer()
-                VStack {
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                }
-            }
-            .frame(height: rowHeight)
-        }
-    }
-    
-    @ViewBuilder
-    private func hiddenIndicatorIcon(for item: ItemEntity) -> some View {
-        if viewModel.isItemHidden(item) {
-            VStack {
-                Spacer()
-                HiddenIndicatorView(onLongPress: {
-                    viewModel.handleLongPress(for: item)
-                })
-                Spacer()
-            }
-            .padding(.leading, 20)
-            .frame(height: rowHeight)
-        }
-    }
-    
-    @ViewBuilder
-    private func glassBackground(for item: ItemEntity) -> some View {
-        GeometryReader { geometry in
-            if viewModel.isItemHidden(item) {
-                GlassMorphicBackground()
-                    .frame(width: UIScreen.screenWidth, height: rowHeight)
-                    .offset(x: -geometry.frame(in: .global).minX)
-                    .id(item.id)
-            }
-        }
-        .frame(height: rowHeight)
     }
     
     public func rowContent(for item: ItemEntity) -> some View {
@@ -432,14 +355,6 @@ struct ContentView: View {
             }
     }
     
-    public func deleteItem(_ item: ItemEntity) {
-        withAnimation {
-            viewContext.delete(item)
-            try? viewContext.save()
-            viewModel.loadItems()
-        }
-    }
-    
     public var rowHeight: CGFloat {
         viewModel.currentSortOption == .type ? 80 : 100
     }
@@ -452,7 +367,7 @@ struct ContentView: View {
     }
     
     private func rowInsets(for sortOption: SortOption) -> EdgeInsets {
-        EdgeInsets(top: 0, leading: sortOption == .type ? 5 : -5, bottom: 0, trailing: sortOption == .type ? 5 : -5)
+        EdgeInsets(top: 0, leading: sortOption == .type ? 10 : -5, bottom: 0, trailing: sortOption == .type ? 10 : -5)
     }
 }
 

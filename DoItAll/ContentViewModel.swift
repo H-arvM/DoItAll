@@ -81,6 +81,14 @@ class ContentViewModel: NSObject, ObservableObject, ListViewModelProtocol, NSFet
         self.items = fetchedResultsController.fetchedObjects ?? []
     }
     
+    public func deleteItem(_ item: ItemEntity) {
+        withAnimation {
+            viewContext.delete(item)
+            try? viewContext.save()
+            loadItems()
+        }
+    }
+    
     private func getSortDescriptors() -> [NSSortDescriptor] {
         switch currentSortOption {
         case .dateCreated:

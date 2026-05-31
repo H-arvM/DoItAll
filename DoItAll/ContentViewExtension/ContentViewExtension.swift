@@ -121,7 +121,7 @@ extension ContentView {
     }
 
     @ViewBuilder
-    public func hiddenOverlay(for item: ItemEntity) -> some View {
+    public func hiddenGroupedOverlay(for item: ItemEntity) -> some View {
         let theme = themeManager.selectedTheme
 
         HStack {
@@ -130,6 +130,7 @@ extension ContentView {
             })
             .frame(height: rowHeight)
             .padding(.trailing, 5)
+            .padding(.leading, 10)
 
             VStack {
                 Spacer()
@@ -137,7 +138,9 @@ extension ContentView {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(theme.secondaryTextColour ?? .secondary)
                 Spacer()
+                    
             }
+            .padding(.trailing, 10)
             .frame(height: rowHeight)
         }
     }
