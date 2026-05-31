@@ -132,14 +132,14 @@ extension ContentView {
             .padding(.trailing, 5)
             .padding(.leading, 10)
 
-            VStack {
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(theme.secondaryTextColour ?? .secondary)
-                Spacer()
-                    
-            }
+//            VStack {
+//                Spacer()
+//                Image(systemName: "chevron.right")
+//                    .font(.system(size: 14, weight: .semibold))
+//                    .foregroundStyle(theme.secondaryTextColour ?? .secondary)
+//                Spacer()
+//                    
+//            }
             .padding(.trailing, 10)
             .frame(height: rowHeight)
         }

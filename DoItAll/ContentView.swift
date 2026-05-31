@@ -137,8 +137,8 @@ struct ContentView: View {
     private var simpleList: some View {
         List {
             ForEach(viewModel.items, id: \.self) { item in
-                listRow(for: item)
-                    .listRowInsets(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10))
+                simpleListRow(for: item)
+                    .listRowInsets(rowInsets(for: viewModel.currentSortOption))
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
             }
@@ -153,7 +153,7 @@ struct ContentView: View {
     }
     
     @ViewBuilder
-    private func listRow(for item: ItemEntity) -> some View {
+    private func simpleListRow(for item: ItemEntity) -> some View {
         let isHidden = viewModel.isItemHidden(item)
         
         if isHidden {
@@ -169,11 +169,11 @@ struct ContentView: View {
                 .onTapGesture {
                     viewModel.handleHiddenItemTap(item)
                 }
-                .listRowInsets(rowInsets(for: viewModel.currentSortOption))
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: -10))
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
         } else {
-            normalListRow(for: item)
+            visibleRows(for: item)
                 .background(
                     NavigationLink(value: ItemNavigationDestination(itemID: item.objectID, itemType: item.itemType)) {
                         EmptyView()
@@ -181,12 +181,13 @@ struct ContentView: View {
                     }
                         .opacity(0)
                 )
-                .listRowInsets(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10))                .listRowBackground(Color.clear)
+                .listRowInsets(rowInsets(for: viewModel.currentSortOption))
+                .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
         }
     }
     
-    private func normalListRow(for item: ItemEntity) -> some View {
+    private func visibleRows(for item: ItemEntity) -> some View {
         rowVariant(for: item, sortOption: viewModel.currentSortOption)
             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                 Button(role: .destructive) {
@@ -203,7 +204,7 @@ struct ContentView: View {
         if viewModel.isItemHidden(item) {
             hiddenGroupedListRow(for: item)
         } else {
-            normalListRow(for: item)
+            visibleRows(for: item)
         }
     }
     
@@ -367,7 +368,7 @@ struct ContentView: View {
     }
     
     private func rowInsets(for sortOption: SortOption) -> EdgeInsets {
-        EdgeInsets(top: 0, leading: sortOption == .type ? 10 : -5, bottom: 0, trailing: sortOption == .type ? 10 : -5)
+        EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
     }
 }
 
