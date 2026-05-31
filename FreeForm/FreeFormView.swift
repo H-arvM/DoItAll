@@ -16,9 +16,13 @@ struct FreeFormView: View {
     
     let mode: EditOrViewMode
     var onSave: (() -> Void)?
+    
     private var isViewMode: Bool { mode == .view }
 
-    init(mode: EditOrViewMode = .edit, entry: FreeWritingEntry? = nil, initialEntryType: EntryType = .freeForm, onSave: (() -> Void)? = nil) {
+    init(mode: EditOrViewMode = .edit,
+         entry: FreeWritingEntry? = nil,
+         initialEntryType: EntryType = .freeForm,
+         onSave: (() -> Void)? = nil) {
         self.mode = mode
         self.onSave = onSave
         _viewModel = StateObject(wrappedValue: FreeFormViewModel(entry: entry, initialEntryType: initialEntryType))
@@ -26,11 +30,21 @@ struct FreeFormView: View {
     
     var body: some View {
         ZStack {
-            Color(uiColor: .systemGroupedBackground)
+            ThemeBackgroundView(theme: themeManager.selectedTheme)
                 .ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: 24) {
-                GenericHeaderSection(mode: mode, viewModel: viewModel, themeManager: themeManager)
+                GenericHeaderMultiSection(
+                    mode: mode,
+                    viewModel: viewModel,
+                    themeManager: themeManager
+                )
+                .padding(.horizontal, 20)
+                
+                PulsingDividerBar()
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 20)
+                
                 textEditorSection
                 
                 if !viewModel.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -38,29 +52,31 @@ struct FreeFormView: View {
                 }
             }
         }
-        .navigationTitle("Free Form")
+        .navigationBarBackButtonHidden(mode == .edit)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            if !isViewMode {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        viewModel.saveFreeform(context: viewContext) {
-                            onSave?()
-                            dismiss()
-                        }
-                    } label: {
-                        Image(systemName: "square.and.arrow.down")
-                            .foregroundStyle(themeManager.selectedTheme.primaryColour)
-                    }
-                }
-            }
-        }
+        .toolbar { toolbarItems }
         .onAppear {
             if !isViewMode {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     isTextFieldFocused = true
                 }
             }
+        }
+    }
+    
+    @ToolbarContentBuilder
+    private var toolbarItems: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            if mode == .edit {
+                CancelButton()
+            }
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+            SaveButton(
+                viewModel: viewModel,
+                context: viewContext,
+                onSave: onSave ?? { dismiss() }
+            )
         }
     }
     
@@ -87,6 +103,7 @@ struct FreeFormView: View {
         .animation(.easeInOut(duration: 0.2), value: viewModel.wordCount)
     }
 }
+
 #Preview {
     FreeFormView(mode: .edit, entry: nil, initialEntryType: .freeForm)
 }

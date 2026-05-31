@@ -9,8 +9,9 @@ import SwiftUI
 import CoreData
 import PhotosUI
 
-final class NotesViewModel: ObservableObject, @MainActor HeaderProviderProtocol {
-    // MARK: - Published Properties
+@MainActor
+final class NotesViewModel: ObservableObject, @MainActor HeaderProviderProtocol, @MainActor CoreDataSaveable {
+    
     @Published var title: String = ""
     @Published var newItemText: String = ""
     @Published var createdDate: Date = Date()
@@ -18,7 +19,6 @@ final class NotesViewModel: ObservableObject, @MainActor HeaderProviderProtocol 
 
     public var existingEntry: CheckListEntry?
 
-    // MARK: - Init
     init(entry: CheckListEntry? = nil, initialEntryType: EntryType = .list) {
         self.existingEntry = entry
         
@@ -40,8 +40,6 @@ final class NotesViewModel: ObservableObject, @MainActor HeaderProviderProtocol 
         let set = (existingEntry?.items as? Set<CheckListItem>) ?? []
         return set.sorted { ($0.note ?? "") < ($1.note ?? "") }
     }
-
-    // MARK: - List Actions
     
     func addItem(context: NSManagedObjectContext) {
         guard !newItemText.isEmpty else { return }
@@ -79,8 +77,6 @@ final class NotesViewModel: ObservableObject, @MainActor HeaderProviderProtocol 
         context.delete(item)
         saveNotesEntry(context: context)
     }
-
-    // MARK: - Persistence Logic
     
     private func getOrCreateEntry(in context: NSManagedObjectContext) -> CheckListEntry {
         if let existing = existingEntry { return existing }
@@ -112,7 +108,7 @@ final class NotesViewModel: ObservableObject, @MainActor HeaderProviderProtocol 
         do {
             try context.save()
             existingEntry = entry
-            objectWillChange.send() // Force UI update for the sortedItems
+            objectWillChange.send()
             postSaveNotification()
             onSuccess?()
         } catch {
@@ -126,11 +122,15 @@ final class NotesViewModel: ObservableObject, @MainActor HeaderProviderProtocol 
         case .shoppingList: return ItemType.shoppingListType.rawValue
         case .freeForm: return ItemType.freeFormType.rawValue
         case .lifeAdmin: return ItemType.lifeAdminType.rawValue
-        case .list: return ItemType.generalListType.rawValue
+        case .list: return ItemType.generalNoteType.rawValue
         }
     }
 
     private func postSaveNotification() {
         NotificationCenter.default.post(name: NSNotification.Name("CheckListEntrySaved"), object: nil)
+    }
+    
+    func save(context: NSManagedObjectContext, completion: @escaping () -> Void) {
+        saveNotesEntry(context: context, onSuccess: completion)
     }
 }

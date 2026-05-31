@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct ExpandedPhotosView: View {
-    let mode: EditOrViewMode
     @ObservedObject var viewModel: JournalViewModel
+    let mode: EditOrViewMode
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -31,7 +31,6 @@ struct ExpandedPhotosView: View {
                         }
                 }
             }
-            .padding(.horizontal, 20)
         }
         .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
     }
@@ -47,7 +46,7 @@ extension View {
         }
     }
 }
-//
+
 //#Preview {
-//    ExpandedPhotosVIew()
+//    ExpandedPhotosView(mode: .edit, viewModel: viewModel)
 //}

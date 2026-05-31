@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import CoreData
 import LocalAuthentication
 import MapKit
 import Combine
@@ -23,22 +22,16 @@ struct ScrollOffsetPreferenceKey: PreferenceKey {
 struct ContentView: View {
     @Environment(\.colorScheme) var colourScheme
     @Environment(\.managedObjectContext) private var viewContext
-    @StateObject private var viewModel = ContentViewModel()
-    @StateObject private var themeManager = ThemeManager.shared
-    @State private var showSortOptions: Bool = false
-    @State private var expandedSections: Set<ItemType> = Set(ItemType.allCases)
-    @State private var scrollOffSet: CGFloat = 0
-    @State private var lastScrollOffset: CGFloat = 0
-    @State private var isScrolling: Bool = false
-    @State private var hideButtonsWorkItem: DispatchWorkItem?
-    @State private var isShowingSelectEntry = false
+    @StateObject public var viewModel = ContentViewModel()
+    @StateObject public var themeManager = ThemeManager.shared
+    @State public var showSortOptions: Bool = false
+    @State public var expandedSections: Set<ItemType> = Set(ItemType.allCases)
+    @State public var isShowingSelectEntry = false
     
-    @State private var lastScrollTime: TimeInterval = 0
-    @State private var consecutiveVelocityHits: Int = 0
-    @State private var scrollDetectionEnabled: Bool = false
+    private let titleLimit = 50
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $viewModel.navigationPath) {
             mainContent
         }
         .alert("Authentication required", isPresented: $viewModel.showAuthAlert) {
@@ -56,9 +49,6 @@ struct ContentView: View {
             viewModel.setupViewModel()
             viewModel.checkOnboarding()
             viewModel.loadItems()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                scrollDetectionEnabled = true
-            }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("JournalEntrySaved"))) { _ in
             viewModel.loadItems()
@@ -84,35 +74,235 @@ struct ContentView: View {
         ZStack {
             ThemeBackgroundView(theme: themeManager.selectedTheme)
             itemsList
-            floatingButtonOverlay()
+            SettingsButton(viewModel: viewModel)
         }
-        .navigationDestination(for: ItemEntity.self) { item in
-            navigationDestination(for: item)
+        .navigationDestination(for: ItemNavigationDestination.self) { destination in
+            if let item = try? viewContext.existingObject(with: destination.itemID) as? ItemEntity {
+                destinationView(for: destination.itemType, item: item)
+            }
         }
         .toolbar {
             toolbarContent
         }
     }
-
+    
+    var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .primaryAction) {
+            Button {
+                isShowingSelectEntry = true
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(themeManager.selectedTheme.iconColour)
+            }
+        }
+    }
+    
     @ViewBuilder
-    private func navigationDestination(for item: ItemEntity) -> some View {
-        let itemType = ItemType(rawValue: item.type ?? "") ?? .journalType
-        let isVisible = !viewModel.isItemHidden(item) || viewModel.selectedItem == item
-
-        if isVisible {
-            destinationView(for: itemType, item: item)
+    private var itemsList: some View {
+        if viewModel.items.isEmpty {
+            PlaceHolderContentView()
         } else {
-            EmptyView()
+            listViewContent
         }
     }
-
+    
+    public var listViewContent: some View {
+        Group {
+            if viewModel.currentSortOption == .type {
+                groupedList
+                    .cornerRadius(10)
+            } else {
+                simpleList
+            }
+        }
+    }
+    
+    public var groupedList: some View {
+        List {
+            ForEach(viewModel.sortedItemTypes, id: \.self) { type in
+                Section {
+                    sectionCard(for: type)
+                }
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+    }
+    
     @ViewBuilder
-    private var authAlertMessage: some View {
-        if let error = viewModel.authError {
-            Text(error.errorDescription ?? "An error occurred")
+    private var simpleList: some View {
+        List {
+            ForEach(viewModel.items, id: \.self) { item in
+                simpleListRow(for: item)
+                    .listRowInsets(rowInsets(for: viewModel.currentSortOption))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+            }
+            .onDelete { indexSet in
+                indexSet.forEach { viewModel.deleteItem(viewModel.items[$0]) }
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .transition(.opacity)
+        .background(Color.clear)
+    }
+    
+    @ViewBuilder
+    private func simpleListRow(for item: ItemEntity) -> some View {
+        let isHidden = viewModel.isItemHidden(item)
+        
+        if isHidden {
+            rowVariant(for: item, sortOption: viewModel.currentSortOption)
+                .overlay(alignment: .leading) {
+                    HiddenIndicatorView(onLongPress: {
+                        viewModel.handleLongPress(for: item)
+                    })
+                    .padding(.leading, 20)
+                }
+                .background(AnyView(GlassMorphicBackground()))
+                .contentShape(.rect)
+                .onTapGesture {
+                    viewModel.handleHiddenItemTap(item)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: -10))
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+        } else {
+            visibleRows(for: item)
+                .listRowInsets(rowInsets(for: viewModel.currentSortOption))
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
         }
     }
-
+    
+    private func visibleRows(for item: ItemEntity) -> some View {
+        rowVariant(for: item, sortOption: viewModel.currentSortOption)
+            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                Button(role: .destructive) {
+                    viewModel.deleteItem(item)
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
+            .simultaneousGesture(longPressGesture(for: item))
+    }
+    
+    @ViewBuilder
+    public func groupedListRow(for item: ItemEntity) -> some View {
+        if viewModel.isItemHidden(item) {
+            hiddenGroupedListRow(for: item)
+        } else {
+            visibleRows(for: item)
+        }
+    }
+    
+    private func hiddenGroupedListRow(for item: ItemEntity) -> some View {
+        hiddenGroupedRowContent(for: item)
+            .contentShape(.rect)
+            .onTapGesture {
+                viewModel.handleHiddenItemTap(item)
+            }
+    }
+    
+    private func hiddenGroupedRowContent(for item: ItemEntity) -> some View {
+        ZStack(alignment: .leading) {
+            GlassMorphicBackground()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            
+            rowContent(for: item)
+                .contentShape(Rectangle())
+                .frame(height: rowHeight)
+                .allowsHitTesting(true)
+            
+            hiddenGroupedOverlay(for: item)
+                .zIndex(1)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, -15)
+    }
+    
+    @ViewBuilder
+    private func rowBackground(for item: ItemEntity) -> some View {
+        Color.clear
+    }
+    
+    public func rowContent(for item: ItemEntity) -> some View {
+        let theme = themeManager.selectedTheme
+        let isHidden = viewModel.isItemHidden(item)
+        
+        return HStack {
+            if viewModel.currentSortOption == .dateCreated {
+                Image(systemName: item.itemType.iconName)
+                    .font(.system(size: isHidden ? 16 : 20, weight: .medium))
+                    .foregroundStyle(theme.iconColour)
+                    .frame(width: isHidden ? 24 : 28)
+                    .opacity(isHidden ? 0 : 1)
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                switch item.itemType {
+                case .journalType:
+                    let content = item.journalEntry?.content ?? ""
+                    themedTextStack(
+                        title: String(content.prefix(titleLimit)),
+                        subtitle: item.journalEntry?.createdDate?.funFormatString
+                    )
+                    
+                case .shoppingListType:
+                    let content = viewModel.getShoppingListContent(item.shoppingEntry)
+                    themedTextStack(
+                        title: content,
+                        subtitle: item.createdAt?.funFormatString ?? Date().funFormatString
+                    )
+                    
+                case .freeFormType:
+                    themedTextStack(
+                        title: item.freeWritingEntry?.title ?? item.title ?? "No title",
+                        subtitle: item.createdAt?.funFormatString ?? Date().funFormatString
+                    )
+                    
+                case .lifeAdminType:
+                    themedTextStack(
+                        title: item.taskItemEntry?.entryType ?? item.title ?? "No title",
+                        subtitle: item.createdAt?.funFormatString ?? Date().funFormatString
+                    )
+                    
+                case .generalNoteType:
+                    themedTextStack(
+                        title: viewModel.getChecklistContent(item.checkListEntry),
+                        subtitle: nil
+                    )
+                }
+            }
+            .opacity(isHidden ? 0 : 1)
+        }
+        .opacity(isHidden ? 0.01 : 1)
+        .frame(maxWidth: .infinity, minHeight: rowHeight, alignment: .leading)
+        .padding(.horizontal, 5)
+        .background(Color.clear)
+    }
+    
+    @ViewBuilder
+    private func themedTextStack(title: String, subtitle: String?) -> some View {
+        let theme = themeManager.selectedTheme
+        
+        Text(title)
+            .lineLimit(1)
+            .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
+            .foregroundStyle(theme.primaryTextColour ?? .primary)
+        
+        if let subtitle = subtitle {
+            Text(subtitle)
+                .font(.caption2)
+                .foregroundStyle(theme.secondaryTextColour ?? .secondary)
+        }
+    }
+    
     @ViewBuilder
     private var sortOptionsContent: some View {
         ForEach(SortOption.allCases, id: \.self) { option in
@@ -136,697 +326,46 @@ struct ContentView: View {
             )
             
         case .shoppingListType:
-            ShoppingEntryView(entry: item.getOrCreateShoppingEntry(context: viewContext))
+            ShoppingListView(entry: item.getOrCreateShoppingEntry(context: viewContext))
             
         case .freeFormType:
-            FreeFormView(mode: item.freeWritingEntry == nil ? .edit : .view,
-                         entry: item.getOrCreateFreeWritingEntry(context: viewContext)
+            FreeFormView(
+                mode: item.freeWritingEntry == nil ? .edit : .view,
+                entry: item.getOrCreateFreeWritingEntry(context: viewContext)
             )
             
         case .lifeAdminType:
             LifeAdminView(entry: item.getOrCreateAdminEntry(context: viewContext))
             
-        case .generalListType:
+        case .generalNoteType:
             NoteListView(entry: item.getOrCreateChecklistEntry(context: viewContext))
         }
     }
     
-    var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .primaryAction) {
-            Button {
-                isShowingSelectEntry = true
-            } label: {
-                Image(systemName: "plus")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(themeManager.selectedTheme.iconColour)
-            }
-        }
-    }
-    
-    // MARK: ViewBuilders
-    private var rowHeight: CGFloat {
-        viewModel.currentSortOption == .type ? 80 : 100
-    }
-    
-    @ViewBuilder
-    private var itemsList: some View {
-        if viewModel.currentSortOption == .type {
-            groupedList
-                .cornerRadius(10)
-        } else {
-            simpleList
-        }
-    }
-    
-    @ViewBuilder
-    private var groupedList: some View {
-        List {
-            ForEach(viewModel.sortedItemTypes, id: \.self) { type in
-                Section {
-                    VStack(spacing: 0) {
-                        groupHeader(for: type)
-                            .padding(.horizontal, 8)
-                        
-                        if expandedSections.contains(type) {
-                            Rectangle()
-                                .frame(height: 1)
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [themeManager.selectedTheme.primaryColour.opacity(0.6),
-                                                 themeManager.selectedTheme.secondaryColour.opacity(0.4),
-                                                 themeManager.selectedTheme.primaryColour.opacity(0.6)],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .transition(.opacity.combined(with: .scale(scale: 1.0, anchor: .top)))
-                            
-                            ForEach(viewModel.groupedItems[type] ?? [], id: \.objectID) { item in
-                                if viewModel.isItemHidden(item) {
-                                    /// Hidden rows don't need swipe to delete
-                                    groupedListRow(for: item)
-                                        .id(item.objectID)
-                                        .padding(.horizontal, 15)
-                                } else {
-                                    SwipeToDeleteRow(onDelete: {
-                                        deleteItem(item) }) {
-                                            groupedListRow(for: item)
-                                                .id(item.objectID)
-                                                .padding(.horizontal, 15)
-                                                .background(Color(UIColor.systemBackground))
-                                                .contentShape(.rect)
-                                        }
-                                }
-                                if item != viewModel.groupedItems[type]?.last {
-                                    Rectangle()
-                                        .frame(height: 0.5)
-                                        .foregroundStyle(Color(UIColor.separator))
-                                        .padding(.horizontal, 15)
-                                }
-                            }
-                        }
-                    }
-                    .background(
-                        LinearGradient(
-                            colors: [themeManager.selectedTheme.primaryColour.opacity(expandedSections.contains(type) ? 0.15 : 0.1),
-                                     themeManager.selectedTheme.secondaryColour.opacity(expandedSections.contains(type) ? 0.1 : 0.05)
-                                    ],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .cornerRadius(20)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color(UIColor.separator), lineWidth: 0.5)
-                    )
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 10)
-                }
-                .listRowInsets(EdgeInsets())
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
-            }
-            
-            Color.clear
-                .frame(height: 0)
-                .background(
-                    GeometryReader { geometry in
-                        Color.clear.preference(
-                            key: ScrollOffsetPreferenceKey.self,
-                            value: geometry.frame(in: .named("scroll")).minY
-                        )
-                    }
-                )
-                .listRowInsets(EdgeInsets())
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
-        }
-        .coordinateSpace(name: "scroll")
-        .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-            handleScroll(offset: value)
-        }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-        .transition(.opacity)
-    }
-    
-    @ViewBuilder
-    private var simpleList: some View {
-        List(viewModel.items) { item in
-            if viewModel.isItemHidden(item) {
-                /// Hidden row
-                listRow(for: item)
-            } else {
-                SwipeToDeleteRow(onDelete: { deleteItem(item) }) {
-                    listRow(for: item)
-                }
-            }
-        }
-        .background(
-            GeometryReader { geometry in
-                Color.clear.preference(
-                    key: ScrollOffsetPreferenceKey.self,
-                    value: geometry.frame(in: .named("scroll")).minY
-                )
-            }
-        )
-        .coordinateSpace(name: "scroll")
-        .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-            handleScroll(offset: value)
-        }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-        .transition(.opacity)
-        .background(Color.clear)
-    }
-    
-    @ViewBuilder
-    private func groupHeader(for type: ItemType) -> some View {
-        Button {
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                if expandedSections.contains(type) {
-                    expandedSections.remove(type)
-                } else {
-                    expandedSections.insert(type)
-                }
-            }
-        } label: {
-            HStack(alignment: .center, spacing: 5) {
-                Image(systemName: type.iconName)
-                    .font(.system(size: 22))
-                    .foregroundStyle(themeManager.selectedTheme.iconColour)
-                    .frame(width: 30)
-                
-                Text(type.rawValue)
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                
-                Spacer()
-                
-                Image(systemName: "chevron.down")
-                    .font(.body)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
-                    .rotationEffect(.degrees(expandedSections.contains(type) ? 0 : -90))
-            }
-            .frame(height: 50)
-        }
-        .buttonStyle(.plain)
-    }
-    
-    @ViewBuilder
-    private func listRow(for item: ItemEntity) -> some View {
-        if viewModel.isItemHidden(item) {
-            hiddenListRow(for: item)
-        } else {
-            normalListRow(for: item)
-        }
-    }
-    
-    @ViewBuilder
-    private func groupedListRow(for item: ItemEntity) -> some View {
-        if viewModel.isItemHidden(item) {
-            hiddenGroupedListRow(for: item)
-        } else {
-            normalListRow(for: item)
-        }
-    }
-    
-    private func hiddenListRow(for item: ItemEntity) -> some View {
-        Button {
-            viewModel.handleHiddenItemTap(item)
-        } label: {
-            hiddenRowContent(for: item)
-        }
-        .frame(height: rowHeight)
-        .padding(.leading, viewModel.currentSortOption == .type ? -16 : -8)
-        .padding(.trailing, viewModel.currentSortOption == .type ? 0 : 10)
-        .buttonStyle(.plain)
-        .contentShape(Rectangle())
-        .listRowInsets(EdgeInsets())
-        .listRowBackground(rowBackground(for: item))
-        .listRowSeparator(.hidden)
-        .background(glassBackground(for: item))
-    }
-    
-    private func hiddenRowContent(for item: ItemEntity) -> some View {
-        ZStack(alignment: .leading) {
-            HStack(spacing: 0) {
-                rowContent(for: item)
-            }
-            .contentShape(Rectangle())
-            .frame(height: rowHeight)
-            
-            hiddenIndicatorIcon(for: item)
-                .frame(height: rowHeight)
-                .zIndex(1)
-                .allowsHitTesting(true)
-            
-            navigationArrow(for: item)
-                .zIndex(2)
-                .allowsHitTesting(true)
-        }
-    }
-    
-    // Normal row
-    private func normalListRow(for item: ItemEntity) -> some View {
-        NavigationLink(value: item) {
-            VStack(spacing: 0) {
-                HStack(spacing: 0) {
-                    rowContent(for: item)
-                    if viewModel.currentSortOption == .type {
-                        Spacer()
-                            .frame(width: 18)
-                    }
-                }
-                .contentShape(Rectangle())
-                .frame(height: rowHeight)
-                
-                if item.objectID != viewModel.items.last?.objectID && viewModel.currentSortOption == .dateCreated {
-                    Rectangle()
-                        .frame(height: 0.5)
-                        .foregroundStyle(Color(UIColor.separator))
-                }
-            }
-        }
-        .simultaneousGesture(longPressGesture(for: item))
-        .listRowInsets(EdgeInsets(
-            top: 0,
-            leading: 10,
-            bottom: 0,
-            trailing: viewModel.currentSortOption == .type ? -5 : 10)
-        )
-        .listRowBackground(rowBackground(for: item))
-        .listRowSeparator(.hidden)
-    }
-    
-    private func normalGroupedListRow(for item: ItemEntity) -> some View {
-        Button {
-            viewModel.selectedItem = item
-        } label: {
-            ZStack(alignment: .trailing) {
-                HStack(spacing: 0) {
-                    rowContent(for: item)
-                    Spacer()
-                        .frame(width: 18)
-                }
-                .contentShape(Rectangle())
-                .frame(height: rowHeight)
-                
-                VStack {
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                }
-                .frame(height: rowHeight)
-                .padding(.trailing, 5)
-            }
-        }
-        .buttonStyle(.plain)
-        .simultaneousGesture(longPressGesture(for: item))
-    }
-    
-    private func hiddenGroupedListRow(for item: ItemEntity) -> some View {
-        Button {
-            viewModel.handleHiddenItemTap(item)
-        } label: {
-            hiddenGroupedRowContent(for: item)
-        }
-        .frame(height: rowHeight)
-        .buttonStyle(.plain)
-        .contentShape(Rectangle())
-    }
-    
-    private func hiddenGroupedRowContent(for item: ItemEntity) -> some View {
-        ZStack(alignment: .leading) {
-            HStack(spacing: 0) {
-                rowContent(for: item)
-            }
-            .contentShape(Rectangle())
-            .frame(height: rowHeight)
-            .allowsHitTesting(true)
-            
-            HStack {
-                VStack {
-                    Spacer()
-                    HiddenIndicatorView(onLongPress: {
-                        viewModel.handleLongPress(for: item)
-                    })
-                    Spacer()
-                }
-                .frame(height: rowHeight)
-                .padding(.trailing, 5)
-                
-                VStack {
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                }
-                .frame(height: rowHeight)
-                .allowsHitTesting(true)
-            }
-            .zIndex(1)
-        }
-        .background(
-            GeometryReader { geometry in
-                GlassMorphicBackground()
-                    .frame(width: UIScreen.screenWidth, height: rowHeight)
-                    .offset(x: -geometry.frame(in: .global).minX)
-                    .id(item.id)
-            }
-                .frame(height: rowHeight)
-        )
-    }
-    
-    @ViewBuilder
-    private func rowBackground(for item: ItemEntity) -> some View {
-        Color.clear
-    }
-    
-    @ViewBuilder
-    private func rowContentNotHidden(for item: ItemEntity) -> some View {
-        if viewModel.isItemHidden(item) {
-            HStack(spacing: 0) {
-                rowContent(for: item)
-                
-                if viewModel.currentSortOption == .type {
-                    Spacer()
-                        .frame(width: 18)
-                }
-            }
-            .contentShape(Rectangle())
-            .allowsHitTesting(true)
-        } else {
-            HStack(spacing: 0) {
-                NavigationLink(value: item) {
-                    rowContent(for: item)
-                        .padding(.trailing, 12)
-                }
-                .simultaneousGesture(longPressGesture(for: item))
-                
-                if viewModel.currentSortOption == .type {
-                    Spacer()
-                        .frame(width: 18)
-                }
-            }
-            .contentShape(Rectangle())
-        }
-    }
-    
-    @ViewBuilder
-    private func navigationArrow(for item: ItemEntity) -> some View {
-        if viewModel.isItemHidden(item) {
-            HStack {
-                Spacer()
-                VStack {
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                }
-            }
-            .frame(height: rowHeight)
-        }
-    }
-    
-    @ViewBuilder
-    private func hiddenIndicatorIcon(for item: ItemEntity) -> some View {
-        if viewModel.isItemHidden(item) {
-            VStack {
-                Spacer()
-                HiddenIndicatorView(onLongPress: {
-                    viewModel.handleLongPress(for: item)
-                })
-                Spacer()
-            }
-            .padding(.leading, 20)
-            .frame(height: rowHeight)
-        }
-    }
-    
-    @ViewBuilder
-    private func glassBackground(for item: ItemEntity) -> some View {
-        GeometryReader { geometry in
-            if viewModel.isItemHidden(item) {
-                GlassMorphicBackground()
-                    .frame(width: UIScreen.screenWidth, height: rowHeight)
-                    .offset(x: -geometry.frame(in: .global).minX)
-                    .id(item.id)
-            }
-        }
-        .frame(height: rowHeight)
-    }
-    
-    @ViewBuilder
-    private func floatingButtonOverlay() -> some View {
-        VStack {
-            Spacer()
-            HStack(alignment: .bottom) {
-                FloatingMenuButton(
-                    showSortOptions: $showSortOptions,
-                    currentSortOption: viewModel.currentSortOption,
-                    onToggleSort: {
-                        let allOptions = SortOption.allCases
-                        if let currentIndex = allOptions.firstIndex(of: viewModel.currentSortOption) {
-                            let nextIndex = (currentIndex + 1) % allOptions.count
-                            viewModel.setSortOption(allOptions[nextIndex])
-                        }
-                    }
-                )
-                .padding(.leading, 20)
-                .padding(.bottom, 20)
-                Spacer()
-            }
-        }
-        .offset(y: isScrolling ? 200 : 0)
-        .animation(.easeInOut(duration: 0.3), value: isScrolling)
-        .ignoresSafeArea(.keyboard)
-    }
-    
-    
-    // TODO: Point AI here and have update the CoreData models and consider all the other entryTypes too
-    @ViewBuilder
-    private func rowContent(for item: ItemEntity) -> some View {
-        HStack {
-            if viewModel.currentSortOption == .dateCreated {
-                Image(systemName: item.itemType.iconName)
-                    .font(.system(size: viewModel.isItemHidden(item) ? 16 : 20, weight: .medium))
-                    .foregroundStyle(themeManager.selectedTheme.iconColour)
-                    .frame(width: viewModel.isItemHidden(item) ? 24 : 28)
-                    .opacity(viewModel.isItemHidden(item) ? 0 : 1)
-            }
-            
-            VStack(alignment: .leading, spacing: 4) {
-                switch item.itemType {
-                    
-                case .journalType:
-                    let journalEntry = item.journalEntry
-                    Text(journalEntry?.title ?? "No title")
-                        .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
-                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                    Text(journalEntry?.createdDate?.funFormatString ?? "")
-                        .font(.caption2)
-                        .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
-                    
-                case .shoppingListType:
-                    let shoppingList = item.shoppingEntry
-                    Text("No title")
-                        .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
-                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                    Text(item.createdAt?.funFormatString ?? Date().funFormatString)
-                        .font(.caption2)
-                        .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
-                    
-                case .freeFormType:
-                    let freeForm = item.freeWritingEntry
-                    Text(freeForm?.title ?? item.title ?? "No title")
-                        .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
-                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                    Text(item.createdAt?.funFormatString ?? Date().funFormatString)
-                        .font(.caption2)
-                        .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
-                    
-                case .lifeAdminType:
-                    let lifeAdmin = item.taskItemEntry
-                    Text(lifeAdmin?.entryType ?? item.title ?? "No title")
-                        .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
-                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                    Text(item.createdAt?.funFormatString ?? Date().funFormatString)
-                        .font(.caption2)
-                        .foregroundStyle(themeManager.selectedTheme.secondaryTextColour ?? .secondary)
-                    
-                case .generalListType:
-                    let listItem = item.checkListEntry
-                    Text(listItem?.title ?? item.title ?? "No title")
-                        .font(viewModel.currentSortOption == .type ? .subheadline : .headline)
-                        .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
-                }
-            }
-            .opacity(viewModel.isItemHidden(item) ? 0 : 1)
-        }
-        .opacity(viewModel.isItemHidden(item) ? 0.01 : 1)
-        .frame(maxWidth: .infinity, minHeight: rowHeight, alignment: .leading)
-        .padding(.horizontal, 5)
-    }
-    // MARK: Helper methods
-    
-    private func handleScroll(offset: CGFloat) {
-        let now = CACurrentMediaTime()
-        let timeDelta = now - lastScrollTime
-        let delta = offset - lastScrollOffset
-
-        // Update lastScrollOffset/time for next calculation
-        lastScrollOffset = offset
-        lastScrollTime = now
-
-        // Ignore until detection is enabled to avoid initial layout
-        if !scrollDetectionEnabled {
-            return
-        }
-
-        // Guard against extremely small time deltas (first run or same frame)
-        if timeDelta <= 0 {
-            return
-        }
-
-        // Compute absolute velocity (points per second)
-        let velocity = abs(delta) / CGFloat(timeDelta)
-
-        // Tunable thresholds
-        let minDisplacement: CGFloat = viewModel.scrollMinDisplacement
-        let minVelocity: CGFloat = viewModel.scrollMinVelocity
-        let requiredConsecutiveHits = viewModel.scrollRequiredConsecutiveHits
-
-        let qualifies = abs(delta) > minDisplacement && velocity > minVelocity
-
-        if qualifies {
-            consecutiveVelocityHits += 1
-            if consecutiveVelocityHits >= requiredConsecutiveHits {
-                withAnimation {
-                    isScrolling = true
-                }
-            }
-        } else {
-            consecutiveVelocityHits = 0
-        }
-
-        // Debounce hiding reset
-        hideButtonsWorkItem?.cancel()
-        let workItem = DispatchWorkItem {
-            withAnimation {
-                isScrolling = false
-            }
-            consecutiveVelocityHits = 0
-        }
-        hideButtonsWorkItem = workItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
-    }
-    
     private func longPressGesture(for item: ItemEntity) -> some Gesture {
-        LongPressGesture(minimumDuration: 0.3) /// May need to tweak this after real device test
+        LongPressGesture(minimumDuration: 0.3)
             .onEnded { _ in
                 viewModel.handleLongPress(for: item)
             }
     }
     
-    private func deleteItem(_ item: ItemEntity) {
-        withAnimation {
-            viewContext.delete(item)
-            try? viewContext.save()
-            viewModel.loadItems()
+    public var rowHeight: CGFloat {
+        viewModel.currentSortOption == .type ? 80 : 100
+    }
+    
+    @ViewBuilder
+    private var authAlertMessage: some View {
+        if let error = viewModel.authError {
+            Text(error.errorDescription ?? "An error occurred")
         }
     }
-    private let itemFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .medium
-        return formatter
-    }()
     
+    private func rowInsets(for sortOption: SortOption) -> EdgeInsets {
+        EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
+    }
 }
 
 //#Preview {
 //    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 //}
-
-extension ItemEntity {
-    func getOrCreateJournalEntry(context: NSManagedObjectContext) -> JournalEntry {
-        if let existing = self.journalEntry {
-            return existing
-        }
-        let newEntry = JournalEntry(context: context)
-        newEntry.id = self.id
-        newEntry.createdDate = Date()
-        newEntry.title = self.title
-        newEntry.entryType = self.type
-        self.journalEntry = newEntry
-        
-        try? context.save()
-        return newEntry
-    }
-    
-    func getOrCreateFreeWritingEntry(context: NSManagedObjectContext) -> FreeWritingEntry {
-        if let existing = self.freeWritingEntry {
-            return existing
-        }
-        let newEntry = FreeWritingEntry(context: context)
-        newEntry.id = self.id
-        newEntry.createdDate = Date()
-        newEntry.title = self.title
-        newEntry.entryType = self.type
-        self.freeWritingEntry = newEntry
-        
-        try? context.save()
-        return newEntry
-    }
-    
-    func getOrCreateShoppingEntry(context: NSManagedObjectContext) -> ShoppingEntry {
-        if let existing = self.shoppingEntry {
-            return existing
-        }
-        let newEntry = ShoppingEntry(context: context)
-        newEntry.id = self.id
-        newEntry.createdDate = Date()
-        newEntry.entryType = self.type
-        self.shoppingEntry = newEntry
-        
-        try? context.save()
-        return newEntry
-    }
-    
-    func getOrCreateAdminEntry(context: NSManagedObjectContext) -> TaskEntry {
-        if let existing = self.taskItemEntry {
-            return existing
-        }
-        let newEntry = TaskEntry(context: context)
-        newEntry.id = self.id
-        newEntry.createdAt = Date()
-        newEntry.entryType = self.type
-        self.taskItemEntry = newEntry
-        
-        try? context.save()
-        return newEntry
-    }
-    
-    func getOrCreateChecklistEntry(context: NSManagedObjectContext) -> CheckListEntry {
-        if let existing = self.checkListEntry {
-            return existing
-        }
-        let newEntry = CheckListEntry(context: context)
-        newEntry.id = self.id
-        newEntry.createdAt = Date()
-        newEntry.entryType = self.type
-        self.checkListEntry = newEntry
-        
-        try? context.save()
-        return newEntry
-    }
-}
 

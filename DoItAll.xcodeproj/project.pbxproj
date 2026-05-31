@@ -25,6 +25,8 @@
 		D29C094E2F86922D0015749B /* EntryTypeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29C094D2F86922D0015749B /* EntryTypeButton.swift */; };
 		D2A316B32F911F80004CB336 /* ShoppingListSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A316B12F911F80004CB336 /* ShoppingListSettingsView.swift */; };
 		D2A844BB2F844E6500D5BB2B /* SwipeToDeleteRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A844BA2F844E6500D5BB2B /* SwipeToDeleteRow.swift */; };
+		D2ED5A882FA2283300C70558 /* GlassMorphicBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2ED5A782FA2283300C70558 /* GlassMorphicBackground.swift */; };
+		D2ED5A892FA2283300C70558 /* HiddenIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2ED5A792FA2283300C70558 /* HiddenIndicatorView.swift */; };
 		D2F85ABA2F901E9B008CB872 /* JournalSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F85AB92F901E9B008CB872 /* JournalSettings.swift */; };
 /* End PBXBuildFile section */
 
@@ -67,6 +69,8 @@
 		D29C094D2F86922D0015749B /* EntryTypeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryTypeButton.swift; sourceTree = "<group>"; };
 		D2A316B12F911F80004CB336 /* ShoppingListSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingListSettingsView.swift; sourceTree = "<group>"; };
 		D2A844BA2F844E6500D5BB2B /* SwipeToDeleteRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeToDeleteRow.swift; sourceTree = "<group>"; };
+		D2ED5A782FA2283300C70558 /* GlassMorphicBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassMorphicBackground.swift; sourceTree = "<group>"; };
+		D2ED5A792FA2283300C70558 /* HiddenIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenIndicatorView.swift; sourceTree = "<group>"; };
 		D2F85AB92F901E9B008CB872 /* JournalSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalSettings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -85,7 +89,7 @@
 			);
 			target = D23CBCAF2E635A6D007F5B0A /* DoItAll */;
 		};
-		D2A844B12F82C3E000D5BB2B /* Exceptions for "DoItAll" folder in "DoItAll" target */ = {
+		D2773FE52FA11099006A2C86 /* Exceptions for "DoItAll" folder in "DoItAll" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -98,7 +102,7 @@
 		D23CBCB22E635A6E007F5B0A /* DoItAll */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				D2A844B12F82C3E000D5BB2B /* Exceptions for "DoItAll" folder in "DoItAll" target */,
+				D2773FE52FA11099006A2C86 /* Exceptions for "DoItAll" folder in "DoItAll" target */,
 			);
 			path = DoItAll;
 			sourceTree = "<group>";
@@ -142,11 +146,6 @@
 				D26591CB2F99196400FC72A9 /* Exceptions for "ViewModels" folder in "DoItAll" target */,
 			);
 			path = ViewModels;
-			sourceTree = "<group>";
-		};
-		D26D483B2F43553A009575A7 /* GeneralList */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = GeneralList;
 			sourceTree = "<group>";
 		};
 		D28C51882E6C9A7C00B65946 /* Resources */ = {
@@ -220,7 +219,6 @@
 				D2D1B99D2F7430A6003A18BF /* Models */,
 				D2D1B9982F742E12003A18BF /* Extensions */,
 				D29930D92F59DF5C00624DCE /* Onboarding */,
-				D26D483B2F43553A009575A7 /* GeneralList */,
 				D25A554B2F3E3E6100BEC4A3 /* CommonUI */,
 				D25A55382F3E256F00BEC4A3 /* LifeAdmin */,
 				D25A55352F3E212B00BEC4A3 /* FreeForm */,
@@ -345,6 +343,8 @@
 			children = (
 				D29C09382F868F7D0015749B /* SelectEntryTypeView.swift */,
 				D2A844BA2F844E6500D5BB2B /* SwipeToDeleteRow.swift */,
+				D2ED5A782FA2283300C70558 /* GlassMorphicBackground.swift */,
+				D2ED5A792FA2283300C70558 /* HiddenIndicatorView.swift */,
 				D29C094D2F86922D0015749B /* EntryTypeButton.swift */,
 			);
 			path = Views;
@@ -379,7 +379,6 @@
 				D25A55352F3E212B00BEC4A3 /* FreeForm */,
 				D25A55382F3E256F00BEC4A3 /* LifeAdmin */,
 				D25A554B2F3E3E6100BEC4A3 /* CommonUI */,
-				D26D483B2F43553A009575A7 /* GeneralList */,
 				D28C51882E6C9A7C00B65946 /* Resources */,
 				D29930D92F59DF5C00624DCE /* Onboarding */,
 				D29E22D62E63651900000F8A /* Journal */,
@@ -526,6 +525,8 @@
 				D29C094E2F86922D0015749B /* EntryTypeButton.swift in Sources */,
 				D27770122F7C0CB9007CCDDA /* RowTitle.swift in Sources */,
 				D2A316B32F911F80004CB336 /* ShoppingListSettingsView.swift in Sources */,
+				D2ED5A882FA2283300C70558 /* GlassMorphicBackground.swift in Sources */,
+				D2ED5A892FA2283300C70558 /* HiddenIndicatorView.swift in Sources */,
 				D277700B2F79BCB8007CCDDA /* FavouriteSupermarketManager.swift in Sources */,
 				D28F2BC92F7EBD9F00E37D85 /* SupermarketsMapView.swift in Sources */,
 				D2F85ABA2F901E9B008CB872 /* JournalSettings.swift in Sources */,
@@ -694,22 +695,25 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = DoItAll/DoItAll.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YU65V62LAA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DoItAll/Info.plist;
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = Disclaimer;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "This app needs biometrics to hide/show rows on the main list";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Same as the supermarket for when backgrounded";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Will allow the notification for when you're close to your chosen supermarket";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app will use the location to determine if the user is close to a supermarket they have chosen";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the microphone to capture voice notes";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app uses Apple Music";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This will let you add photos to journal entries";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -717,6 +721,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Marc-Harvey.DoItAll";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -728,22 +733,25 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = DoItAll/DoItAll.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YU65V62LAA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DoItAll/Info.plist;
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = Disclaimer;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "This app needs biometrics to hide/show rows on the main list";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Same as the supermarket for when backgrounded";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Will allow the notification for when you're close to your chosen supermarket";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app will use the location to determine if the user is close to a supermarket they have chosen";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the microphone to capture voice notes";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app uses Apple Music";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This will let you add photos to journal entries";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -751,6 +759,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Marc-Harvey.DoItAll";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

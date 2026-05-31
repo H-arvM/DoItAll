@@ -9,7 +9,8 @@ import SwiftUI
 import CoreData
 
 @MainActor
-class LifeAdminViewModel: ObservableObject {
+class LifeAdminViewModel: ObservableObject, @MainActor CoreDataSaveable {
+    
     // MARK: - Properties
     @Published var tasks: [TaskItem] = []
     @Published var selectedCategory: TaskCategory?
@@ -183,11 +184,15 @@ class LifeAdminViewModel: ObservableObject {
         case .shoppingList: return ItemType.shoppingListType.rawValue
         case .freeForm: return ItemType.freeFormType.rawValue
         case .lifeAdmin: return ItemType.lifeAdminType.rawValue
-        case .list: return ItemType.generalListType.rawValue
+        case .list: return ItemType.generalNoteType.rawValue
         }
     }
 
     private func postSaveNotification() {
         NotificationCenter.default.post(name: NSNotification.Name("LifeAdminEntrySaved"), object: nil)
+    }
+    
+    func save(context: NSManagedObjectContext, completion: @escaping () -> Void) {
+        saveAdminEntry(context: context, onSuccess: completion)
     }
 }

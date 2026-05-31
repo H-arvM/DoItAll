@@ -36,7 +36,6 @@ struct SelectEntryTypeView: View {
                 ScrollView {
                     VStack(spacing: 20) {
                         let buttonWidth = (UIScreen.main.bounds.width - 60) / 2
-                        
                         let rows = entryTypes.chunked(into: 2)
                         
                         ForEach(0..<rows.count, id: \.self) { rowIndex in
@@ -50,19 +49,16 @@ struct SelectEntryTypeView: View {
                                         colour: themeManager.selectedTheme.primaryColour,
                                         action: item.action
                                     )
-                                    // 2. Apply the fixed width here
                                     .frame(width: buttonWidth)
                                 }
                             }
                             .frame(maxWidth: .infinity)
                         }
                     }
-                    .padding(.horizontal, 20)                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 20)
                     .padding(.top, 20)
                 }
             }
-            .navigationTitle("New Entry")
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -78,7 +74,7 @@ struct SelectEntryTypeView: View {
                     .environment(\.managedObjectContext, viewContext)
             }
             .navigationDestination(isPresented: $navigateToShoppingList) {
-                ShoppingEntryView(entry: nil, initialEntryType: .shoppingList) { dismiss() }
+                ShoppingListView(entry: nil, initialEntryType: .shoppingList) { dismiss() }
                     .environment(\.managedObjectContext, viewContext)
             }
             .navigationDestination(isPresented: $navigateToLifeAdmin) {
@@ -86,7 +82,8 @@ struct SelectEntryTypeView: View {
                     .environment(\.managedObjectContext, viewContext)
             }
             .navigationDestination(isPresented: $navigateToNotes) {
-                NoteListView()
+                NoteListView() { dismiss() }
+                    .environment(\.managedObjectContext, viewContext)
             }
         }
     }

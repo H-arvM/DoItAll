@@ -16,7 +16,7 @@
         <attribute name="notes" optional="YES" attributeType="String"/>
         <attribute name="title" optional="YES" attributeType="String"/>
         <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ItemEntity" inverseName="checkListEntry" inverseEntity="ItemEntity"/>
-        <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CheckListItem" inverseName="items" inverseEntity="CheckListItem"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CheckListItem" inverseName="items" inverseEntity="CheckListItem"/>
     </entity>
     <entity name="CheckListItem" representedClassName="CheckListItem" syncable="YES" codeGenerationType="class">
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -53,13 +53,13 @@
         <attribute name="createdDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="entryType" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="musicArtist" optional="YES" attributeType="String"/>
-        <attribute name="musicArtworkURL" optional="YES" attributeType="String"/>
-        <attribute name="musicTrackID" optional="YES" attributeType="String"/>
-        <attribute name="musicTrackTitle" optional="YES" attributeType="String"/>
         <attribute name="photoData" optional="YES" attributeType="Binary"/>
-        <attribute name="title" optional="YES" attributeType="String"/>
         <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ItemEntity" inverseName="journalEntry" inverseEntity="ItemEntity"/>
+        <relationship name="photos" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PhotoEntity" inverseName="journalEntry" inverseEntity="PhotoEntity"/>
+    </entity>
+    <entity name="PhotoEntity" representedClassName="PhotoEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="imageData" optional="YES" attributeType="Binary"/>
+        <relationship name="journalEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="JournalEntry" inverseName="photos" inverseEntity="JournalEntry"/>
     </entity>
     <entity name="ShoppingEntry" representedClassName="ShoppingEntry" syncable="YES" codeGenerationType="class">
         <attribute name="createdDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -83,7 +83,7 @@
         <attribute name="entryType" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <relationship name="item" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ItemEntity" inverseName="taskItemEntry" inverseEntity="ItemEntity"/>
-        <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TaskItem" inverseName="taskEntry" inverseEntity="TaskItem"/>
+        <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TaskItem" inverseName="taskEntry" inverseEntity="TaskItem"/>
     </entity>
     <entity name="TaskItem" representedClassName="TaskItem" syncable="YES" codeGenerationType="class">
         <attribute name="category" optional="YES" attributeType="String"/>

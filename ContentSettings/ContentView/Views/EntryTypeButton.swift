@@ -40,10 +40,10 @@ struct EntryTypeButton: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 200)
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 10)
             .background(
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(UIColor.systemBackground))
+                    .fill(Color.systemBackground)
                     .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 4)
             )
         }

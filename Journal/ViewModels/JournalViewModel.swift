@@ -10,13 +10,14 @@ import PhotosUI
 import CoreData
 import Combine
 
+
 @MainActor
-final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtocol {
+final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtocol, @MainActor CoreDataSaveable {
     @Published var title: String = ""
     @Published var content: String = ""
     @Published var createdDate: Date = Date()
     @Published var entryType: EntryType = .journal
-
+    
     @Published var selectedPhotos: [UIImage] = []
     @Published var photoSelection: [PhotosPickerItem] = []
     @Published var selectedTrack: MusicTrack?
@@ -24,7 +25,7 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
     @Published var showMusicPicker: Bool = false
     @Published var isPhotosExpanded: Bool = false
     @Published var isMusicExpanded: Bool = false
-
+    
     private var existingEntry: JournalEntry?
     
     init(entry: JournalEntry? = nil, initialEntryType: EntryType = .journal) {
@@ -38,33 +39,25 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
     }
     
     private func loadExistingEntry(_ entry: JournalEntry) {
-        title = entry.title ?? ""
         content = entry.content ?? ""
         createdDate = entry.createdDate ?? Date()
         entryType = EntryType(rawValue: entry.entryType!) ?? .journal
         
-        loadMusicFromEntry(entry)
         loadPhotosFromEntry(entry)
     }
     
-    private func loadMusicFromEntry(_ entry: JournalEntry) {
-        guard let trackID = entry.musicTrackID,
-              let trackTitle = entry.musicTrackTitle,
-              let trackArtist = entry.musicArtist else { return }
-        
-        let artworkURL = entry.musicArtworkURL.flatMap { URL(string: $0) }
-        selectedTrack = MusicTrack(
-            id: trackID,
-            title: trackTitle,
-            artist: trackArtist,
-            artworkURL: artworkURL)
-    }
-    
     private func loadPhotosFromEntry(_ entry: JournalEntry) {
-        guard let photoData = entry.photoData,
-              let image = UIImage(data: photoData) else { return }
+        guard let photoEntities = entry.photos as? Set<PhotoEntity> else { return }
         
-        selectedPhotos = [image]
+        // 2. Map the entities back to UIImages
+        let images = photoEntities.compactMap { entity in
+            if let data = entity.imageData {
+                return UIImage(data: data)
+            }
+            return nil
+        }
+        
+        self.selectedPhotos = images
     }
     
     private func getOrCreateEntry(in context: NSManagedObjectContext) -> JournalEntry {
@@ -104,55 +97,51 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
         case .lifeAdmin:
             return ItemType.lifeAdminType.rawValue
         case .list:
-            return ItemType.generalListType.rawValue
+            return ItemType.generalNoteType.rawValue
         }
     }
-
+    
     private func updateEntryProperties(_ entry: JournalEntry) {
-        entry.title = title.isEmpty ? "Untitled Entry" : title
         entry.content = content
         entry.entryType = entryType.rawValue
     }
     
-    private func updateMediaProperties(_ entry: JournalEntry) {
+    private func updateMediaProperties(_ entry: JournalEntry, in context: NSManagedObjectContext) {
         if entryType == .journal {
-            updateMusicProperties(entry)
-            updatePhotoProperties(entry)
+            updatePhotoProperties(entry, in: context)
         } else {
             clearMediaProperties(entry)
         }
     }
     
-    private func updateMusicProperties(_ entry: JournalEntry) {
-        if let track = selectedTrack {
-            entry.musicTrackID = track.id
-            entry.musicTrackTitle = track.title
-            entry.musicArtist = track.artist
-            entry.musicArtworkURL = track.artworkURL?.absoluteString
-        } else {
-            clearMusicProperties(entry)
+    private func updatePhotoProperties(_ entry: JournalEntry, in context: NSManagedObjectContext) {
+        if let existingPhotos = entry.photos as? Set<PhotoEntity> {
+            for photo in existingPhotos {
+                context.delete(photo)
+            }
         }
-    }
-    
-    private func updatePhotoProperties(_ entry: JournalEntry) {
-        if !selectedPhotos.isEmpty,
-           let firstPhoto = selectedPhotos.first,
-           let photoData = firstPhoto.jpegData(compressionQuality: 0.8) {
-            entry.photoData = photoData
-        } else {
-            entry.photoData = nil
+        
+        for image in selectedPhotos {
+            let newPhotoEntity = PhotoEntity(context: context)
+            newPhotoEntity.imageData = image.jpegData(compressionQuality: 0.8)
+            
+            newPhotoEntity.journalEntry = entry
         }
     }
     
     private func clearMediaProperties(_ entry: JournalEntry) {
-        clearMusicProperties(entry)
         entry.photoData = nil
     }
     
     func saveJournal(context: NSManagedObjectContext, onSuccess: (() -> Void)? = nil) {
         let entry = getOrCreateEntry(in: context)
         updateEntryProperties(entry)
-        updateMediaProperties(entry)
+        
+        if entryType == .journal {
+            updatePhotoProperties(entry, in: context)
+        } else {
+            clearMediaProperties(entry)
+        }
         
         do {
             try context.save()
@@ -160,16 +149,8 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
             postSaveNotification()
             onSuccess?()
         } catch {
-            // TODO: Handle this in a nicer way
             print("Error saving jounrnal")
         }
-    }
-    
-    private func clearMusicProperties(_ entry: JournalEntry) {
-        entry.musicTrackID = nil
-        entry.musicTrackTitle = nil
-        entry.musicArtist = nil
-        entry.musicArtworkURL = nil
     }
     
     private func postSaveNotification() {
@@ -177,28 +158,41 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
             name: NSNotification.Name("JournalEntrySaved"),
             object: nil
         )
-     }
+    }
     
     func removePhoto(_ photo: UIImage) {
         selectedPhotos.removeAll { $0 == photo }
     }
     
     func loadPhoto(from items: [PhotosPickerItem]) {
-        guard !items.isEmpty else { return }
+        guard !items.isEmpty else {
+            self.selectedPhotos = []
+            return
+        }
         
         Task {
+            var loadedImages: [UIImage] = []
+            
             for item in items {
-                if let data = try? await item.loadTransferable(type: Data.self),
-                   let image = UIImage(data: data) {
-                    await MainActor.run {
-                        selectedPhotos.append(image)
+                do {
+                    if let data = try await item.loadTransferable(type: Data.self) {
+                        if let uiImage = UIImage(data: data) {
+                            loadedImages.append(uiImage)
+                        }
                     }
+                } catch {
+                    print("Error loading image: \(error.localizedDescription)")
                 }
             }
+            
             await MainActor.run {
-                photoSelection = []
+                self.selectedPhotos = loadedImages
             }
         }
+    }
+    
+    func save(context: NSManagedObjectContext, completion: @escaping () -> Void) {
+        saveJournal(context: context, onSuccess: completion)
     }
 }
 

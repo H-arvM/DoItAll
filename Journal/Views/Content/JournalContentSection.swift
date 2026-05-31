@@ -12,6 +12,7 @@ struct JournalContentSection: View {
     @ObservedObject var viewModel: JournalViewModel
     @ObservedObject var themeManager: ThemeManager
     @Environment(\.colorScheme) private var colourScheme
+    @FocusState private var isEditorFocused: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -22,15 +23,13 @@ struct JournalContentSection: View {
                         .foregroundStyle(themeManager.selectedTheme.primaryTextColour ?? .primary)
                         .scrollContentBackground(.hidden)
                         .padding(12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(adaptiveBackgroundColour)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color(UIColor.separator), lineWidth: 0.5)
-                                )
-                        )
-                        .frame(minHeight: 200, maxHeight: .infinity)
+                        .frame(minHeight: 400, maxHeight: .infinity)
+                        .focused($isEditorFocused)
+                }
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        isEditorFocused = true
+                    }
                 }
             } else {
                 ScrollView {
@@ -40,33 +39,14 @@ struct JournalContentSection: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(12)
                 }
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(adaptiveBackgroundColour)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color(UIColor.separator), lineWidth: 0.5)
-                        )
-                )
-                .frame(minHeight: 200, maxHeight: .infinity)
+                .frame(minHeight: 400, maxHeight: .infinity)
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 10)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
-
-
-
-    private var adaptiveBackgroundColour: Color {
-        colourScheme == .dark ?
-        Color(UIColor.secondarySystemBackground)
-        : Color(UIColor.systemBackground)
-    }
 }
-
 #Preview {
-    // Minimal preview setup without relying on external helpers like `.mock` or `.constant`.
-    // Construct a JournalViewModel with a simple sample entry if needed.
     let sampleViewModel = JournalViewModel()
     sampleViewModel.content = "Sample journal entry..."
     return JournalContentSection(

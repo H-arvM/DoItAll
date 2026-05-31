@@ -26,35 +26,57 @@ struct NoteListView: View {
         ZStack(alignment: .bottom) {
             ThemeBackgroundView(theme: themeManager.selectedTheme)
                 .ignoresSafeArea()
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+            
+            List {
+                Group {
                     headerSection
                     
-                    // Input field with items listed directly beneath it
-                    VStack(spacing: 12) {
-                        if mode == .edit {
-                            newItemInputSection
-                        }
-                        
-                        if !viewModel.sortedItems.isEmpty {
-                            listContentSection
-                        }
-                    }
+                    PulsingDividerBar()
+                        .padding(.vertical, 4)
                     
-                    Spacer(minLength: 150)
+                    if mode == .edit {
+                        itemInputSection
+                    }
                 }
-                .padding(.horizontal)
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+                
+                listContentSection
             }
+            .padding(.horizontal, 5)
+            .cornerRadius(10)
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
         }
+        .navigationBarBackButtonHidden(true)
         .navigationTitle(viewModel.title.isEmpty ? "New List" : viewModel.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbarItems }
     }
     
-    // MARK: - New Item Input
     @ViewBuilder
-    private var newItemInputSection: some View {
+    private var headerSection: some View {
+        GenericHeaderMultiSection(mode: mode, viewModel: viewModel, themeManager: themeManager)
+    }
+    
+    @ToolbarContentBuilder
+    private var toolbarItems: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            if mode == .edit {
+                CancelButton()
+            }
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+            SaveButton(
+                viewModel: viewModel,
+                context: viewContext,
+                onSave: onSave ?? { dismiss() }
+            )
+        }
+    }
+    
+    @ViewBuilder
+    private var itemInputSection: some View {
         HStack {
             TextField("Add an item...", text: $viewModel.newItemText)
                 .textFieldStyle(.plain)
@@ -70,73 +92,42 @@ struct NoteListView: View {
             }
             .disabled(viewModel.newItemText.isEmpty)
         }
+        .frame(height: 50)
         .padding()
-        .background(RoundedRectangle(cornerRadius: 12).fill(.ultraThinMaterial))
+        .background(themeManager.selectedTheme.primaryColour.opacity(0.1))
+        .cornerRadius(10)
     }
     
-    // MARK: - List Content
     @ViewBuilder
     private var listContentSection: some View {
-        VStack(spacing: 12) {
-            ForEach(viewModel.sortedItems) { item in
-                HStack(spacing: 15) {
-                    // Checkbox Toggle
-                    Button {
-                        withAnimation(.snappy) {
-                            viewModel.toggleItem(item, context: viewContext)
-                        }
-                    } label: {
-                        Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
-                            .font(.title2)
-                            .foregroundStyle(item.isChecked ? themeManager.selectedTheme.primaryColour : .secondary)
-                    }
-                    
-                    Text(item.note ?? "")
-                        .font(.body)
-                        .strikethrough(item.isChecked)
-                        .foregroundStyle(item.isChecked ? .secondary : .primary)
-                    
-                    Spacer()
-                    
-                    // Delete button (Optional, based on your preference)
-                    if mode == .edit {
-                        Button(role: .destructive) {
-                            withAnimation {
-                                viewModel.deleteItem(item, context: viewContext)
-                            }
-                        } label: {
-                            Image(systemName: "trash")
-                                .font(.subheadline)
-                                .foregroundStyle(.red.opacity(0.7))
-                        }
-                    }
-                }
-                .padding()
-                .background(RoundedRectangle(cornerRadius: 12).fill(.ultraThinMaterial))
+        ForEach(viewModel.sortedItems) { item in
+            HStack(spacing: 5) {
+                ListToggleButton(item: item, context: viewContext, action: viewModel.toggleItem(_:context:))
+                
+                Text(item.note ?? "")
+                    .font(.body)
+                    .strikethrough(item.isChecked)
+                    .foregroundStyle(item.isChecked ? .secondary : .primary)
+                
+                Spacer()
             }
-        }
-    }
-    // MARK: - Helper Sections
-    @ViewBuilder
-    private var headerSection: some View {
-        GenericHeaderSection(mode: mode, viewModel: viewModel, themeManager: themeManager)
-    }
-    
-    @ToolbarContentBuilder
-    private var toolbarItems: some ToolbarContent {
-        ToolbarItem(placement: .topBarTrailing) {
-            if mode == .edit {
-                Button("Done") {
-                    viewModel.saveNotesEntry(context: viewContext) {
-                        if let onSave = onSave {
-                            onSave()
-                        } else {
-                            dismiss()
-                        }
+            .padding(.vertical, 16)
+            .padding(.horizontal, 16)
+            .frame(minHeight: 60)
+            .cornerRadius(10)
+            .listRowSeparator(.hidden)
+            .listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets(top: 4, leading: 15, bottom: 4, trailing: 15))
+            .background(themeManager.selectedTheme.primaryColour.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                if mode == .edit {
+                    Button(role: .destructive) {
+                        viewModel.deleteItem(item, context: viewContext)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
                     }
                 }
-                .foregroundStyle(themeManager.selectedTheme.primaryColour)
-                .bold()
             }
         }
     }
@@ -145,4 +136,3 @@ struct NoteListView: View {
 #Preview {
     NoteListView()
 }
-

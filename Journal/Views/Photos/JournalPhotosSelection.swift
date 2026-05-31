@@ -17,14 +17,14 @@ struct JournalPhotosSelection: View {
     var body: some View {
         Group {
             if isParentExpanded {
-                ExpandedPhotosView(mode: mode, viewModel: viewModel)
+                ExpandedPhotosView(viewModel: viewModel, mode: mode)
                     .transition(.opacity)
             } else {
                 CollapsedPhotosView(viewModel: viewModel, themeManager: themeManager)
                     .transition(.opacity)
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 10)
     }
 }
 

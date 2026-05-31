@@ -1,5 +1,5 @@
 //
-//  TaskRow.swift
+//  AdminTaskRow.swift
 //  DoItAll
 //
 //  Created by Marc Harvey on 12/02/2026.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TaskRow: View {
+struct AdminTaskRow: View {
     let task: TaskItem
     let onToggle: () -> Void
     let onDelete: () -> Void
@@ -22,7 +22,7 @@ struct TaskRow: View {
             .buttonStyle(.glass)
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(task.title ?? "Fuck all")
+                Text(task.title ?? "")
                     .font(.body)
                     .strikethrough(task.isCompleted)
                     .foregroundColor(task.isCompleted ? .secondary : .primary)
@@ -34,8 +34,6 @@ struct TaskRow: View {
                         Text(task.category ?? "")
                             .font(.caption)
                     }
-//                    .foregroundColor(task.category)
-                    
                     Text("•")
                         .foregroundColor(.secondary)
                         .font(.caption)

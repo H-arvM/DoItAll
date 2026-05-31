@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct FloatingActionButton: View {
+struct SettingsOptionButton: View {
     let icon: String
     let colour: Color
     let delay: Double

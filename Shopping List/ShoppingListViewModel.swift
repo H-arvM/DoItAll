@@ -10,7 +10,7 @@ import Combine
 import CoreData
 
 @MainActor
-public class ShoppingListViewModel: ObservableObject {
+public class ShoppingListViewModel: ObservableObject, @MainActor CoreDataSaveable {
     @Published var itemName: String = ""
     @Published var quantity: String = ""
     @Published var createdDate: Date = Date()
@@ -83,12 +83,11 @@ public class ShoppingListViewModel: ObservableObject {
         case .shoppingList: return ItemType.shoppingListType.rawValue
         case .freeForm: return ItemType.freeFormType.rawValue
         case .lifeAdmin: return ItemType.lifeAdminType.rawValue
-        case .list: return ItemType.generalListType.rawValue
+        case .list: return ItemType.generalNoteType.rawValue
         }
     }
     
     func saveShoppingEntry(context: NSManagedObjectContext, onSuccess: (() -> Void)? = nil) {
-        // Use existingEntry if already set, otherwise create
         let entry = existingEntry ?? getOrCreateEntry(in: context)
         entry.entryType = entryType.rawValue
 
@@ -105,5 +104,9 @@ public class ShoppingListViewModel: ObservableObject {
     
     private func postSaveNotification() {
         NotificationCenter.default.post(name: NSNotification.Name("ShoppingEntrySaved"), object: nil)
+    }
+    
+    func save(context: NSManagedObjectContext, completion: @escaping () -> Void) {
+        saveShoppingEntry(context: context, onSuccess: completion)
     }
 }
