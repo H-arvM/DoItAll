@@ -174,13 +174,6 @@ struct ContentView: View {
                 .listRowSeparator(.hidden)
         } else {
             visibleRows(for: item)
-                .background(
-                    NavigationLink(value: ItemNavigationDestination(itemID: item.objectID, itemType: item.itemType)) {
-                        EmptyView()
-                            .frame(width: 10)
-                    }
-                        .opacity(0)
-                )
                 .listRowInsets(rowInsets(for: viewModel.currentSortOption))
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
