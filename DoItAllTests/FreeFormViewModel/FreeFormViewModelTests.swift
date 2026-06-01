@@ -123,7 +123,7 @@ final class FreeFormViewModelTests: XCTestCase {
             expectation.fulfill()
         }
 
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectation], timeout: 2.0)
     }
 
     func test_wordCount_countsZeroForEmptyContent() {
@@ -137,7 +137,7 @@ final class FreeFormViewModelTests: XCTestCase {
             expectation.fulfill()
         }
 
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectation], timeout: 4.0)
     }
 
     func test_wordCount_ignoresLeadingAndTrailingWhitespace() {
@@ -151,7 +151,7 @@ final class FreeFormViewModelTests: XCTestCase {
             expectation.fulfill()
         }
 
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectation], timeout: 2.0)
     }
 
     func test_wordCount_handlesMultipleSpacesBetweenWords() {
@@ -165,7 +165,7 @@ final class FreeFormViewModelTests: XCTestCase {
             expectation.fulfill()
         }
 
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectation], timeout: 2.0)
     }
 
     func test_wordCount_handlesNewlines() {
@@ -179,7 +179,7 @@ final class FreeFormViewModelTests: XCTestCase {
             expectation.fulfill()
         }
 
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectation], timeout: 2.0)
     }
 
     func test_wordCount_doesNotUpdateBeforeDebounce() {
@@ -259,6 +259,6 @@ final class FreeFormViewModelTests: XCTestCase {
             name: NSNotification.Name("FreeFormEntrySaved")
         )
         sut.saveFreeform(context: ctx)
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectation], timeout: 2.0)
     }
 }

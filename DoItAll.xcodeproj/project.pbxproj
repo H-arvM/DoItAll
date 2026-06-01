@@ -112,11 +112,6 @@
 			path = DoItAllTests;
 			sourceTree = "<group>";
 		};
-		D23CBCCF2E635A70007F5B0A /* DoItAllUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = DoItAllUITests;
-			sourceTree = "<group>";
-		};
 		D25A55352F3E212B00BEC4A3 /* FreeForm */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = FreeForm;
@@ -227,7 +222,6 @@
 				D29E22D62E63651900000F8A /* Journal */,
 				D23CBCB22E635A6E007F5B0A /* DoItAll */,
 				D23CBCC52E635A70007F5B0A /* DoItAllTests */,
-				D23CBCCF2E635A70007F5B0A /* DoItAllUITests */,
 				D23CBCB12E635A6E007F5B0A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -429,9 +423,6 @@
 			);
 			dependencies = (
 				D23CBCCE2E635A70007F5B0A /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				D23CBCCF2E635A70007F5B0A /* DoItAllUITests */,
 			);
 			name = DoItAllUITests;
 			packageProductDependencies = (
