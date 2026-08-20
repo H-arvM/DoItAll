@@ -4,4 +4,3 @@ WIP but an app I've built mostly for myself as a way of keeping on top of the da
 
 <img width="370" height="781" alt="Screenshot 2026-08-20 at 15 18 41" src="https://github.com/user-attachments/assets/9225490d-c2d6-4d63-8272-0a94b05eaff8" />
 
-<img width="368" height="784" alt="Screenshot 2026-08-20 at 15 21 08" src="https://github.com/user-attachments/assets/fe1cf0a9-d26d-4605-84e8-5bbe9f8d860e" />
