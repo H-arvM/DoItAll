@@ -86,6 +86,8 @@ class FreeFormViewModel: ObservableObject, @MainActor HeaderProviderProtocol, Co
     private func updateEntryProperties(_ entry: FreeWritingEntry) {
         entry.title = title.isEmpty ? "Untitled Entry" : title
         entry.content = content
+        entry.wordCount = wordCount
+        entry.item?.wordCount = wordCount
     }
     
     func saveFreeform(context: NSManagedObjectContext, onSuccess: (() -> Void)? = nil) {

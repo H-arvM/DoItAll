@@ -32,15 +32,15 @@ enum EntryType: String, CaseIterable {
     var colour: Color {
         switch self {
         case .journal:
-            return .accentColor
+            return .blue
         case .shoppingList:
-            return .accentColor
+            return .red
         case .freeForm:
-            return .accentColor
+            return .pink
         case .lifeAdmin:
-            return .accentColor
+            return .yellow
         case .list:
-            return .accentColor
+            return .orange
         }
     }
 }

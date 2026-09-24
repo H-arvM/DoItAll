@@ -38,7 +38,7 @@ final class NotesViewModel: ObservableObject, @MainActor HeaderProviderProtocol,
     
     var sortedItems: [CheckListItem] {
         let set = (existingEntry?.items as? Set<CheckListItem>) ?? []
-        return set.sorted { ($0.note ?? "") < ($1.note ?? "") }
+        return set.sorted { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }
     }
     
     func addItem(context: NSManagedObjectContext) {

@@ -42,11 +42,11 @@
         <attribute name="title" optional="YES" attributeType="String"/>
         <attribute name="type" optional="YES" attributeType="String"/>
         <attribute name="wordCount" optional="YES" attributeType="String"/>
-        <relationship name="checkListEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CheckListEntry" inverseName="item" inverseEntity="CheckListEntry"/>
-        <relationship name="freeWritingEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FreeWritingEntry" inverseName="item" inverseEntity="FreeWritingEntry"/>
-        <relationship name="journalEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="JournalEntry" inverseName="item" inverseEntity="JournalEntry"/>
-        <relationship name="shoppingEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ShoppingEntry" inverseName="item" inverseEntity="ShoppingEntry"/>
-        <relationship name="taskItemEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TaskEntry" inverseName="item" inverseEntity="TaskEntry"/>
+        <relationship name="checkListEntry" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="CheckListEntry" inverseName="item" inverseEntity="CheckListEntry"/>
+        <relationship name="freeWritingEntry" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FreeWritingEntry" inverseName="item" inverseEntity="FreeWritingEntry"/>
+        <relationship name="journalEntry" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="JournalEntry" inverseName="item" inverseEntity="JournalEntry"/>
+        <relationship name="shoppingEntry" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="ShoppingEntry" inverseName="item" inverseEntity="ShoppingEntry"/>
+        <relationship name="taskItemEntry" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="TaskEntry" inverseName="item" inverseEntity="TaskEntry"/>
     </entity>
     <entity name="JournalEntry" representedClassName="JournalEntry" syncable="YES" codeGenerationType="class">
         <attribute name="content" optional="YES" attributeType="String"/>
@@ -58,7 +58,7 @@
         <relationship name="photos" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PhotoEntity" inverseName="journalEntry" inverseEntity="PhotoEntity"/>
     </entity>
     <entity name="PhotoEntity" representedClassName="PhotoEntity" syncable="YES" codeGenerationType="class">
-        <attribute name="imageData" optional="YES" attributeType="Binary"/>
+        <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
         <relationship name="journalEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="JournalEntry" inverseName="photos" inverseEntity="JournalEntry"/>
     </entity>
     <entity name="ShoppingEntry" representedClassName="ShoppingEntry" syncable="YES" codeGenerationType="class">

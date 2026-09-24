@@ -2,19 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleURLTypes</key>
+	<key>LSApplicationQueriesSchemes</key>
 	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLName</key>
-			<string>LSApplicationQueriesSchemes</string>
-			<key>music</key>
-			<string></string>
-			<key>spotify</key>
-			<string></string>
-		</dict>
-		<dict/>
+		<string>music</string>
+		<string>spotify</string>
 	</array>
 </dict>
 </plist>

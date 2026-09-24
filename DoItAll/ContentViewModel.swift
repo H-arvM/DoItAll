@@ -18,7 +18,7 @@ class ContentViewModel: NSObject, ObservableObject, ListViewModelProtocol, NSFet
     @Published var authError: BiometricAuthManager.BiometricError?
     @Published var showOnboarding: Bool = false
     @Published var currentSortOption: SortOption = .dateCreated
-    @Published var navigationPath = NavigationPath()
+    @Published var navigationPath: [ItemNavigationDestination] = []
     
     public var isScrolling: Bool = false
     private var hideButtonsWorkItem: DispatchWorkItem?
@@ -83,9 +83,11 @@ class ContentViewModel: NSObject, ObservableObject, ListViewModelProtocol, NSFet
     
     public func deleteItem(_ item: ItemEntity) {
         withAnimation {
+            let objectID = item.objectID
             viewContext.delete(item)
             try? viewContext.save()
             loadItems()
+            navigationPath.removeAll { $0.itemID == objectID }
         }
     }
     
@@ -203,7 +205,8 @@ class ContentViewModel: NSObject, ObservableObject, ListViewModelProtocol, NSFet
     public func getShoppingListContent(_ entry: ShoppingEntry?) -> String {
         guard let entry = entry else { return "" }
         let itemsArray = (entry.items?.allObjects as? [ShoppingItem]) ?? []
-        return itemsArray.first?.name ?? ""
+        let sortedItems = itemsArray.sorted { ($0.name ?? "") < ($1.name ?? "") }
+        return sortedItems.first?.name ?? ""
     }
     
     public func getChecklistContent(_ entry: CheckListEntry?) -> String {

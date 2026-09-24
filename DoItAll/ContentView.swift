@@ -169,6 +169,10 @@ struct ContentView: View {
                 .onTapGesture {
                     viewModel.handleHiddenItemTap(item)
                 }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Hidden item")
+                .accessibilityHint("Double tap to unlock")
+                .accessibilityAddTraits(.isButton)
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: -10))
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
@@ -207,6 +211,10 @@ struct ContentView: View {
             .onTapGesture {
                 viewModel.handleHiddenItemTap(item)
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Hidden item")
+            .accessibilityHint("Double tap to unlock")
+            .accessibilityAddTraits(.isButton)
     }
     
     private func hiddenGroupedRowContent(for item: ItemEntity) -> some View {

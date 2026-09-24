@@ -77,7 +77,7 @@ class LifeAdminViewModel: ObservableObject, @MainActor CoreDataSaveable {
         newTask.category = selectedCategory?.rawValue
         newTask.createdAt = Date()
         newTask.isCompleted = false
-        newTask.sortOrder = Int32(tasks.count)
+        newTask.sortOrder = (tasks.map(\.sortOrder).max() ?? -1) + 1
         newTask.dueDate = hasDueDate ? dueDate : nil
         newTask.taskEntry = entry
         

@@ -27,6 +27,7 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
     @Published var isMusicExpanded: Bool = false
     
     private var existingEntry: JournalEntry?
+    private var photoLoadTask: Task<Void, Never>?
     
     init(entry: JournalEntry? = nil, initialEntryType: EntryType = .journal) {
         self.existingEntry = entry
@@ -41,7 +42,7 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
     private func loadExistingEntry(_ entry: JournalEntry) {
         content = entry.content ?? ""
         createdDate = entry.createdDate ?? Date()
-        entryType = EntryType(rawValue: entry.entryType!) ?? .journal
+        entryType = EntryType(rawValue: entry.entryType ?? "") ?? .journal
         
         loadPhotosFromEntry(entry)
     }
@@ -165,14 +166,13 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
     }
     
     func loadPhoto(from items: [PhotosPickerItem]) {
-        guard !items.isEmpty else {
-            self.selectedPhotos = []
-            return
-        }
-        
-        Task {
+        photoLoadTask?.cancel()
+
+        guard !items.isEmpty else { return }
+
+        photoLoadTask = Task {
             var loadedImages: [UIImage] = []
-            
+
             for item in items {
                 do {
                     if let data = try await item.loadTransferable(type: Data.self) {
@@ -184,9 +184,11 @@ final class JournalViewModel: ObservableObject, @MainActor HeaderProviderProtoco
                     print("Error loading image: \(error.localizedDescription)")
                 }
             }
-            
+
+            guard !Task.isCancelled else { return }
+
             await MainActor.run {
-                self.selectedPhotos = loadedImages
+                self.selectedPhotos.append(contentsOf: loadedImages)
             }
         }
     }
