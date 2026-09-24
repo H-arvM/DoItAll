@@ -10,6 +10,16 @@ import CoreData
 @MainActor
 final class ContentViewModelTests: XCTestCase {
 
+    override func setUp() {
+        super.setUp()
+        UserDefaults.standard.removeObject(forKey: "sortOption")
+    }
+
+    override func tearDown() {
+        UserDefaults.standard.removeObject(forKey: "sortOption")
+        super.tearDown()
+    }
+
     /// Returns a throwaway in-memory NSManagedObjectContext so we never touch disk.
     private func makeInMemoryContext() -> NSManagedObjectContext {
         let container = NSPersistentContainer(name: "DoItAll")
@@ -215,6 +225,6 @@ final class ContentViewModelTests: XCTestCase {
 
     func test_initialState_defaultSortIsDateCreated() {
         let sut = makeSUT()
-        XCTAssertEqual(sut.currentSortOption, .type)
+        XCTAssertEqual(sut.currentSortOption, .dateCreated)
     }
 }
